@@ -1,0 +1,118 @@
+for (Literal f:theory.getFacts()) {
+	plusDelta.add(f);
+	negDelta.add(f.negate());
+	
+	# inject all facts into rules
+	for (Rule r:theory.getRules()) {
+		for (Literal t:r.getTail()) {
+			if (t.equals(f)) { # f triggers r
+				actions.add(RemoveLiteral(f, r));
+			} else if (t.isNegationOf(f)) { # f untriggers r
+				actions.add(RemoveRule(r));
+			}
+		}
+		
+		if (f.equals(r.getHead())) { # f is head of rule
+			actions.add(RemoveRule(r));
+		}
+	}
+	
+}
+
+actions.removeDuplicates(); # optional
+theory.execute(actions); # apply actions to the theory
+
+# end preprocessing
+# strict rules
+fixpoint = false;
+while(!fixpoint) {
+	fixpoint = true;
+	for(Rule s:theory.getStrictRules()) {
+		if (s.getTail().isEmpty()) { # we treat an active strict conclusion as a fact
+			Literal h = s.getHead();
+			plusDelta.add(h);
+			NegDelta.add(h.negate());
+			fixpoint = false; # we will have to cycle again
+			theory.execute(RemoveRule(s));
+			
+			# we inject the new "fact" into remaining strict rules
+			for (Rule r:theory.getStrictRules()) {
+				for (Literal t:r.getTail()) {
+					if (t.equals(h)) { # h triggers r
+						actions.add(RemoveLiteral(h, r));
+					} else if (t.isNegationOf(h)) { # h untriggers r
+						actions.add(RemoveRule(r));
+					}
+				}
+				
+				if (h.equals(r.getHead())) { # h is head of rule
+					actions.add(RemoveRule(r));
+				}
+			}	
+			
+			actions.removeDuplicates(); # optional
+			theory.execute(actions); # apply actions to the theory
+			
+			break; # outer "for" cycle must stop because the strict rules set is changed
+		}
+	}
+}
+
+# now active strict rules are assumed "facts", inactive strict rules have been removed
+# remaining strict rules are converted into defeasible
+for (Rule s:theory.getStrictRules()) {
+	s.setDefeasible();
+}
+
+# Defeasible rules and Defeaters
+for(Literal f:plusDelta) {
+	plusPartial.add(f);
+	negPartial.add(f.negate());
+}
+
+fixpoint = false;
+while(!fixpoint) {
+	fixpoint = true;
+	for(Rule d:theory.getDefeasibleRules()) {
+		if (d.getTail().isEmpty()){
+			fixpoint = false;
+			# must check if there are no defeasible rules or defeaters for the opposite
+			Literal h = d.getHead();
+			irrefutable = true; # assume h irrefutable
+			for(Rule dd:theory.getDefeasibleRulesAndDefeaters()) {
+				if (dd.getHead().isNegationOf(h)) {
+					irrefutable = false;
+					break; # one counterprove is enough
+				}
+			}
+			
+			if (irrefutable){
+				plusPartial.add(h);
+				negPartial.add(h.negate()); # TODO: not sure
+				negDelta.add(h.negate()); # TODO: not sure
+				theory.execute(RemoveRule(d));
+				
+				# we inject the new irrefutable into remaining defeasible rules
+				# TODO: also defeaters?
+				for (Rule r:theory.getDefeasibleRules()) {
+					for (Literal t:r.getTail()) {
+						if (t.equals(h)) { # h triggers r
+							actions.add(RemoveLiteral(h, r));
+						} else if (t.isNegationOf(h)) { # h untriggers r
+							actions.add(RemoveRule(r)); # TODO: not sure
+						}
+					}
+				}
+				
+				theory.execute(actions);
+				
+			} else {
+				# TODO: must evaluate superiority order
+			}
+			
+			# TODO: shorter chains prevail over longer chains
+			
+			break; # outer "for" cycle must stop because the defeasible rules set is changed
+		}
+	}
+}
