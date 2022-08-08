@@ -1,0 +1,213 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head> 
+    <title>Houdini</title> 
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link src="../static/bootstrap-5.2.0-dist/css/bootstrap.min.css" rel="stylesheet" th:href="@{bootstrap-5.2.0-dist/css/bootstrap.min.css}" /> 
+    <link src="../static/style.css" rel="stylesheet" />
+    <script type="text/javascript" th:src="@{js/jquery-3.6.0.min.js}"></script>
+</head>
+<body  style="width: 100%;">
+    <form id="logic-form" action="#" th:action="@{/}" th:object="${logicModel}" method="post">
+        <div class="w-100" style="margin: 0; padding: 0; width: 100%;">
+            <div class="w-100">
+                <div class="row justify-content-between">
+                    <div class="col-2" style="background-color: #ffffff;">
+                        <h1 style="margin-left: 30px; margin-top: 10px;">
+                        Houdini
+                        </h1>
+                    </div>
+                    <div class="col-2" style="background-color: #ffffff;">
+                        <h1 style="text-align: right; margin-right: 30px; margin-top: 10px;">
+                            Help
+                        </h1>
+                    </div>
+                </div>
+                <div class="row" style="background-color: #ffffff;">
+                        <div class="col" style="background-color: #239a02;">
+                            <h1 style="margin-left: 90px; margin-top: 10px;">
+                                Facts
+                            </h1>
+                                <div class="container col-7 variable-list" style="margin-left: 80px; margin-top: 10px; margin-bottom: 20px;">
+                                    <div class="input-group md-3">
+                                        <span class="input-group-text" id="basic-addon2">Fact 1</span>
+                                        <input id="facts-input-final" th:field="*{facts}" name="fact" type="text" class="form-control fact-input"></input>
+                                    </div>
+                                </div>    
+                        </div>
+                        <div class="col" style="background-color: #6000da;">
+                            <h1 style="margin-left: 90px; margin-top: 10px;">
+                                Rules
+                            </h1>
+                            <div class="container col-7 variable-list" style="margin-left: 80px; margin-top: 10px; margin-bottom: 20px;">
+                                <div class="input-group md-3">
+                                    <span class="input-group-text" id="basic-addon2">Rule 1</span>
+                                    <input id="rules-input-final" th:field="*{rules}" name="rule" type="text" class="form-control rules-input"></input>
+                                </div>
+                            </div>    
+                        </div>
+                        <div class="col" style="background-color: #112fff;">
+                            <h1 style="margin-left: 90px; margin-top: 10px;">
+                               Superiority rules 
+                            </h1>
+                            <div class="container col-7 variable-list" style="margin-left: 80px; margin-top: 10px; margin-bottom: 20px;">
+                                <div class="input-group md-3">
+                                    <span class="input-group-text" id="basic-addon2">Sup. rule 1</span>
+                                    <input name="sup-rule" type="text" class="form-control sup-rules-input"></input>
+                                </div>
+                            </div>   
+                        </div>
+                    </div>
+                <div class="row" style="background-color: #f564f5ff;">
+                    <div class="col-1">
+
+                    </div>
+                    <div class="col" style="background-color: #ff222f;">
+                        <h1 style="margin-left: 90px; margin-top: 10px;">
+                            Upload a JSON theory
+                        </h1>
+                        <div class="container" style="text-align: right; margin-bottom: 50px;">
+                            <button type="submit" value="Submit" class="btn btn-primary">UPLOAD</button>
+                        </div>                   
+                        <div class="container" style="text-align: right; margin-bottom: 50px;">
+                            <button type="submit" value="Submit" class="btn btn-primary">CALCULATE</button>
+                        </div>
+                    </div>
+                    <div class="col-1">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="container" >
+        
+        <form id="test-form" action="#" th:action="@{/}" th:object="${logicModel}" method="post">
+        <!--
+            <p>Id: <textarea type="text" th:field="*{id}" /></p>
+            <p>Message: <textarea type="text" th:field="*{content}" /></p>
+            <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
+        -->
+            <div style="margin-bottom:20px;margin-top:10px">
+                <h1>
+                    FATTI
+                </h1>
+            </div>
+            <div class="input-group">
+                <span class="input-group-text">FATTI</span>
+                <textarea type="text" th:field="*{facts}" id="fatti-control" class="form-control" 
+                    th:classappend="${are_facts_valid} ? ok : is-invalid" aria-label="FATTI"></textarea>
+                <div id="fatti-control-feedback" class="invalid-feedback">
+                    I fatti non possono contenere i seguenti simboli: spazio, virgola, -, _, =, >, &lt;, ~, ¬, \, ', ", ;,  
+                </div>
+            </div>
+        
+            <div style="margin-bottom:20px;margin-top:20px">
+                <h1>
+                    REGOLE
+                </h1>
+            </div>
+            <div class="input-group">
+                <span class="input-group-text">REGOLE</span>
+                <textarea type="text" th:field="*{rules}" class="form-control" 
+                    th:classappend="${are_rules_valid} ? ok : is-invalid" aria-label="REGOLE"></textarea>
+                <div id="fatti-control-feedback" class="invalid-feedback">
+                    Definisci una sola regola per linea. Una regola può avere solo le seguenti forme: c -> t, c => t, c ~> t <br>
+                    dove "c" è la coda ed è uno o più letterali divisi da virgole, e "t" è la testa ed è un solo letterale 
+                </div>
+            </div>
+            <div class="container md-col-1">
+                <input type="text" class="form-control fact-input" aria-label="test"></input>
+            </div>
+            <div clas="container" style="margin-top: 15px;">
+                <button type="submit" value="Submit" class="btn btn-primary">INVIO</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        var facts_counter = 1;
+        var rules_counter = 1;
+        var sup_rules_counter = 1;
+        let f = function(e) {
+            facts_counter += 1;
+            let tar = $(this);
+            tar.removeClass("fact-input");
+            tar.unbind();
+            tar.parent().after(`<div class="input-group md-3">
+                                        <span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
+                                        <input name="fact" type="text" class="form-control fact-input"></input>
+                                    </div>
+                               `);
+            $(".fact-input").keypress(f);
+        };
+
+        let r = function(e) {
+            rules_counter += 1;
+            let tar = $(this);
+            tar.removeClass("rules-input");
+            tar.unbind();
+            tar.parent().after(`<div class="input-group md-3">
+                                        <span class="input-group-text" id="basic-addon2">Rule ${rules_counter}</span>
+                                        <input name="rule" type="text" class="form-control rules-input"></input>
+                                    </div>
+                               `);
+            $(".rules-input").keypress(r);
+        };
+
+        let sr = function(e) {
+            sup_rules_counter += 1;
+            let tar = $(this);
+            tar.removeClass("sup-rules-input");
+            tar.unbind();
+            tar.parent().after(`<div class="input-group md-3">
+                                        <span class="input-group-text" id="basic-addon2">Sup. rule ${sup_rules_counter}</span>
+                                        <input name="sup-rule" type="text" class="form-control sup-rules-input"></input>
+                                    </div>
+                               `);
+            $(".sup-rules-input").keypress(sr);
+        };
+        
+        $(".fact-input").keypress(f);
+        $(".rules-input").keypress(r);
+        $(".sup-rules-input").keypress(sr);
+    </script>
+    <script>
+        const form = $("#logic-form");
+        form.submit(function(e) {
+            e.preventDefault; 
+            //let formData = new FormData(document.querySelector('#logic-form'))
+            let data = $("#logic-form").serializeArray();
+            $("#facts-input-final").val('a\nb\nz');
+            $("#rules-input-final").val('ccc');
+            
+            return true;
+        
+            //console.log(e);
+            /*
+            let $inputs = $('#logic-form :input');
+            var values = {};
+            $inputs.each(function() {
+                values[this.name] = $(this).val();
+            });
+            console.log(values);
+            */
+        })
+    </script>
+    <script>
+        const form2 = $("#test-form");
+        form2.submit(function(e) {
+            console.log(e);
+            //console.log(form2.serialize());
+        })
+    </script>
+    <style>
+        .variable-list {
+            height: 300px;
+            overflow: auto;
+        }
+    </style>
+</body>
+
+</html>

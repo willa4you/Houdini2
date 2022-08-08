@@ -1,0 +1,179 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head> 
+    <title>Houdini</title> 
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link src="../static/bootstrap-5.2.0-dist/css/bootstrap.min.css" rel="stylesheet" th:href="@{bootstrap-5.2.0-dist/css/bootstrap.min.css}" /> 
+    <link href="style.css" rel="stylesheet" />
+    <script type="text/javascript" th:src="@{js/jquery-3.6.0.min.js}"></script>
+</head>
+<body class="body-style">
+    <form id="logic-form" action="#" th:action="@{/}" th:object="${logic_model}" method="post">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-2">
+            <a class="navbar-brand" href="#">
+                <h1 class="set-title-navbar">
+                    Houdini
+                </h1>
+            </a>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item" style="align-items: center;">
+                        <a class="nav-link" href="#">
+                            <h5>
+                                Help
+                            </h5>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="row bg-1 row-style"style="background-color: #5ba396;">
+            <div class="col">
+                <h1 class="set-title-home-facts">
+                    Facts
+                </h1>
+            </div>
+            <div class="col-5">
+                <h1 class="set-title-home-rules">
+                    Rules
+                </h1>
+            </div>
+            <div class="col">
+                <h1 class="set-title-home-facts">
+                    Sup. relations
+                </h1>
+            </div>
+        </div>
+        <div class="row bg-1 row-style" style="background-color: #84bab0;">
+            <div class="col">
+                <div class="card card-home shadow-sm p-3 mb-5 bg-white rounded">
+                    <div class="container col-7 variable-list-home">
+                        <div th:each="fact, f_i : *{facts}" class="input-group md-3">
+                            <span class="input-group-text" id="basic-addon2">Fact&nbsp;<span th:text=" ${f_i.index+1}"></span></span>
+                            <input th:field="*{facts[__${f_i.index}__]}" 
+                            style="border-radius: .375rem" type="text" class="form-control"
+                            th:classappend="${(f_i.index == facts_length ? 'facts-input ' : 'not-input ') + (are_facts_valid[__${f_i.index}__] ? 'valid ' : 'is-invalid ')}"/>
+                            <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
+                                <b>Do not use symbols: space, comma, -, _, =, >, &lt;, ~, ¬, \, ', ", ; </b>
+                            </div>
+                        </div>
+                    </div> 
+                </div>  
+            </div>
+            <div class="col-5">
+                <div class="card card-home-rules shadow-sm p-3 mb-5 bg-white rounded">
+                    <div class="container col-5 variable-list-home-rule">
+                        <div th:each="rule, r_i : *{rules}" class="input-group md-3">
+                            <span class="input-group-text" id="basic-addon2">Rule&nbsp;<span th:text=" ${r_i.index+1}"></span></span>
+                            <input th:field="*{rules[__${r_i.index}__]}" 
+                            style="border-radius: .375rem" type="text" class="form-control"
+                            th:classappend="${(r_i.index == rules_length ? 'rules-input ' : 'not-input ') + (are_rules_valid[__${r_i.index}__] ? 'valid ' : 'is-invalid ')}">
+                            <div id="regole-control-feedback" class="invalid-feedback error-home-card">
+                                <b>It must have the form: a -> b, a => b, a ~> b.</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>  
+            </div>
+            <div class="col">
+                <div class="card card-home shadow-sm p-3 mb-5 bg-white rounded">
+                    <div class="container col-7 variable-list-home">
+                        <div th:each="srule, sr_i : *{supRules}" class="input-group md-3">
+                            <span  class="input-group-text" id="basic-addon2">Sup. rule&nbsp;<span th:text=" ${sr_i.index+1}"></span></span>
+                            <input th:field="*{supRules[__${sr_i.index}__]}" 
+                            style="border-radius: .375rem" type="text" class="form-control"
+                            th:classappend="${(sr_i.index == suprules_length ? 'sup-rules-input ' : 'not-input ') + (are_suprules_valid[__${sr_i.index}__] ? 'valid ' : 'is-invalid ')}">
+                            <div id="regole-control-feedback" class="invalid-feedback error-home-card">
+                                <b>It must have thr form: rx &lt; ry, rx > ry where x,y are numbers.</b>
+                            </div>
+                        </div>
+                    </div>  
+                </div>
+                <button type="submit" value="Submit" class="btn btn-primary calculate-buttom">CALCULATE</button>
+            </div>
+        </div>
+    </form>
+    <form id="upload-form" enctype="multipart/form-data" action="/upload" th:action="@{/upload}" method="post">
+        <div class="row bg-1 row-style" style="background-color: #9E9E9E;">
+            <h1 class="set-title-theory-summary" >
+                Upload a JSON theory
+            </h1>
+        </div>
+        <div class="row bg-5 row-style">
+            <div class="col">
+                <div class="spinner-border spinner-home-style" role="status" th:classappend="${loading_file? ' d-all ' : ' d-none '}">
+                    <span class="sr-only"></span>
+                </div>
+                <input class="form-control form-home-upload" type="file" name="file"/>
+                <button type="submit" value="Submit" class="btn btn-primary upload-buttom">UPLOAD</button>
+            </div>
+        </div>      
+    </form>
+    <div class="container" th:classappend="${loading_file? ' d-all ' : ' d-none '}">
+        <span th:text="${file_content}"></span>
+    </div>
+
+    <script th:inline="javascript">
+        var facts_counter = /*[[${facts_length+1}]]*/1;
+        var rules_counter = /*[[${rules_length+1}]]*/1;
+        var sup_rules_counter = /*[[${suprules_length+1}]]*/1;
+    </script>
+
+    <script>
+        let f = function(e) {
+            facts_counter += 1;
+            let tar = $(this);
+            tar.removeClass("facts-input");
+            tar.unbind();
+            tar.parent().after(`<div class="input-group md-3">
+                                        <span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
+                                        <input id="facts${facts_counter-1}" name="facts[${facts_counter-1}]"
+                                        style="border-radius: .375rem" 
+                                        th:classappend="\${are_facts_valid} ? ok : is-invalid" type="text" class="form-control facts-input"></input>
+                                        <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
+                                            <b>Evita i simboli: spazio, virgola, -, _, =, >, &lt;, ~, ¬, \, ', ", ; </b> 
+                                        </div>
+                                    </div>
+                               `);
+            $(".facts-input").mousedown(f);
+        };
+
+        let r = function(e) {
+            rules_counter += 1;
+            let tar = $(this);
+            tar.removeClass("rules-input");
+            tar.unbind();
+            tar.parent().after(`<div class="input-group md-3">
+                                        <span class="input-group-text" id="basic-addon2">Rule ${rules_counter}</span>
+                                        <input id="rules${rules_counter-1}" name="rules[${rules_counter-1}]"
+                                        style="border-radius: .375rem" 
+                                        th:classappend="\${are_rules_valid} ? ok : is-invalid" type="text" class="form-control rules-input"></input>
+                                    </div>
+                               `);
+            $(".rules-input").mousedown(r);
+        };
+
+        let sr = function(e) {
+            sup_rules_counter += 1;
+            let tar = $(this);
+            tar.removeClass("sup-rules-input");
+            tar.unbind();
+            tar.parent().after(`<div class="input-group md-3">
+                                        <span class="input-group-text" id="basic-addon2">Sup. rule ${sup_rules_counter}</span>
+                                        <input id="supRules${sup_rules_counter-1}" name="supRules[${sup_rules_counter-1}]" 
+                                        style="border-radius: .375rem" 
+                                        th:classappend="\${are_suprules_valid} ? ok : is-invalid" type="text" class="form-control sup-rules-input"></input>
+                                    </div>
+                               `);
+            $(".sup-rules-input").mousedown(sr);
+        };
+        
+        $(".facts-input").mousedown(f);
+        $(".rules-input").mousedown(r);
+        $(".sup-rules-input").mousedown(sr);
+    </script>
+</body>
+
+</html>
