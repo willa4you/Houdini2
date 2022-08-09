@@ -4,7 +4,7 @@ import java.util.*;
 public class Literal{
 
     private String label;
-    private Boolean truthValue;
+    private boolean truthValue;
     private Literal opposite;
     private Set<String> rules = new TreeSet<String>();
     // private boolean hasActiveRules; not a property of the literal itself, I guess it shouldn't be here
@@ -25,7 +25,7 @@ public class Literal{
         this.label = label;
     }
 
-    public Boolean getTruthValue() {
+    public boolean getTruthValue() {
         return truthValue;
     }
 
@@ -33,11 +33,11 @@ public class Literal{
         this.truthValue = truthValue;
     }
 
-    public backend.Literal getOpposite() {
+    public Literal getOpposite() {
         return opposite;
     }
 
-    public void setOpposite(backend.Literal opposite) {
+    public void setOpposite(Literal opposite) {
         this.opposite = opposite;
     }
 
