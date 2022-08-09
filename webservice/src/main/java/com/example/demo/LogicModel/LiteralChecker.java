@@ -1,6 +1,8 @@
 package com.example.demo.LogicModel;
 
 import java.util.ArrayList;
+
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -8,12 +10,11 @@ public class LiteralChecker {
     //Internal state ?
     public Set<String> literals = new TreeSet<String>();
 
-    public String getLiterals() {
-        String str = literals.toString();
-        return str.substring(1, str.length() - 1);
+    public Set<String> getLiterals() {
+       return literals;
     }
 
-    public ArrayList<Boolean> validate_facts(ArrayList<String> s) {
+    public ArrayList<Boolean> validate_facts(List<String> s) {
         ArrayList<Boolean> bool_array = new ArrayList<Boolean>();
         for (String fact : s) {
             if (!validate_literal(fact)) bool_array.add(false);
@@ -22,7 +23,7 @@ public class LiteralChecker {
         return bool_array;
     }
 
-    public ArrayList<Boolean> validate_rules(ArrayList<String> s) {
+    public ArrayList<Boolean> validate_rules(List<String> s) {
         ArrayList<Boolean> bool_array = new ArrayList<Boolean>();
         //if (s.size() == 1 && s.get(0) == "") return true; //empty rules
 
@@ -77,7 +78,7 @@ public class LiteralChecker {
         
     }
 
-    public ArrayList<Boolean> validate_supRules(ArrayList<String> s) {
+    public ArrayList<Boolean> validate_supRules(List<String> s) {
         ArrayList<Boolean> bool_array = new ArrayList<Boolean>();
         //Empty
         if (s.size() == 1 && s.get(0) == "") {
@@ -98,7 +99,8 @@ public class LiteralChecker {
     }
     public Boolean validate_literal(String s) {
         String s_trimmed = s.trim();
-        String[] banned = {" ", ",", "_", ";", "'", "\"", "\\", ">", "<", "~", "-", "=", "¬"};
+        String[] banned = {" ", ",", "_", ";", "'", "\"", "\\", ">", "<", "!", "-", "=", "¬"};
+
         for (String b : banned) {
             //trim the fact so it doesn't contain trailing and intiial spaces, then checks for banned symbols
             if (s_trimmed.contains(b)) {

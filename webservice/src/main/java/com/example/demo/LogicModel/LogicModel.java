@@ -2,34 +2,35 @@ package com.example.demo.LogicModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class LogicModel {
 
-  private ArrayList<String> facts = new ArrayList<String>(Arrays.asList(""));
-  private ArrayList<String> rules = new ArrayList<String>(Arrays.asList(""));
-  private ArrayList<String> supRules = new ArrayList<String>(Arrays.asList(""));
+  private List<String> facts = new ArrayList<String>(Arrays.asList(""));
+  private List<String> rules = new ArrayList<String>(Arrays.asList(""));
+  private List<String> supRules = new ArrayList<String>(Arrays.asList(""));
 
-  public ArrayList<String> getFacts() {
+  public List<String> getFacts() {
     return facts;
   }
 
-  public void setFacts(ArrayList<String> facts) {
+  public void setFacts(List<String> facts) {
     this.facts = facts;
   }
 
-  public ArrayList<String> getRules() {
+  public List<String> getRules() {
     return rules;
   }
 
-  public void setRules(ArrayList<String> rules) {
+  public void setRules(List<String> rules) {
     this.rules = rules;
   }
 
-  public ArrayList<String> getSupRules() {
+  public List<String> getSupRules() {
     return supRules;
   }
 
-  public void setSupRules(ArrayList<String> supRules) {
+  public void setSupRules(List<String> supRules) {
     this.supRules = supRules;
   }
 

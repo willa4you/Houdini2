@@ -1,0 +1,15 @@
+com/example/demo/FileUpload/storage/FileSystemStorageService.class
+com/example/demo/JSONParser/JSONLogicModel.class
+com/example/demo/LogicModel/LogicModelController.class
+com/example/demo/LogicModel/LogicModel.class
+com/example/demo/FileUpload/storage/StorageException.class
+com/example/demo/LogicModel/LiteralChecker.class
+com/example/Config.class
+com/example/demo/FileUpload/storage/StorageService.class
+com/example/demo/FileUpload/storage/StorageFileNotFoundException.class
+com/example/demo/DemoApplication.class
+com/example/demo/FileUpload/FileUploadController.class
+com/example/demo/JSONParser/JSONLogicParser.class
+com/example/demo/JSONParser/EmptyFileException.class
+com/example/demo/FileUpload/storage/StorageProperties.class
+com/example/demo/JSONParser/WrongFormatException.class

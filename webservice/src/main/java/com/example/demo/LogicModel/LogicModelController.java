@@ -4,9 +4,9 @@ package com.example.demo.LogicModel;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-
+import java.util.List;
 import com.example.demo.FileUpload.storage.StorageService;
-import com.example.demo.JSONParser.EmptyFileException;
+
 import com.example.demo.JSONParser.JSONLogicParser;
 import com.example.demo.JSONParser.WrongFormatException;
 
@@ -82,9 +82,9 @@ public class LogicModelController {
   public void configFromLogicModel(LogicModel logicModel) {
     this.logicModel = logicModel;
 
-    ArrayList<String> facts = logicModel.getFacts();
-    ArrayList<String> rules = logicModel.getRules();
-    ArrayList<String> supRules = logicModel.getSupRules();
+    List<String> facts = logicModel.getFacts();
+    List<String> rules = logicModel.getRules();
+    List<String> supRules = logicModel.getSupRules();
 
     //to deal with the case where the inputs are wrong and we need to
     //resend the data back. This will let the home.html js to correctly add labels
@@ -94,8 +94,8 @@ public class LogicModelController {
     this.rulesLength = (rules.size()-1 < 0) ? 0 : rules.size()-1;
     this.supRulesLength = (supRules.size()-1 < 0) ? 0 : supRules.size()-1;
 
-    LiteralChecker validator = new LiteralChecker();
-    
+    this.validator = new LiteralChecker();
+
     this.areFactsValid = validator.validate_facts(facts);
     this.areRulesValid = validator.validate_rules(rules);
     this.areSupRulesValid = validator.validate_supRules(supRules);
@@ -130,6 +130,9 @@ public class LogicModelController {
     //Update data
     this.configFromLogicModel(logicModel);
     
+    /* TODO this is to test: remove */
+    Theory th = new Theory(this.validator.getLiterals(), this.logicModel);
+
     if (this.getAreFactsValid().contains(false) || this.getAreRulesValid().contains(false) || this.getAreSupRulesValid().contains(false)) {
       return "redirect:/";
     } 
@@ -153,6 +156,7 @@ public class LogicModelController {
     
     try {
       LogicModel parsed_model = parser.parseJson();
+
       this.configFromLogicModel(parsed_model);
     } catch(WrongFormatException e) {
       redirectAttributes.addFlashAttribute("json_error_message", e.getMessage());
