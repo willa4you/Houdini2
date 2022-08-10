@@ -98,7 +98,7 @@ public class LogicModelController {
 
     this.areFactsValid = validator.validate_facts(facts);
     this.areRulesValid = validator.validate_rules(rules);
-    this.areSupRulesValid = validator.validate_supRules(supRules);
+    this.areSupRulesValid = validator.validate_supRules(supRules, rules);
 
     if (this.getAreFactsValid().contains(false) || this.getAreRulesValid().contains(false) || this.getAreSupRulesValid().contains(false)) {
       throw new IOException("Some input is wrong.");

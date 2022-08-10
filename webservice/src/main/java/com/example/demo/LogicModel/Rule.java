@@ -2,7 +2,6 @@ package com.example.demo.LogicModel;import java.util.*;
 
 public class Rule {
 
-    private String label; // should we keep it here too?
     private Literal head;
     private TreeSet<Literal> tail = new TreeSet<Literal>();
     private RuleType type;
@@ -10,19 +9,10 @@ public class Rule {
     private Set<String> losesAfter = new TreeSet<String>();
     // private boolean losesAfterActiveRule; not a property of the rule itself, I guess it shouldn't be here
 
-    public Rule(String label, Literal head, TreeSet<Literal> tail, RuleType type) {
-        this.label = label;
+    public Rule(Literal head, TreeSet<Literal> tail, RuleType type) {
         this.head = head;
         this.tail = tail;
         this.type = type;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 
     public Literal getHead() {
@@ -70,11 +60,11 @@ public class Rule {
         if (!(object instanceof Rule)) return false;
         if (!super.equals(object)) return false;
         Rule rule = (Rule) object;
-        return getLabel().equals(rule.getLabel()) && getHead().equals(rule.getHead()) && getTail().equals(rule.getTail()) && getType().equals(rule.getType());
+        return getHead().equals(rule.getHead()) && getTail().equals(rule.getTail()) && getType().equals(rule.getType());
     }
 
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getLabel(), getHead(), getTail(), getType());
+        return Objects.hash(super.hashCode(), getHead(), getTail(), getType());
     }
 
 }

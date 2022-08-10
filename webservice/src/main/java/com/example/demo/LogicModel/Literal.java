@@ -1,8 +1,5 @@
 package com.example.demo.LogicModel;
-import java.security.InvalidParameterException;
 import java.util.*;
-
-import javax.management.InvalidAttributeValueException;
 
 public class Literal implements Comparable<Literal> {
 
@@ -31,20 +28,14 @@ public class Literal implements Comparable<Literal> {
         this.label = label;
         boolean startsWithTilde = label.startsWith("~");
         
-        /*TODO check
-        Here we create a new instance of Literal. It may be inefficient if we have too many Literals
-        in the theory due to the fact that we also have the same 'instance creation' for the opposite literal.
-        However, dealing with references and 'linked' instances seems a useless hassle given we'll 
-        likely have very few literals
-        */
         if (!startsWithTilde) {
             this.type = LITERALTYPE.LITERAL;
-            //Must call this constructor otherwise there will be a recursion
+            //Must call this constructor otherwise there will be recursion
             this.opposite = new Literal("~".concat(label), type, this);
         }
         else {
             this.type = LITERALTYPE.NEGATED;
-            //Must call this constructor otherwise there will be a recursion
+            //Must call this constructor otherwise there will be recursion
             this.opposite = new Literal(label.substring(1), type, this);
         }
     }
@@ -55,8 +46,6 @@ public class Literal implements Comparable<Literal> {
         this.opposite = opposite;
     }
     
-    
-
     public String getLabel() {
         return label;
     }

@@ -11,7 +11,9 @@ public class Theory {
 
     public Theory() {}
 
-    public Theory(Set<Literal> facts, Map<String, Rule> rules, Set<SuperiorityRelation> superiorityRelations) {
+    //Notice the different literals type here
+    public Theory(Set<Literal> literals, Set<Literal> facts, Map<String, Rule> rules, Set<SuperiorityRelation> superiorityRelations) {
+        this.literals = literals;
         this.facts = facts;
         this.rules = rules;
         this.superiorityRelations = superiorityRelations;
@@ -47,7 +49,7 @@ public class Theory {
             Literal lit_head = new Literal(head);
             String label = rule_counters.toString();
             rule_counters = rule_counters.intValue() + 1;
-            this.rules.put(label, new Rule(label, lit_head, set_tail, rtype));
+            this.rules.put(label, new Rule(lit_head, set_tail, rtype));
         };
 
         for (String sr : superiorityRelations) {

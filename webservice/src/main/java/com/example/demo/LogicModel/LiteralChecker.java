@@ -78,7 +78,7 @@ public class LiteralChecker {
         
     }
 
-    public ArrayList<Boolean> validate_supRules(List<String> s) {
+    public ArrayList<Boolean> validate_supRules(List<String> s, List<String> rules) {
         ArrayList<Boolean> bool_array = new ArrayList<Boolean>();
         //Empty
         if (s.size() == 1 && s.get(0) == "") {
@@ -91,8 +91,24 @@ public class LiteralChecker {
                 continue;
             }
             //check whether matches the regex (but only if it's not empty)
-            if(!rule.matches("r[1-9][0-9]*[ ]*[<>][ ]*r[1-9][0-9]*")) bool_array.add(false);
-            else bool_array.add(true);
+            if(!rule.matches("r[1-9][0-9]*[ ]*[<>][ ]*r[1-9][0-9]*")) {
+                bool_array.add(false);
+            }
+            String[] split_suprel = rule.split(">");
+            if (split_suprel.length == 1) //it is <
+            split_suprel = rule.split("<");
+            int[] indexes = {Integer.valueOf(split_suprel[0].trim().substring(1)), Integer.valueOf(split_suprel[1].trim().substring(1))};
+            int ruleslength = rules.size();
+            boolean correctindex = true;
+            for (int i : indexes) {
+                if (i > ruleslength || rules.get(i-1)=="") {
+                    bool_array.add(false);
+                    correctindex = false;
+                    break;
+                }
+            }
+            if (correctindex) bool_array.add(true);
+            
         }
         return bool_array;
 
