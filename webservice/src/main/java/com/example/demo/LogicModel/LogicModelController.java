@@ -79,7 +79,7 @@ public class LogicModelController {
     return this.loadingFile;
   }
 
-  public void configFromLogicModel(LogicModel logicModel) {
+  public void configFromLogicModel(LogicModel logicModel) throws IOException {
     this.logicModel = logicModel;
 
     List<String> facts = logicModel.getFacts();
@@ -99,6 +99,10 @@ public class LogicModelController {
     this.areFactsValid = validator.validate_facts(facts);
     this.areRulesValid = validator.validate_rules(rules);
     this.areSupRulesValid = validator.validate_supRules(supRules);
+
+    if (this.getAreFactsValid().contains(false) || this.getAreRulesValid().contains(false) || this.getAreSupRulesValid().contains(false)) {
+      throw new IOException("Some input is wrong.");
+    }
   }
 
 	@Autowired
@@ -108,13 +112,11 @@ public class LogicModelController {
 
   @GetMapping("/")
   public String homeForm(Model model) {
-    this.configFromLogicModel(new LogicModel());
-    
-    //If the following line is not added then, for some reason, when
-    //coming back from "sets.html" by clicking on the "Houdini" title
-    //the logic_model is not updated in the view, but only here, 
-    //in the field this.logicModel
-    //model.addAttribute("logic_model", this.getLogicModel());
+    try {
+      this.configFromLogicModel(new LogicModel());
+    } catch(IOException e) {
+      //It's impossibible to have an exception here
+    }
     return "home";
   }
 
@@ -128,19 +130,13 @@ public class LogicModelController {
   public String homeSubmit(@ModelAttribute LogicModel logicModel, Model model) {
     
     //Update data
-    this.configFromLogicModel(logicModel);
-    
-    /* TODO this is to test: remove */
-    Theory th = new Theory(this.validator.getLiterals(), this.logicModel);
-
-    if (this.getAreFactsValid().contains(false) || this.getAreRulesValid().contains(false) || this.getAreSupRulesValid().contains(false)) {
-      return "redirect:/";
-    } 
-    else {
-      
+    try {
+      this.configFromLogicModel(logicModel);
+      Theory th = new Theory(this.validator.getLiterals(), this.logicModel);
       return "redirect:/sets";
+    } catch(IOException e) {
+      return "redirect:/";
     }
-    
   }
 
 	@PostMapping("/upload")
@@ -156,17 +152,17 @@ public class LogicModelController {
     
     try {
       LogicModel parsed_model = parser.parseJson();
-
       this.configFromLogicModel(parsed_model);
+      Theory th = new Theory(this.validator.getLiterals(), this.logicModel);
+      return "redirect:/sets";
     } catch(WrongFormatException e) {
+      //JSON is not formatted correctly
       redirectAttributes.addFlashAttribute("json_error_message", e.getMessage());
       return "redirect:/";
+    } catch(IOException e) {
+      //JSON is formatted correctly but its facts, rules etc. are NOT
+      return "redirect:/";
     }
-      
-    //redirectAttributes.addFlashAttribute("loading_file", true);
-    //redirectAttributes.addFlashAttribute("file_content", content);
-        
-		return "redirect:/sets";
 	}
   
 }
