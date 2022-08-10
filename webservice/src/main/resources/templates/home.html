@@ -11,13 +11,13 @@
 </head>
 <body class="body-style">
     <form id="logic-form" action="#" th:action="@{/}" th:object="${logic_model}" method="post">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-2">
-            <a class="navbar-brand" href="#">
-                <h1 class="set-title-navbar">
-                    Houdini
-                </h1>
-            </a>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-2" >
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <a class="navbar-brand" href="#">
+                    <h1 class="set-title-navbar">
+                        Houdini
+                    </h1>
+                </a>
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item" style="align-items: center;">
                         <a class="nav-link" href="#">
@@ -29,79 +29,85 @@
                 </ul>
             </div>
         </nav>
-        <div class="row bg-1 row-style"style="background-color: #5ba396;">
-            <div class="col">
-                <h1 class="set-title-home-facts">
-                    Facts
-                </h1>
-            </div>
-            <div class="col-5">
-                <h1 class="set-title-home-rules">
-                    Rules
-                </h1>
-            </div>
-            <div class="col">
-                <h1 class="set-title-home-facts">
-                    Sup. relations
-                </h1>
-            </div>
-        </div>
-        <div class="row col-md bg-1 row-style" style="background-color: #84bab0;">
-            <div class="col">
-                <div class="card card-home shadow-sm p-3 mb-5 bg-white rounded">
-                    <div class="container col-7 variable-list-home">
-                        <div th:each="fact, f_i : *{facts}" class="input-group md-3">
-                            <span class="input-group-text" id="basic-addon2">Fact&nbsp;<span th:text=" ${f_i.index+1}"></span></span>
-                            <input th:field="*{facts[__${f_i.index}__]}" 
-                            style="border-radius: .375rem" type="text" class="form-control"
-                            th:classappend="${(f_i.index == facts_length ? 'facts-input ' : 'not-input ') + (are_facts_valid[__${f_i.index}__] ? 'valid ' : 'is-invalid ')}"/>
-                            <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
-                                <b>Do not use symbols: space, comma, -, _, =, >, &lt;, !, ¬, \, ', ", ; </b>
+        <div class="row row-style" style="flex-wrap: wrap;">
+            <div class="col-3" style="padding: 0px !important; min-width: 300px;">
+                <div class="row bg-1 row-style"style="background-color: #5ba396; padding-left: 20px; ">
+                    <h1 class="set-title-home-facts">
+                        Facts
+                    </h1>
+                </div>
+                <div class="row bg-1 row-style" style="background-color: #84bab0; padding: 20px;">
+                    <div class="card card-home shadow-sm p-3 mb-5 bg-white rounded">
+                        <div class="container col-7 variable-list-home">
+                            <div th:each="fact, f_i : *{facts}" class="input-group md-3">
+                                <span class="input-group-text" id="basic-addon2">Fact&nbsp;<span th:text=" ${f_i.index+1}"></span></span>
+                                <input th:field="*{facts[__${f_i.index}__]}" 
+                                style="border-radius: .375rem" type="text" class="form-control"
+                                th:classappend="${(f_i.index == facts_length ? 'facts-input ' : 'not-input ') + (are_facts_valid[__${f_i.index}__] ? 'valid ' : 'is-invalid ')}"/>
+                                <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
+                                    <b>Do not use symbols: space, comma, -, _, =, >, &lt;, ~, ¬, \, ', ", ; </b>
+                                </div>
                             </div>
-                        </div>
-                    </div> 
-                </div>  
+                        </div> 
+                    </div>
+                </div>
             </div>
-            <div class="col-5">
-                <div class="card card-home-rules shadow-sm p-3 mb-5 bg-white rounded">
-                    <div class="container col-5 variable-list-home-rule">
-                        <div th:each="rule, r_i : *{rules}" class="input-group md-3">
-                            <span class="input-group-text" id="basic-addon2">Rule&nbsp;<span th:text=" ${r_i.index+1}"></span></span>
-                            <input th:field="*{rules[__${r_i.index}__]}" 
-                            style="border-radius: .375rem" type="text" class="form-control"
-                            th:classappend="${(r_i.index == rules_length ? 'rules-input ' : 'not-input ') + (are_rules_valid[__${r_i.index}__] ? 'valid ' : 'is-invalid ')}">
-                            <div id="regole-control-feedback" class="invalid-feedback error-home-card">
-                                <b>It must have the form: a -> b, a => b, a ~> b.</b>
+            <div class="col-6" style="padding: 0px !important;  min-width: 300px;">
+                <div class="row bg-1 row-style"style="background-color: #5ba396; padding-left: 20px;">
+                    <h1 class="set-title-home-rules">
+                        Rules
+                    </h1>
+                </div>
+                <div class="row bg-1 row-style" style="background-color: #84bab0; padding: 20px;">
+                    <div class="card card-home-rules shadow-sm p-3 mb-5 bg-white rounded">
+                        <div class="container col-5 variable-list-home-rule">
+                            <div th:each="rule, r_i : *{rules}" class="input-group md-3">
+                                <span class="input-group-text" id="basic-addon2">Rule&nbsp;<span th:text=" ${r_i.index+1}"></span></span>
+                                <input th:field="*{rules[__${r_i.index}__]}" 
+                                style="border-radius: .375rem" type="text" class="form-control"
+                                th:classappend="${(r_i.index == rules_length ? 'rules-input ' : 'not-input ') + (are_rules_valid[__${r_i.index}__] ? 'valid ' : 'is-invalid ')}">
+                                <div id="regole-control-feedback" class="invalid-feedback error-home-card">
+                                    <b>It must have the form: a -> b, a => b, a ~> b.</b>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>  
-            </div>
-            <div class="col">
-                <div class="card card-home shadow-sm p-3 mb-5 bg-white rounded">
-                    <div class="container col-7 variable-list-home">
-                        <div th:each="srule, sr_i : *{supRules}" class="input-group md-3">
-                            <span  class="input-group-text" id="basic-addon2">Sup. rule&nbsp;<span th:text=" ${sr_i.index+1}"></span></span>
-                            <input th:field="*{supRules[__${sr_i.index}__]}" 
-                            style="border-radius: .375rem" type="text" class="form-control"
-                            th:classappend="${(sr_i.index == suprules_length ? 'sup-rules-input ' : 'not-input ') + (are_suprules_valid[__${sr_i.index}__] ? 'valid ' : 'is-invalid ')}">
-                            <div id="regole-control-feedback" class="invalid-feedback error-home-card">
-                                <b>It must have thr form: rx &lt; ry, rx > ry where x,y are numbers.</b>
-                            </div>
-                        </div>
-                    </div>  
                 </div>
-                <button type="submit" value="Submit" class="btn btn-primary calculate-buttom">CALCULATE</button>
             </div>
+            <div class="col-3 " style="padding: 0px !important;  min-width: 300px;">
+                <div class="row bg-1 row-style"style="background-color: #5ba396; padding-left: 20px;">
+                    <h1 class="set-title-home-facts">
+                        Sup. relations
+                    </h1>
+                </div>
+                <div class="row bg-1 row-style" style="background-color: #84bab0; padding: 20px;">
+                    <div class="card card-home shadow-sm p-3 mb-5 bg-white rounded">
+                        <div class="container col-7 variable-list-home">
+                            <div th:each="srule, sr_i : *{supRules}" class="input-group md-3">
+                                <span  class="input-group-text" id="basic-addon2">Sup. rule&nbsp;<span th:text=" ${sr_i.index+1}"></span></span>
+                                <input th:field="*{supRules[__${sr_i.index}__]}" 
+                                style="border-radius: .375rem" type="text" class="form-control"
+                                th:classappend="${(sr_i.index == suprules_length ? 'sup-rules-input ' : 'not-input ') + (are_suprules_valid[__${sr_i.index}__] ? 'valid ' : 'is-invalid ')}">
+                                <div id="regole-control-feedback" class="invalid-feedback error-home-card">
+                                    <b>It must have thr form: rx &lt; ry, rx > ry where x,y are numbers.</b>
+                                </div>
+                            </div>
+                        </div>  
+                    </div>
+                </div>
+            </div>    
+        </div>
+        <div class="row bg-1 row-style" style="background-color: #84bab0; flex-wrap: wrap;">
+            <button type="submit" value="Submit" class="btn btn-primary calculate-buttom">CALCULATE</button>
         </div>
     </form>
     <form id="upload-form" enctype="multipart/form-data" action="/upload" th:action="@{/upload}" method="post">
-        <div class="row bg-1 row-style" style="background-color: #9E9E9E;">
+        <div class="row bg-1 row-style" style="background-color: #9E9E9E; flex-wrap: wrap;">
             <h1 class="set-title-theory-summary" >
                 Upload a JSON theory
             </h1>
         </div>
-        <div class="row bg-5 row-style">
+        <div class="row bg-5 row-style" style="flex-wrap: wrap;">
             <div class="col">
                 <div class="spinner-border spinner-home-style" role="status" th:classappend="${loading_file? ' d-all ' : ' d-none '}">
                     <span class="sr-only"></span>
