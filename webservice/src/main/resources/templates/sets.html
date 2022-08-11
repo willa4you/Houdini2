@@ -30,11 +30,6 @@
             </ul>
         </div>
     </nav>
-    <div class="row row-style bg-4">
-        <h1 class="set-title-theory-summary" >
-            Theory extension
-        </h1>
-    </div>
     <div class="row bg-1 row-style" style="background-color: #5ba396;">
         <div class="col">
             <h1 class="set-title-derivation">
@@ -87,24 +82,57 @@
             </div>
         </div>
     </div>
-    <div class="row bg-1 row-style" style="background-color: #9E9E9E;">
-        <div class="col">
-            <h1 class="set-title-summary-facts" style="padding-left: 40px;">
-                Facts
-            </h1>
+    <div class="row row-style" style="flex-wrap: wrap;">
+        <div class="col-3" style="padding: 0px !important; min-width: 300px;">
+            <div class="row bg-1 row-style"style="background-color: #9E9E9E;">
+                <h1 class="set-title-summary-facts">
+                    Facts
+                </h1>
+            </div>
+            <div class="row bg-5 row-style" style="padding: 20px;">
+                <div class="card card-home shadow-sm p-3 mb-5 bg-white rounded">
+                    <div class="container col-7 scroll-view-list-summary">
+                        <h4 th:each="fact : ${logic_model.getFacts()}">
+                            <span th:text="${fact}"></span>
+                        </h4>
+                    </div> 
+                </div>
+            </div>
         </div>
-        <div class="col-6">
-            <h1 class="set-title-summary-facts" style="padding-left: 20px;">
-                Rules
-            </h1>
+        <div class="col-6" style="padding: 0px !important;  min-width: 300px;">
+            <div class="row bg-1 row-style"style="background-color: #9E9E9E;">
+                <h1 class="set-title-summary-facts">
+                    Rules
+                </h1>
+            </div>
+            <div class="row bg-5 row-style" style="padding: 20px;">
+                <div class="card card-home-rules shadow-sm p-3 mb-5 bg-white rounded">
+                    <div class="container col-5 scroll-view-list-summary-rules">
+                        <h4 th:each="rule : ${logic_model.getRules()}">
+                            <span th:text="${rule}"></span>
+                        </h4>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col">
-            <h1 class="set-title-summary-facts" style="padding-left: 40px;">
-                Sup. relations
-            </h1>
-        </div>
+        <div class="col-3 " style="padding: 0px !important;  min-width: 300px;">
+            <div class="row bg-1 row-style"style="background-color: #9E9E9E;">
+                <h1 class="set-title-summary-facts">
+                    Sup. relations
+                </h1>
+            </div>
+            <div class="row bg-5 row-style" style="padding: 20px;">
+                <div class="card card-home shadow-sm p-3 mb-5 bg-white rounded">
+                    <div class="container col-7 scroll-view-list-summary">
+                        <h4 th:each="srule : ${logic_model.getSupRules()}">
+                            <span th:text="${srule}"></span>
+                        </h4>
+                    </div>  
+                </div>
+            </div>
+        </div>    
     </div>
-    <div class="row bg-5 row-style">
+    <!-- <div class="row bg-5 row-style">
         <div class="col">
             <div class="card card-summary shadow-sm p-3 mb-5 bg-white rounded">
                 <div class="scroll-view-list-summary">
@@ -131,7 +159,7 @@
                     </h4>
                 </div>
             </div>
-        </div>
+        </div> -->
             <!--<div class="container" style="margin-top: 35px;">
                 <form th:action="@{/}" method="GET">
                     <button type="submit" value="Submit" class="btn btn-secondary">HOME</button></button>
