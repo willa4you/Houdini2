@@ -31,17 +31,17 @@ body {
 }
 
 .set-title-summary-facts {
-    padding-left: 120px;
+    padding-left: 25px;
     padding-top: 10px;
 }
 
 .set-title-home-facts {
-    padding: 0px !important;
+    padding-left: 25px;
     padding-top: 10px;
 }
 
 .set-title-home-rules {
-    padding: 0px !important;
+    padding-left: 25px;
     padding-top: 10px;
 }
 
@@ -56,7 +56,7 @@ body {
     margin-top: 30px;
     margin-bottom: 30px;
     width: 110px;
-    margin-left: 95px;
+    margin-left: 26px;
 }
 
 .spinner-home-style {
@@ -68,6 +68,7 @@ body {
     width: 20%;
     margin-left: 80px;
     margin-top: 70px;
+    margin-left: 15px;
 }
 
 .upload-buttom {
@@ -75,6 +76,7 @@ body {
     margin-top: 50px;
     margin-bottom: 19px;
     background-color: #015d52;
+    margin-left: 15px;
 }
 
 .row-style {
@@ -136,24 +138,34 @@ body {
 
 .scroll-view-list-theory-extension {
     height: 240px;
-    width: 330px;
+    width: -webkit-fill-available;
     overflow-y: scroll;
-    margin-bottom: 10px;
+    margin: 0px;
+    padding: 0px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+
 }
 
 .scroll-view-list-summary {
     height: 240px;
-    width: 330px;
+    width: -webkit-fill-available;
     overflow-y: scroll;
-    padding-bottom: 10px;
+    margin: 0px;
+    padding: 0px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+
 }
 
 .scroll-view-list-summary-rules {
     height: 240px;
-    width: 850px;
+    width: -webkit-fill-available;
     overflow-y: scroll;
-    overflow-x: scroll;
-    padding-bottom: 10px;
+    margin: 0px;
+    padding: 0px;
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
 
 .variable-list-home {
