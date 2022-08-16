@@ -31,12 +31,12 @@ public class Literal implements Comparable<Literal> {
         if (!startsWithTilde) {
             this.type = LITERALTYPE.LITERAL;
             //Must call this constructor otherwise there will be recursion
-            this.opposite = new Literal("~".concat(label), type, this);
+            this.opposite = new Literal("~".concat(label), LITERALTYPE.NEGATED, this);
         }
         else {
             this.type = LITERALTYPE.NEGATED;
             //Must call this constructor otherwise there will be recursion
-            this.opposite = new Literal(label.substring(1), type, this);
+            this.opposite = new Literal(label.substring(1), LITERALTYPE.LITERAL, this);
         }
     }
     
@@ -94,12 +94,12 @@ public class Literal implements Comparable<Literal> {
         this.partialState = partialState;
     }
 
+    @Override
     public boolean equals(Object object) {
-        if (this == object) return true;
         if (!(object instanceof Literal)) return false;
-        if (!super.equals(object)) return false;
+        //if (!super.equals(object)) return false;
         Literal literal = (Literal) object;
-        return (getLabel().equals(literal.getLabel())) && (this.getType().equals(literal.getType()));
+        return (getLabel().equals(literal.getLabel()) && (this.getType().equals(literal.getType())));
     }
 
     @Override
@@ -107,8 +107,9 @@ public class Literal implements Comparable<Literal> {
         return this.label.compareTo(o.getLabel());
     }
 
+    @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getLabel(), getType());
+        return Objects.hash(getLabel(), getType());
     }
 
     public String toString() {
