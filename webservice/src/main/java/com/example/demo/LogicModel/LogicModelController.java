@@ -161,6 +161,11 @@ public class LogicModelController {
     return "sets";
   }
 
+  @GetMapping("/help")
+  public String helpForm(Model model) {
+    return "help";
+  }
+
   @PostMapping("/")
   public String homeSubmit(@ModelAttribute LogicModel logicModel, Model model) {
     
