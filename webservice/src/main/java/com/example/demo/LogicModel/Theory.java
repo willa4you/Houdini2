@@ -69,8 +69,13 @@ public class Theory {
 
             String loser_index = String.valueOf(Integer.parseInt(loser.substring(1)) - 1);
             String winner_index = String.valueOf(Integer.parseInt(winner.substring(1)) - 1);
+            Rule winner_rule = this.rules.get(winner_index);
+            Rule loser_rule = this.rules.get(loser_index);
 
-            SuperiorityRelation suprel = new SuperiorityRelation(this.rules.get(winner_index), this.rules.get(loser_index));
+            SuperiorityRelation suprel = new SuperiorityRelation(winner_rule, loser_rule);
+            winner_rule.getWinsOver().add(loser_index);
+            loser_rule.getLosesAfter().add(winner_index);
+            
             this.superiorityRelations.add(suprel);
         }
     }
