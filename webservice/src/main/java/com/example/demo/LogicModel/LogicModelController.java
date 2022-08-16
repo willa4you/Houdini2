@@ -5,10 +5,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import com.example.demo.Pair;
 import com.example.demo.FileUpload.storage.StorageService;
 
 import com.example.demo.JSONParser.JSONLogicParser;
-import com.example.demo.JSONParser.WrongFormatException;
+import com.example.demo.JSONParser.JSONWrongFormatException;
+import com.example.demo.LogicModel.Extension.Extension;
+import com.example.demo.LogicModel.Extension.StrictExtensionComputator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,7 +37,11 @@ public class LogicModelController {
   private int rulesLength = 0;
   private int supRulesLength = 0;
   private Boolean loadingFile = false;
-  
+  private String plusDeltaString = "∅";
+  private String minusDeltaString = "∅";
+  private String plusPartialString = "∅";
+  private String minusPartialString = "∅";
+
   @ModelAttribute("logic_model")
   private LogicModel getLogicModel() {
     return this.logicModel;
@@ -79,6 +87,26 @@ public class LogicModelController {
     return this.loadingFile;
   }
 
+  @ModelAttribute("plus_delta_string")
+  private String getPlusDeltaString() {
+    return this.plusDeltaString;
+  }
+
+  @ModelAttribute("minus_delta_string")
+  private String getMinusDeltaString() {
+    return this.minusDeltaString;
+  }
+
+  @ModelAttribute("plus_partial_string")
+  private String getPlusPartialString() {
+    return this.plusPartialString;
+  }
+
+  @ModelAttribute("minus_partial_string")
+  private String getMinusPartialString() {
+    return this.minusPartialString;
+  }
+
   public void configFromLogicModel(LogicModel logicModel) throws IOException {
     this.logicModel = logicModel;
 
@@ -103,6 +131,13 @@ public class LogicModelController {
     if (this.getAreFactsValid().contains(false) || this.getAreRulesValid().contains(false) || this.getAreSupRulesValid().contains(false)) {
       throw new IOException("Some input is wrong.");
     }
+    Theory th = new Theory(this.validator.getLiterals(), this.logicModel);
+    Pair<Theory, Extension> computed = new StrictExtensionComputator().computeExtension(th);
+
+    this.plusDeltaString = computed.getSecond().getPlusDeltaString();
+    this.minusDeltaString = computed.getSecond().getMinusDeltaString();
+    this.plusPartialString = computed.getSecond().getPlusPartialString();
+    this.minusPartialString = computed.getSecond().getMinusPartialString();
   }
 
 	@Autowired
@@ -132,7 +167,6 @@ public class LogicModelController {
     //Update data
     try {
       this.configFromLogicModel(logicModel);
-      Theory th = new Theory(this.validator.getLiterals(), this.logicModel);
       return "redirect:/sets";
     } catch(IOException e) {
       return "redirect:/";
@@ -141,7 +175,7 @@ public class LogicModelController {
 
 	@PostMapping("/upload")
 	public String handleFileUpload(@RequestParam("file") MultipartFile file,
-			RedirectAttributes redirectAttributes, Model model) throws IOException, WrongFormatException {
+			RedirectAttributes redirectAttributes, Model model) throws IOException, JSONWrongFormatException {
 
 		//storageService.store(file);
 
@@ -153,9 +187,8 @@ public class LogicModelController {
     try {
       LogicModel parsed_model = parser.parseJson();
       this.configFromLogicModel(parsed_model);
-      Theory th = new Theory(this.validator.getLiterals(), this.logicModel);
       return "redirect:/sets";
-    } catch(WrongFormatException e) {
+    } catch(JSONWrongFormatException e) {
       //JSON is not formatted correctly
       redirectAttributes.addFlashAttribute("json_error_message", e.getMessage());
       return "redirect:/";

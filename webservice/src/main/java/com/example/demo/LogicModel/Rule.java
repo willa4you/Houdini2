@@ -8,7 +8,7 @@ public class Rule {
     private Set<String> winsOver = new TreeSet<String>();
     private Set<String> losesAfter = new TreeSet<String>();
     // private boolean losesAfterActiveRule; not a property of the rule itself, I guess it shouldn't be here
-
+    private RuleState ruleState = RuleState.ACTIVABLE;
     public Rule(Literal head, TreeSet<Literal> tail, RuleType type) {
         this.head = head;
         this.tail = tail;
@@ -39,6 +39,14 @@ public class Rule {
         this.type = type;
     }
 
+    public RuleState getRuleState() {
+        return ruleState;
+    }
+
+    public void setRuleState(RuleState ruleState) {
+        this.ruleState = ruleState;
+    }
+
     public Set<String> getWinsOver() {
         return winsOver;
     }
@@ -53,6 +61,17 @@ public class Rule {
 
     public void setLosesAfter(Set<String> losesAfter) {
         this.losesAfter = losesAfter;
+    }
+
+    public void removeFromTail(Literal literal){
+        this.tail.remove(literal);
+    }
+    public void deactivate(){
+        this.ruleState = RuleState.DEACTIVATED;
+    }
+
+    public void activate(){
+        this.ruleState = RuleState.ACTIVE;
     }
 
     public boolean equals(Object object) {

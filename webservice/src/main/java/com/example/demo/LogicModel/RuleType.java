@@ -1,5 +1,5 @@
 package com.example.demo.LogicModel;
-enum RuleType{
+public enum RuleType{
     STRICT,
     DEFEASIBLE,
     DEFEATER;

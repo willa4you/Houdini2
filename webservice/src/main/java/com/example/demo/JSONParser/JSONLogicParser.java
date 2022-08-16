@@ -14,7 +14,7 @@ public class JSONLogicParser {
         this.rawJson = rawJson;
     }
 
-    public LogicModel parseJson() throws WrongFormatException {
+    public LogicModel parseJson() throws JSONWrongFormatException {
         //String s = rawJson;
         JSONLogicModel model = new JSONLogicModel();
         ObjectMapper mapper = new ObjectMapper();
@@ -22,7 +22,7 @@ public class JSONLogicParser {
         try {
             model = mapper.readValue(rawJson, JSONLogicModel.class);
         } catch(Exception e) {
-            throw new WrongFormatException("File content is not compatible with a valid logic model. See the Help page.");
+            throw new JSONWrongFormatException("File content is not compatible with a valid logic model. See the Help page.");
         }
         return model.getLogicModel();
     }

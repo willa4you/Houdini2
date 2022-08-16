@@ -136,16 +136,17 @@
             tar.parent().after(`<div class="input-group md-3">
                                         <span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
                                         <input id="facts${facts_counter-1}" name="facts[${facts_counter-1}]"
-                                        style="border-radius: .375rem" 
+                                        style="border-radius: .375rem"
                                         th:classappend="\${are_facts_valid} ? ok : is-invalid" type="text" class="form-control facts-input"></input>
                                         <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
                                             <b>Evita i simboli: spazio, virgola, -, _, =, >, &lt;, ~, ¬, \, ', ", ; </b> 
                                         </div>
                                     </div>
                                `);
+            
             $(".facts-input").mousedown(f);
         };
-
+        
         let r = function(e) {
             rules_counter += 1;
             let tar = $(this);
@@ -180,6 +181,7 @@
         $(".rules-input").mousedown(r);
         $(".sup-rules-input").mousedown(sr);
     </script>
+    
 </body>
 
 </html>

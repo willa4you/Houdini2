@@ -24,8 +24,8 @@ public class Theory {
     }
 
     public Theory(Set<String> literals, List<String> facts, List<String> rules, List<String> superiorityRelations) {
-        this.literals = literals.stream().filter(l -> !l.equals("")).map(l -> new Literal(l)).collect(Collectors.toSet());
-        this.facts = facts.stream().filter(f -> !f.equals("")).map(f -> new Literal(f)).collect(Collectors.toSet());
+        this.literals = literals.stream().filter(l -> !l.equals("")).map(Literal::new).collect(Collectors.toSet());
+        this.facts = facts.stream().filter(f -> !f.equals("")).map(Literal::new).collect(Collectors.toSet());
 
         Integer rule_counters = 0;
         for (String r : rules) {
@@ -94,7 +94,9 @@ public class Theory {
     public Map<String, Rule> getRules() {
         return rules;
     }
-
+    public Set<Rule> getRules(RuleState ruleState, ArrayList<RuleType> ruleTypes){
+        return this.rules.values().stream().filter(rule -> ruleTypes.contains(rule.getType()) && rule.getRuleState() == ruleState).collect(Collectors.toSet());
+    }
     public void setRules(Map<String, Rule> rules) {
         this.rules = rules;
     }
@@ -105,6 +107,14 @@ public class Theory {
 
     public void setSuperiorityRelations(Set<SuperiorityRelation> superiorityRelations) {
         this.superiorityRelations = superiorityRelations;
+    }
+
+    public Set<Literal> getHeads(Set<Rule> rules){
+        Set<Literal> heads = new TreeSet<>();
+        for (Rule r:rules) {
+            heads.add(r.getHead());
+        }
+        return heads;
     }
 
     public boolean equals(Object object) {
