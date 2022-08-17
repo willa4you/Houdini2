@@ -40,7 +40,7 @@
                     <div class="card card-home shadow-sm p-3 mb-5 bg-white rounded">
                         <div class="container col-7 variable-list-home">
                             <div th:each="fact, f_i : *{facts}" class="input-group md-3">
-                                <span class="input-group-text" id="basic-addon2">Fact&nbsp;<span th:text=" ${f_i.index+1}"></span></span>
+                                <!-- <span class="input-group-text" id="basic-addon2">Fact&nbsp;<span th:text=" ${f_i.index+1}"></span></span> -->
                                 <input th:field="*{facts[__${f_i.index}__]}" 
                                 style="border-radius: .375rem" type="text" class="form-control"
                                 th:classappend="${(f_i.index == facts_length ? 'facts-input ' : 'not-input ') + (are_facts_valid[__${f_i.index}__] ? 'valid ' : 'is-invalid ')}"/>
@@ -84,7 +84,7 @@
                     <div class="card card-home shadow-sm p-3 mb-5 bg-white rounded">
                         <div class="container col-7 variable-list-home">
                             <div th:each="srule, sr_i : *{supRules}" class="input-group md-3">
-                                <span  class="input-group-text" id="basic-addon2">Sup. rule&nbsp;<span th:text=" ${sr_i.index+1}"></span></span>
+                                <!-- <span  class="input-group-text" id="basic-addon2">Sup. rule&nbsp;<span th:text=" ${sr_i.index+1}"></span></span> -->
                                 <input th:field="*{supRules[__${sr_i.index}__]}" 
                                 style="border-radius: .375rem" type="text" class="form-control"
                                 th:classappend="${(sr_i.index == suprules_length ? 'sup-rules-input ' : 'not-input ') + (are_suprules_valid[__${sr_i.index}__] ? 'valid ' : 'is-invalid ')}">
@@ -131,10 +131,12 @@
         let f = function(e) {
             facts_counter += 1;
             let tar = $(this);
-            tar.removeClass("facts-input");
+            tar.removeClass("facts-input");                                        // <span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
+
             tar.unbind();
+            //<span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
             tar.parent().after(`<div class="input-group md-3">
-                                        <span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
+                                        
                                         <input id="facts${facts_counter-1}" name="facts[${facts_counter-1}]"
                                         style="border-radius: .375rem"
                                         th:classappend="\${are_facts_valid} ? ok : is-invalid" type="text" class="form-control facts-input"></input>
@@ -167,8 +169,9 @@
             let tar = $(this);
             tar.removeClass("sup-rules-input");
             tar.unbind();
+            //<span class="input-group-text" id="basic-addon2">Sup. rule ${sup_rules_counter}</span>
             tar.parent().after(`<div class="input-group md-3">
-                                        <span class="input-group-text" id="basic-addon2">Sup. rule ${sup_rules_counter}</span>
+                                        
                                         <input id="supRules${sup_rules_counter-1}" name="supRules[${sup_rules_counter-1}]" 
                                         style="border-radius: .375rem" 
                                         th:classappend="\${are_suprules_valid} ? ok : is-invalid" type="text" class="form-control sup-rules-input"></input>
