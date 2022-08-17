@@ -14,6 +14,12 @@ body {
     background-color: #BCBCBC;
 }
 
+.body-style-help {
+    width: 100%;
+    height: 100%;
+    background-color: #84bab0;
+}
+
 .set-title-theory-summary {
     padding-left: 80px;
     padding-top: 15px;
