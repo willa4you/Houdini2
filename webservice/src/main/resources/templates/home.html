@@ -45,7 +45,7 @@
                                 style="border-radius: .375rem" type="text" class="form-control"
                                 th:classappend="${(f_i.index == facts_length ? 'facts-input ' : 'not-input ') + (are_facts_valid[__${f_i.index}__] ? 'valid ' : 'is-invalid ')}"/>
                                 <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
-                                    <b>Do not use symbols: space, comma, -, _, =, >, &lt;, ~, ¬, \, ', ", ; </b>
+                                    <b>Use only alphanumeric symbols and '_'</b>
                                 </div>
                             </div>
                         </div> 
@@ -89,7 +89,7 @@
                                 style="border-radius: .375rem" type="text" class="form-control"
                                 th:classappend="${(sr_i.index == suprules_length ? 'sup-rules-input ' : 'not-input ') + (are_suprules_valid[__${sr_i.index}__] ? 'valid ' : 'is-invalid ')}">
                                 <div id="regole-control-feedback" class="invalid-feedback error-home-card">
-                                    <b>It must have thr form: rx &lt; ry, rx > ry where x,y are numbers.</b>
+                                    <b>It must have the form: rx &lt; ry, rx > ry where x,y are numbers.</b>
                                 </div>
                             </div>
                         </div>  

@@ -115,16 +115,13 @@ public class LiteralChecker {
     }
     public Boolean validate_literal(String s) {
         String s_trimmed = s.trim();
-        String[] banned = {" ", ",", "_", ";", "'", "\"", "\\", ">", "<", "!", "-", "=", "¬"};
-
-        for (String b : banned) {
-            //trim the fact so it doesn't contain trailing and intiial spaces, then checks for banned symbols
-            if (s_trimmed.contains(b)) {
-                literals = new TreeSet<String>();
-                return false;
-            };
+       
+        //Matches any alphanumeric+"_" sequence or empty
+        if (!s_trimmed.matches("[a-zA-z_]+|^$")) {
+            literals = new TreeSet<String>();
+            return false;
         }
-        if (s_trimmed.length() > 0) literals.add(s_trimmed);
+        literals.add(s_trimmed);
         return true;
     }
 }
