@@ -8,6 +8,78 @@
     <link src="../static/bootstrap-5.2.0-dist/css/bootstrap.min.css" rel="stylesheet" th:href="@{bootstrap-5.2.0-dist/css/bootstrap.min.css}" /> 
     <link href="style.css" rel="stylesheet" />
     <script type="text/javascript" th:src="@{js/jquery-3.6.0.min.js}"></script>
+    <script>
+        function debounce(func, wait, immediate) {
+            var timeout, args, context, timestamp, result;
+            if (null == wait) wait = 100;
+    
+            function later() {
+                var last = Date.now() - timestamp;
+    
+                if (last < wait && last >= 0) {
+                timeout = setTimeout(later, wait - last);
+                } else {
+                timeout = null;
+                if (!immediate) {
+                    result = func.apply(context, args);
+                    context = args = null;
+                }
+                }
+            };
+    
+            var debounced = function(){
+                context = this;
+                args = arguments;
+                timestamp = Date.now();
+                var callNow = immediate && !timeout;
+                if (!timeout) timeout = setTimeout(later, wait);
+                if (callNow) {
+                result = func.apply(context, args);
+                context = args = null;
+                }
+    
+                return result;
+            };
+    
+            debounced.clear = function() {
+                if (timeout) {
+                clearTimeout(timeout);
+                timeout = null;
+                }
+            };
+            
+            debounced.flush = function() {
+                if (timeout) {
+                result = func.apply(context, args);
+                context = args = null;
+                
+                clearTimeout(timeout);
+                timeout = null;
+                }
+            };
+    
+            return debounced;
+        };
+    
+        // Adds compatibility for ES modules
+        debounce.debounce = debounce;
+    </script>
+    <!--script>
+    function debounce(func, wait, immediate) {
+        var timeout;
+        return function() {
+            var context = this, args = arguments;
+            var later = function() {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+            var callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+        };
+};
+    </script-->
 </head>
 <body class="body-style">
     <form id="logic-form" action="#" th:action="@{/}" th:object="${logic_model}" method="post">
@@ -42,7 +114,7 @@
                             <div th:each="fact, f_i : *{facts}" class="input-group md-3">
                                 <span class="input-group-text" id="basic-addon2">Fact&nbsp;<span th:text=" ${f_i.index+1}"></span></span>
                                 <input th:field="*{facts[__${f_i.index}__]}" 
-                                style="border-radius: .375rem" type="text" class="form-control "
+                                style="border-radius: .375rem" type="text" class="form-control facts-input" oninput="debounce(validate_facts, 300)(this);"
                                 th:classappend="${(f_i.index == facts_length ? 'facts-input-active ' : 'facts-input-not-active ') + (are_facts_valid[__${f_i.index}__] ? 'valid ' : 'is-invalid ')}"/>
                                 <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
                                     <b>Use only alphanumeric symbols and '_'</b>
@@ -64,7 +136,7 @@
                             <div th:each="rule, r_i : *{rules}" class="input-group md-3">
                                 <span class="input-group-text" id="basic-addon2">Rule&nbsp;<span th:text=" ${r_i.index+1}"></span></span>
                                 <input th:field="*{rules[__${r_i.index}__]}" 
-                                style="border-radius: .375rem" type="text" class="form-control"
+                                style="border-radius: .375rem" type="text" class="form-control rules-input"
                                 th:classappend="${(r_i.index == rules_length ? 'rules-input-active ' : 'rules-input-not-active ') + (are_rules_valid[__${r_i.index}__] ? 'valid ' : 'is-invalid ')}">
                                 <div id="regole-control-feedback" class="invalid-feedback error-home-card">
                                     <b>It must have the form: a -> b, a => b, a ~> b.</b>
@@ -86,7 +158,7 @@
                             <div th:each="srule, sr_i : *{supRules}" class="input-group md-3">
                                 <span  class="input-group-text" id="basic-addon2">Sup. rule&nbsp;<span th:text=" ${sr_i.index+1}"></span></span>
                                 <input th:field="*{supRules[__${sr_i.index}__]}" 
-                                style="border-radius: .375rem" type="text" class="form-control"
+                                style="border-radius: .375rem" type="text" class="form-control sup-rules-input"
                                 th:classappend="${(sr_i.index == suprules_length ? 'sup-rules-input-active ' : 'sup-rules-input-not-active ') + (are_suprules_valid[__${sr_i.index}__] ? 'valid ' : 'is-invalid ')}">
                                 <div id="regole-control-feedback" class="invalid-feedback error-home-card">
                                     <b>It must have the form: rx &lt; ry, rx > ry where x,y are numbers.</b>
@@ -136,8 +208,8 @@
             tar.parent().after(`<div class="input-group md-3">
                                         <span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
                                         <input id="facts${facts_counter-1}" name="facts[${facts_counter-1}]"
-                                        style="border-radius: .375rem"
-                                        th:classappend="\${are_facts_valid} ? ok : is-invalid" type="text" class="form-control facts-input-active "></input>
+                                        style="border-radius: .375rem" oninput="validate_facts(this.value)"
+                                        th:classappend="\${are_facts_valid} ? ok : is-invalid" type="text" class="form-control facts-input facts-input-active "></input>
                                         <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
                                             <b>Evita i simboli: spazio, virgola, -, _, =, >, &lt;, ~, ¬, \, ', ", ; </b> 
                                         </div>
@@ -156,7 +228,7 @@
                                         <span class="input-group-text" id="basic-addon2">Rule ${rules_counter}</span>
                                         <input id="rules${rules_counter-1}" name="rules[${rules_counter-1}]"
                                         style="border-radius: .375rem" 
-                                        th:classappend="\${are_rules_valid} ? ok : is-invalid" type="text" class="form-control rules-input-active "></input>
+                                        th:classappend="\${are_rules_valid} ? ok : is-invalid" type="text" class="form-control rules-input rules-input-active "></input>
                                     </div>
                                `);
             $(".rules-input-active ").mousedown(r);
@@ -171,7 +243,7 @@
                                         <span class="input-group-text" id="basic-addon2">Sup. rule ${sup_rules_counter}</span>
                                         <input id="supRules${sup_rules_counter-1}" name="supRules[${sup_rules_counter-1}]" 
                                         style="border-radius: .375rem" 
-                                        th:classappend="\${are_suprules_valid} ? ok : is-invalid" type="text" class="form-control sup-rules-input-active "></input>
+                                        th:classappend="\${are_suprules_valid} ? ok : is-invalid" type="text" class="form-control sup-rules-input sup-rules-input-active "></input>
                                     </div>
                                `);
             $(".sup-rules-input-active ").mousedown(sr);
@@ -182,6 +254,24 @@
         $(".sup-rules-input-active ").mousedown(sr);
     </script>
     
+
+    <script>
+    //TODO add debouncing to this function!
+    
+    let validate_facts = function(e) {
+        
+        const target = e;
+        if (!target.value.match(/^(\~)?[a-zA-Z_]*$/)) {
+            $(target).addClass("is-invalid");
+        } else {
+            $(target).removeClass("is-invalid");
+        }
+        
+        //TODP qui non va
+        //e.oninput.clear();
+    }
+    
+    </script>
 </body>
 
 </html>
