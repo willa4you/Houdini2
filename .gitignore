@@ -1,5 +1,6 @@
 token.txt
 .idea
+.antlr
 
 HELP.md
 target/
