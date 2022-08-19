@@ -13,6 +13,7 @@ import com.example.demo.JSONParser.JSONLogicParser;
 import com.example.demo.JSONParser.JSONWrongFormatException;
 import com.example.demo.LogicModel.Extension.Extension;
 import com.example.demo.LogicModel.Extension.StrictExtensionComputator;
+import com.example.demo.LogicModel.grammar.ModelParser;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -186,7 +187,11 @@ public class LogicModelController {
 
     //TODO handle IOException here
     String content = new String(file.getBytes());
-    
+    try {
+      ModelParser.parse(content);
+    } catch(Exception e) {
+
+    }
     JSONLogicParser parser = new JSONLogicParser(content);
     
     try {
