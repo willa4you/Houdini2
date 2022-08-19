@@ -114,7 +114,7 @@
                             <div th:each="fact, f_i : *{facts}" class="input-group md-3">
                                 <span class="input-group-text" id="basic-addon2">Fact&nbsp;<span th:text=" ${f_i.index+1}"></span></span>
                                 <input th:field="*{facts[__${f_i.index}__]}" 
-                                style="border-radius: .375rem" type="text" class="form-control facts-input" onfocusout="debounce(validate_facts, 50)(this);"
+                                style="border-radius: .375rem" type="text" class="form-control facts-input" oninput="validate_facts(this, 333)" onfocusout="clear_timer()"
                                 th:classappend="${(f_i.index == facts_length ? 'facts-input-active ' : 'facts-input-not-active ') + (are_facts_valid[__${f_i.index}__] ? 'valid ' : 'is-invalid ')}"/>
                                 <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
                                     <b>Use only alphanumeric symbols and '_'</b>
@@ -136,7 +136,7 @@
                             <div th:each="rule, r_i : *{rules}" class="input-group md-3">
                                 <span class="input-group-text" id="basic-addon2">Rule&nbsp;<span th:text=" ${r_i.index+1}"></span></span>
                                 <input th:field="*{rules[__${r_i.index}__]}" 
-                                style="border-radius: .375rem" type="text" class="form-control rules-input" onfocusout="debounce(validate_rules, 50)(this);"
+                                style="border-radius: .375rem" type="text" class="form-control rules-input" oninput="validate_rules(this, 333)" onfocusout="clear_timer()"
                                 th:classappend="${(r_i.index == rules_length ? 'rules-input-active ' : 'rules-input-not-active ') + (are_rules_valid[__${r_i.index}__] ? 'valid ' : 'is-invalid ')}">
                                 <div id="regole-control-feedback" class="invalid-feedback error-home-card">
                                     <b>It must have the form: a -> b, a => b, a ~> b.</b>
@@ -157,7 +157,7 @@
                         <div class="container col-7 variable-list-home">
                             <div th:each="srule, sr_i : *{supRules}" class="input-group md-3">
                                 <span  class="input-group-text" id="basic-addon2">Sup. rule&nbsp;<span th:text=" ${sr_i.index+1}"></span></span>
-                                <input th:field="*{supRules[__${sr_i.index}__]}" onfocusout="debounce(validate_suprels, 50)(this);"
+                                <input th:field="*{supRules[__${sr_i.index}__]}" oninput="validate_suprules(this, 333)" onfocusout="clear_timer()"
                                 style="border-radius: .375rem" type="text" class="form-control sup-rules-input"
                                 th:classappend="${(sr_i.index == suprules_length ? 'sup-rules-input-active ' : 'sup-rules-input-not-active ') + (are_suprules_valid[__${sr_i.index}__] ? 'valid ' : 'is-invalid ')}">
                                 <div id="regole-control-feedback" class="invalid-feedback error-home-card">
@@ -208,7 +208,7 @@
             tar.parent().after(`<div class="input-group md-3">
                                         <span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
                                         <input id="facts${facts_counter-1}" name="facts[${facts_counter-1}]"
-                                        style="border-radius: .375rem" onfocusout="debounce(validate_facts, 50)(this);"
+                                        style="border-radius: .375rem" oninput="validate_facts(this, 333)" onfocusout="clear_timer()"
                                         th:classappend="\${are_facts_valid} ? ok : is-invalid" type="text" class="form-control facts-input facts-input-active "></input>
                                         <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
                                             <b>Evita i simboli: spazio, virgola, -, _, =, >, &lt;, ~, ¬, \, ', ", ; </b> 
@@ -227,7 +227,7 @@
             tar.parent().after(`<div class="input-group md-3">
                                         <span class="input-group-text" id="basic-addon2">Rule ${rules_counter}</span>
                                         <input id="rules${rules_counter-1}" name="rules[${rules_counter-1}]"
-                                        style="border-radius: .375rem" onfocusout="debounce(validate_rules, 50)(this);"
+                                        style="border-radius: .375rem" oninput="validate_rules(this, 333)" onfocusout="clear_timer()"
                                         th:classappend="\${are_rules_valid} ? ok : is-invalid" type="text" class="form-control rules-input rules-input-active "></input>
                                     </div>
                                `);
@@ -242,7 +242,7 @@
             tar.parent().after(`<div class="input-group md-3">
                                         <span class="input-group-text" id="basic-addon2">Sup. rule ${sup_rules_counter}</span>
                                         <input id="supRules${sup_rules_counter-1}" name="supRules[${sup_rules_counter-1}]" 
-                                        style="border-radius: .375rem" onfocusout="debounce(validate_suprels, 50)(this);"
+                                        style="border-radius: .375rem" oninput="validate_suprels(this, 333)" onfocusout="clear_timer()"
                                         th:classappend="\${are_suprules_valid} ? ok : is-invalid" type="text" class="form-control sup-rules-input sup-rules-input-active "></input>
                                     </div>
                                `);
@@ -257,42 +257,49 @@
 
     <script>
     //TODO add debouncing to this function!
-    
-    let validate_facts = function(e) {
-        
-        
-        if (!e.value.match(/^[ ]*(\~)?[a-zA-Z_]*[ ]*$/)) {
-            $(e).addClass("is-invalid");
-        } else {
-            $(e).removeClass("is-invalid");
+    let _timer = null;
+
+    let validate_facts = function(elem, ms) {
+        //_timer = setInterval(validate_facts_text(elem), 100);
+        if (_timer === null) {
+            _timer = setInterval(function() {
+                if (!elem.value.match(/^[ ]*(\~)?[a-zA-Z_]*[ ]*$/)) {
+                    $(elem).addClass("is-invalid");
+                } else {
+                    $(elem).removeClass("is-invalid");
+                }
+            }, ms);
         }
-        
-        //TODP qui non va
-        //e.oninput.clear();
     }
 
-    let validate_rules = function(e) {
-        
-        if (!e.value.match(/^[ ]*(\~)?[a-zA-Z_, ~]*[ ]*[-=~]\>[ ]*(\~)?[a-zA-Z_]+[ ]*$/)) {
-            $(e).addClass("is-invalid");
-        } else {
-            $(e).removeClass("is-invalid");
+  
+    let validate_rules= function(elem, ms) {
+        if (_timer === null) {
+            _timer = setInterval(function() {
+                if (!elem.value.match(/^[ ]*(\~)?[a-zA-Z_, ~]*[ ]*[-=~]\>[ ]*(\~)?[a-zA-Z_]+[ ]*$/)) {
+                    $(elem).addClass("is-invalid");
+                } else {
+                    $(elem).removeClass("is-invalid");
+                }
+            }, ms);
         }
-        
-        //TODP qui non va
-        //e.oninput.clear();
     }
 
-    let validate_suprels = function(e) {
-        
-        if (!e.value.match(/^[ ]*r[1-9][0-9]*[ ]*[><][ ]*r[1-9][0-9][ ]*$/)) {
-            $(e).addClass("is-invalid");
-        } else {
-            $(e).removeClass("is-invalid");
+    let validate_suprels = function(elem, ms) {
+        if (_timer === null) {
+            _timer = setInterval(function() {
+                if (!elem.value.match(/^[ ]*r[1-9][0-9]*[ ]*[><][ ]*r[1-9][0-9][ ]*$/)) {
+                    $(elem).addClass("is-invalid");
+                } else {
+                    $(elem).removeClass("is-invalid");
+                }
+            }, ms);
         }
-        
-        //TODP qui non va
-        //e.oninput.clear();
+    }
+
+    let clear_timer = function() {
+        clearInterval(_timer);
+        _timer = null;
     }
     
     </script>
