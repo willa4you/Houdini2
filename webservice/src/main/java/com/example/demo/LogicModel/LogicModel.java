@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class LogicModel {
 
   private List<String> facts = new ArrayList<String>(Arrays.asList(""));
@@ -34,4 +36,13 @@ public class LogicModel {
     this.supRules = supRules;
   }
 
+  public String toJSONString() {
+    try {
+      return new ObjectMapper().writer().withDefaultPrettyPrinter().writeValueAsString(this);
+    }
+    catch(Exception e) {
+      System.out.println("Couldn't write LogicModel to JSON");
+    }
+    return "Error";
+  }
 }

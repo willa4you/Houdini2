@@ -20,7 +20,7 @@ public class ModelParser {
         }
     }
 
-    public static void parse(String string) throws Exception {
+    public static void parse(String string) throws ParseCancellationException {
         
         CharStream input = CharStreams.fromString(string);
 
@@ -34,15 +34,11 @@ public class ModelParser {
         parser.removeErrorListeners();
         parser.addErrorListener(new RecognitionExceptionListener());
 
-        try {
-            ParseTree tree = parser.theory(); 
-            TheoryVisitor<String> visitor = new MyTheoryVisitor();
-            visitor.visit(tree);
-        } catch(ParseCancellationException e) {
-            System.out.println("ERRRRRRROR");
-        }
+        ParseTree tree = parser.theory(); 
+        TheoryVisitor<String> visitor = new MyTheoryVisitor();
+        visitor.visit(tree);
+       
         //System.out.println(tree.toStringTree(parser)); // print tree
-        
     }
 
     

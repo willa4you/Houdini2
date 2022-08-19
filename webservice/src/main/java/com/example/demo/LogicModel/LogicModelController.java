@@ -15,6 +15,7 @@ import com.example.demo.LogicModel.Extension.Extension;
 import com.example.demo.LogicModel.Extension.StrictExtensionComputator;
 import com.example.demo.LogicModel.grammar.ModelParser;
 
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -171,6 +172,7 @@ public class LogicModelController {
   public String homeSubmit(@ModelAttribute LogicModel logicModel, Model model) {
     
     //Update data
+    System.out.println(logicModel.toJSONString());
     try {
       this.configFromLogicModel(logicModel);
       return "redirect:/sets";
@@ -181,7 +183,7 @@ public class LogicModelController {
 
 	@PostMapping("/upload")
 	public String handleFileUpload(@RequestParam("file") MultipartFile file,
-			RedirectAttributes redirectAttributes, Model model) throws IOException, JSONWrongFormatException {
+			RedirectAttributes redirectAttributes, Model model) throws IOException {
 
 		//storageService.store(file);
 
@@ -189,7 +191,8 @@ public class LogicModelController {
     String content = new String(file.getBytes());
     try {
       ModelParser.parse(content);
-    } catch(Exception e) {
+    } catch(ParseCancellationException e) {
+      //There is something wrong in the parsing
       System.out.println("WRONGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
     }
     JSONLogicParser parser = new JSONLogicParser(content);
