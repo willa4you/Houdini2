@@ -190,7 +190,7 @@ public class LogicModelController {
     try {
       ModelParser.parse(content);
     } catch(Exception e) {
-
+      System.out.println("WRONGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
     }
     JSONLogicParser parser = new JSONLogicParser(content);
     

@@ -8,9 +8,10 @@ logicmodel : QT LOGICMODEL QT CLN LBRACE
     QT SUPREL QT CLN LSQUARE suprel RSQUARE 
     RBRACE;
 
-facts:  WS | QT ALPHANUMERIC QT | QT ALPHANUMERIC QT CM facts ;
-unquotedfacts : WS | ALPHANUMERIC | ALPHANUMERIC CM unquotedfacts ;
-rules:  WS | QT (WS|unquotedfacts) ARROW ALPHANUMERIC QT | QT (WS|unquotedfacts) ARROW ALPHANUMERIC QT CM rules ;
+literal: ALPHANUMERIC ;
+facts:  WS | QT literal QT | QT literal QT CM facts ;
+unquotedfacts : WS | literal | literal CM unquotedfacts ;
+rules:  WS | QT (WS|unquotedfacts) ARROW literal QT | QT (WS|unquotedfacts) ARROW literal QT CM rules ;
 suprel: WS | QT RULETAG (GT|LT) RULETAG QT | QT RULETAG (GT|LT) RULETAG QT CM suprel ;
 
 VERSION: 'version' ;
