@@ -117,7 +117,7 @@ public class LiteralChecker {
         String s_trimmed = s.trim();
        
         //Matches any alphanumeric+"_" sequence or empty
-        if (!s_trimmed.matches("[a-zA-z_]+|^$")) {
+        if (!s_trimmed.matches("(~)?[a-zA-z_]+|^$")) {
             literals = new TreeSet<String>();
             return false;
         }
