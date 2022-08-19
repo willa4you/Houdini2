@@ -42,7 +42,7 @@
                             <div th:each="fact, f_i : *{facts}" class="input-group md-3">
                                 <!-- <span class="input-group-text" id="basic-addon2">Fact&nbsp;<span th:text=" ${f_i.index+1}"></span></span> -->
                                 <input th:field="*{facts[__${f_i.index}__]}" 
-                                style="border-radius: .375rem" type="text" class="form-control"
+                                type="text" class="form-control input-home-form"
                                 th:classappend="${(f_i.index == facts_length ? 'facts-input ' : 'not-input ') + (are_facts_valid[__${f_i.index}__] ? 'valid ' : 'is-invalid ')}"/>
                                 <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
                                     <b>Do not use symbols: space, comma, -, _, =, >, &lt;, ~, ¬, \, ', ", ; </b>
@@ -64,7 +64,7 @@
                             <div th:each="rule, r_i : *{rules}" class="input-group md-3">
                                 <span class="input-group-text" id="basic-addon2">Rule&nbsp;<span th:text=" ${r_i.index+1}"></span></span>
                                 <input th:field="*{rules[__${r_i.index}__]}" 
-                                style="border-radius: .375rem" type="text" class="form-control"
+                                type="text" class="form-control input-home-form"
                                 th:classappend="${(r_i.index == rules_length ? 'rules-input ' : 'not-input ') + (are_rules_valid[__${r_i.index}__] ? 'valid ' : 'is-invalid ')}">
                                 <div id="regole-control-feedback" class="invalid-feedback error-home-card">
                                     <b>It must have the form: a -> b, a => b, a ~> b.</b>
@@ -86,7 +86,7 @@
                             <div th:each="srule, sr_i : *{supRules}" class="input-group md-3">
                                 <!-- <span  class="input-group-text" id="basic-addon2">Sup. rule&nbsp;<span th:text=" ${sr_i.index+1}"></span></span> -->
                                 <input th:field="*{supRules[__${sr_i.index}__]}" 
-                                style="border-radius: .375rem" type="text" class="form-control"
+                                type="text" class="form-control input-home-form"
                                 th:classappend="${(sr_i.index == suprules_length ? 'sup-rules-input ' : 'not-input ') + (are_suprules_valid[__${sr_i.index}__] ? 'valid ' : 'is-invalid ')}">
                                 <div id="regole-control-feedback" class="invalid-feedback error-home-card">
                                     <b>It must have thr form: rx &lt; ry, rx > ry where x,y are numbers.</b>
@@ -131,7 +131,7 @@
         let f = function(e) {
             facts_counter += 1;
             let tar = $(this);
-            tar.removeClass("facts-input");                                        // <span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
+            tar.removeClass("facts-input"); // <span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
 
             tar.unbind();
             //<span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
@@ -146,7 +146,7 @@
                                     </div>
                                `);
             
-            $(".facts-input").mousedown(f);
+            $(".facts-input").keypress(f);
         };
         
         let r = function(e) {
@@ -161,7 +161,7 @@
                                         th:classappend="\${are_rules_valid} ? ok : is-invalid" type="text" class="form-control rules-input"></input>
                                     </div>
                                `);
-            $(".rules-input").mousedown(r);
+            $(".rules-input").keypress(r);
         };
 
         let sr = function(e) {
@@ -177,12 +177,11 @@
                                         th:classappend="\${are_suprules_valid} ? ok : is-invalid" type="text" class="form-control sup-rules-input"></input>
                                     </div>
                                `);
-            $(".sup-rules-input").mousedown(sr);
+            $(".sup-rules-input").keypress(sr);
         };
-        
-        $(".facts-input").mousedown(f);
-        $(".rules-input").mousedown(r);
-        $(".sup-rules-input").mousedown(sr);
+        $(".facts-input").keypress(f);
+        $(".rules-input").keypress(r);
+        $(".sup-rules-input").keypress(sr);
     </script>
     
 </body>
