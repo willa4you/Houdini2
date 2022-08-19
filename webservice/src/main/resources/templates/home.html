@@ -117,7 +117,7 @@
                                 type="text" class="form-control input-home-form" oninput="validate_facts(this, 333)" onfocusout="clear_timer()"
                                 th:classappend="${(f_i.index == facts_length ? 'facts-input-active ' : 'facts-input-not-active ') + (are_facts_valid[__${f_i.index}__] ? 'valid ' : 'is-invalid ')}"/>
                                 <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
-                                    <b>Use only alphanumeric symbols and '_'</b>
+                                    <b>Use only alphanumeric symbols and '_'. You can start with '~'.</b>
                                 </div>
                             </div>
                         </div> 
@@ -157,7 +157,7 @@
                         <div class="container col-7 variable-list-home">
                             <div th:each="srule, sr_i : *{supRules}" class="input-group md-3">
                                 <!-- <span  class="input-group-text" id="basic-addon2">Sup. rule&nbsp;<span th:text=" ${sr_i.index+1}"></span></span> -->
-                                <input th:field="*{supRules[__${sr_i.index}__]}" oninput="validate_suprules(this, 333)" onfocusout="clear_timer()"
+                                <input th:field="*{supRules[__${sr_i.index}__]}" oninput="validate_suprels(this, 333)" onfocusout="clear_timer()"
                                 type="text" class="form-control input-home-form"
                                 th:classappend="${(sr_i.index == suprules_length ? 'sup-rules-input-active ' : 'sup-rules-input-not-active ') + (are_suprules_valid[__${sr_i.index}__] ? 'valid ' : 'is-invalid ')}">
                                 <div id="regole-control-feedback" class="invalid-feedback error-home-card">
@@ -212,7 +212,7 @@
                                         style="border-radius: .375rem" oninput="validate_facts(this, 333)" onfocusout="clear_timer()"
                                         th:classappend="\${are_facts_valid} ? ok : is-invalid" type="text" class="form-control facts-input facts-input-active "></input>
                                         <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
-                                            <b>Evita i simboli: spazio, virgola, -, _, =, >, &lt;, ~, ¬, \, ', ", ; </b> 
+                                            <b>Use only alphanumeric symbols and '_'. You can start with '~'.</b>
                                         </div>
                                     </div>
                                `);
@@ -230,6 +230,9 @@
                                         <input id="rules${rules_counter-1}" name="rules[${rules_counter-1}]"
                                         style="border-radius: .375rem" oninput="validate_rules(this, 333)" onfocusout="clear_timer()"
                                         th:classappend="\${are_rules_valid} ? ok : is-invalid" type="text" class="form-control rules-input rules-input-active "></input>
+                                        <div id="regole-control-feedback" class="invalid-feedback error-home-card">
+                                            <b>It must have the form: a -> b, a => b, a ~> b.</b>
+                                        </div>
                                     </div>
                                `);
             $(".rules-input-active").keypress(r);
@@ -246,6 +249,9 @@
                                         <input id="supRules${sup_rules_counter-1}" name="supRules[${sup_rules_counter-1}]" 
                                         style="border-radius: .375rem" oninput="validate_suprels(this, 333)" onfocusout="clear_timer()"
                                         th:classappend="\${are_suprules_valid} ? ok : is-invalid" type="text" class="form-control sup-rules-input sup-rules-input-active "></input>
+                                        <div id="regole-control-feedback" class="invalid-feedback error-home-card">
+                                            <b>It must have the form: rx &lt; ry, rx > ry where x,y are numbers.</b>
+                                        </div>
                                     </div>
                                `);
             $(".sup-rules-input-active").keypress(sr);
