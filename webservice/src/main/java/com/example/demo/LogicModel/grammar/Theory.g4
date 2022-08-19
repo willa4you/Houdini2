@@ -9,7 +9,8 @@ logicmodel : QT LOGICMODEL QT CLN LBRACE
     RBRACE;
 
 facts:  WS | QT ALPHANUMERIC QT | QT ALPHANUMERIC QT CM facts ;
-rules:  WS | QT (WS|ALPHANUMERIC) ARROW ALPHANUMERIC QT | QT (WS|ALPHANUMERIC) ARROW ALPHANUMERIC QT CM rules ;
+unquotedfacts : WS | ALPHANUMERIC | ALPHANUMERIC CM unquotedfacts ;
+rules:  WS | QT (WS|unquotedfacts) ARROW ALPHANUMERIC QT | QT (WS|unquotedfacts) ARROW ALPHANUMERIC QT CM rules ;
 suprel: WS | QT RULETAG (GT|LT) RULETAG QT | QT RULETAG (GT|LT) RULETAG QT CM suprel ;
 
 VERSION: 'version' ;
@@ -20,9 +21,8 @@ SUPREL: 'supRules' ;
 
 NATURAL: '0' | [1-9][0-9]* ;
 DECIMAL : ([1-9]+[0-9]*'.'[0-9]+|'0.'[0-9]+) ;
-ALPHANUMERIC : [a-zA-Z_]+ ;
+ALPHANUMERIC : [~]?[a-zA-Z_]+ ;
 ARROW: ('-'|'='|'~')'>' ;
-
 RULETAG: 'r' NATURAL;
 
 CLN: ':';

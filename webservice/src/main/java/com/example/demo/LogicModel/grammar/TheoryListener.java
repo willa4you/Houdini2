@@ -48,6 +48,16 @@ public interface TheoryListener extends ParseTreeListener {
 	 */
 	void exitFacts(TheoryParser.FactsContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link TheoryParser#unquotedfacts}.
+	 * @param ctx the parse tree
+	 */
+	void enterUnquotedfacts(TheoryParser.UnquotedfactsContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TheoryParser#unquotedfacts}.
+	 * @param ctx the parse tree
+	 */
+	void exitUnquotedfacts(TheoryParser.UnquotedfactsContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link TheoryParser#rules}.
 	 * @param ctx the parse tree
 	 */
