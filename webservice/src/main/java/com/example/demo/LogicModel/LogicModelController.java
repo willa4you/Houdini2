@@ -151,10 +151,23 @@ public class LogicModelController {
       this.configFromLogicModel(new LogicModel());
     } catch(IOException e) {
       //It's impossibible to have an exception here
+      System.out.print(e);
     }
     return "home";
   }
 
+  //Use this route to clear model
+  @GetMapping("/home")
+  public String home2Form(Model model) {
+    try {
+      this.configFromLogicModel(new LogicModel());
+      model.addAttribute("logic_model", new LogicModel());
+    } catch(IOException e) {
+      //It's impossibible to have an exception here
+      System.out.print(e);
+    }
+    return "redirect:/";
+  }
     
   @GetMapping("/sets")
   public String setForm(Model model) {
@@ -181,8 +194,6 @@ public class LogicModelController {
 	@PostMapping("/upload")
 	public String handleFileUpload(@RequestParam("file") MultipartFile file,
 			RedirectAttributes redirectAttributes, Model model) throws IOException, JSONWrongFormatException {
-
-		//storageService.store(file);
 
     //TODO handle IOException here
     String content = new String(file.getBytes());
