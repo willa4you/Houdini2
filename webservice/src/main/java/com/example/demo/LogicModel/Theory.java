@@ -19,12 +19,12 @@ public class Theory {
         this.superiorityRelations = superiorityRelations;
     }
 
-    public Theory(Set<String> literals, LogicModel logicModel) {
+    public Theory(Set<Literal> literals, LogicModel logicModel) {
         this(literals, logicModel.getFacts(), logicModel.getRules(), logicModel.getSupRules());
     }
 
-    public Theory(Set<String> literals, List<String> facts, List<String> rules, List<String> superiorityRelations) {
-        this.literals = literals.stream().filter(l -> !l.equals("")).map(Literal::new).collect(Collectors.toSet());
+    public Theory(Set<Literal> literals, List<String> facts, List<String> rules, List<String> superiorityRelations) {
+        this.literals = literals.stream().filter(l -> l.getLabel().equals("")).collect(Collectors.toSet());
         this.facts = facts.stream().filter(f -> !f.equals("")).map(Literal::new).collect(Collectors.toSet());
 
         Integer rule_counters = 0;

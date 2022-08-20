@@ -12,6 +12,7 @@
 <body class="body-style">
     <form id="logic-form" action="#" th:action="@{/}" th:object="${logic_model}" method="post">
         <nav class="navbar navbar-expand-lg navbar-dark bg-2" >
+            
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <a class="navbar-brand" href="/home">
                     <h1 class="set-title-navbar">
@@ -27,8 +28,14 @@
                         </a>
                     </li>
                 </ul>
+                <div class="alert alert-danger" style="margin-left: 650px; margin-bottom: 0px;" role="alert" th:if="${is_there_a_json_error_message} == true">
+                    There are some syntax errors in the model. Check the HELP page.
+                </div>
+                
             </div>
+            
         </nav>
+       
         <div class="row row-style" style="flex-wrap: wrap;">
             <div class="col-3" style="padding: 0px !important; min-width: 300px;">
                 <div class="row bg-1 row-style"style="background-color: #5ba396;">
@@ -40,10 +47,13 @@
                     <div class="card card-home shadow-sm p-3 mb-5 bg-white rounded">
                         <div class="container col-7 variable-list-home">
                             <div th:each="fact, f_i : *{facts}" class="input-group md-3">
-                                <!-- <span class="input-group-text" id="basic-addon2">Fact&nbsp;<span th:text=" ${f_i.index+1}"></span></span> -->
+                                <span class="input-group-text" id="basic-addon2">Fact&nbsp;<span th:text=" ${f_i.index+1}"></span></span>
+                                <!--input th:field="*{facts[__${f_i.index}__]}" 
+                                style="border-radius: .375rem" type="text" class="form-control"
+                                th:classappend="${(f_i.index == facts_length ? 'facts-input ' : 'not-input ') + (are_facts_valid[__${f_i.index}__] ? 'valid ' : 'is-invalid ')}"-->
                                 <input th:field="*{facts[__${f_i.index}__]}" 
                                 type="text" class="form-control input-home-form" oninput="validate_facts(this, 333)" onfocusout="clear_timer()"
-                                th:classappend="${(f_i.index == facts_length ? 'facts-input-active ' : 'facts-input-not-active ') + (are_facts_valid[__${f_i.index}__] ? 'valid ' : 'is-invalid ')}"/>
+                                th:classappend="${(f_i.index == facts_length)} ? 'facts-input-active ' : 'facts-input-not-active '"/>
                                 <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
                                     <b>Use only alphanumeric symbols and '_'. You can start with '~'.</b>
                                 </div>
@@ -63,9 +73,13 @@
                         <div class="container col-5 variable-list-home-rule">
                             <div th:each="rule, r_i : *{rules}" class="input-group md-3">
                                 <span class="input-group-text" id="basic-addon2">Rule&nbsp;<span th:text=" ${r_i.index+1}"></span></span>
+                                <!--input th:field="*{rules[__${r_i.index}__]}" 
+                                style="border-radius: .375rem" type="text" class="form-control"
+                                th:classappend="${(r_i.index == rules_length ? 'rules-input ' : 'not-input ') + (are_rules_valid[__${r_i.index}__] ? 'valid ' : 'is-invalid ')}"
+                                -->
                                 <input th:field="*{rules[__${r_i.index}__]}" 
                                 type="text" class="form-control input-home-form" oninput="validate_rules(this, 333)" onfocusout="clear_timer()"
-                                th:classappend="${(r_i.index == rules_length ? 'rules-input-active ' : 'rules-input-not-active ') + (are_rules_valid[__${r_i.index}__] ? 'valid ' : 'is-invalid ')}">
+                                th:classappend="${(r_i.index == rules_length)} ? 'rules-input-active ' : 'rules-input-not-active '">
                                 <div id="regole-control-feedback" class="invalid-feedback error-home-card">
                                     <b>It must have the form: a -> b, a => b, a ~> b.</b>
                                 </div>
@@ -84,10 +98,15 @@
                     <div class="card card-home shadow-sm p-3 mb-5 bg-white rounded">
                         <div class="container col-7 variable-list-home">
                             <div th:each="srule, sr_i : *{supRules}" class="input-group md-3">
-                                <!-- <span  class="input-group-text" id="basic-addon2">Sup. rule&nbsp;<span th:text=" ${sr_i.index+1}"></span></span> -->
-                                <input th:field="*{supRules[__${sr_i.index}__]}" oninput="validate_suprels(this, 333)" onfocusout="clear_timer()"
-                                type="text" class="form-control input-home-form"
-                                th:classappend="${(sr_i.index == suprules_length ? 'sup-rules-input-active ' : 'sup-rules-input-not-active ') + (are_suprules_valid[__${sr_i.index}__] ? 'valid ' : 'is-invalid ')}">
+                                <span  class="input-group-text" id="basic-addon2">Sup. rule&nbsp;<span th:text=" ${sr_i.index+1}"></span></span>
+                                <!--input th:field="*{supRules[__${sr_i.index}__]}" 
+                                style="border-radius: .375rem" type="text" class="form-control"
+                                th:classappend="${(sr_i.index == suprules_length ? 'sup-rules-input ' : 'not-input ') + (are_suprules_valid[__${sr_i.index}__] ? 'valid ' : 'is-invalid ')}"
+                                -->
+                                <input th:field="*{supRules[__${sr_i.index}__]}" 
+                                type="text" class="form-control input-home-form" oninput="validate_suprels(this, 333)" onfocusout="clear_timer()"
+                                th:classappend="${(sr_i.index == suprules_length)} ? 'sup-rules-input-active ' : 'sup-rules-input-not-active '"
+                                >
                                 <div id="regole-control-feedback" class="invalid-feedback error-home-card">
                                     <b>It must have the form: rx &lt; ry, rx > ry where x,y are numbers.</b>
                                 </div>
@@ -135,16 +154,15 @@
 		//<span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
             tar.unbind();
             tar.parent().after(`<div class="input-group md-3">
-                                        
-                                        <input id="facts${facts_counter-1}" name="facts[${facts_counter-1}]"
-                                        style="border-radius: .375rem" oninput="validate_facts(this, 333)" onfocusout="clear_timer()"
-                                        th:classappend="\${are_facts_valid} ? ok : is-invalid" type="text" class="form-control facts-input facts-input-active "></input>
+                                        <span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
+                                        <input id="facts${facts_counter-1}" name="facts[${facts_counter-1}]" 
+                                        oninput="validate_facts(this, 333)" onfocusout="clear_timer()"
+                                        type="text" class="form-control facts-input-active input-home-form">
                                         <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
-                                            <b>Use only alphanumeric symbols and '_'. You can start with '~'.</b>
+                                            <b>Evita i simboli: spazio, virgola, -, _, =, >, &lt;, ~, ¬, \, ', ", ; </b> 
                                         </div>
                                     </div>
-                               `);
-            
+                                `);
             $(".facts-input-active").keypress(f);
         };
         
@@ -154,15 +172,12 @@
             tar.removeClass("rules-input-active ");
             tar.unbind();
             tar.parent().after(`<div class="input-group md-3">
-                                        <span class="input-group-text" id="basic-addon2">Rule ${rules_counter}</span>
-                                        <input id="rules${rules_counter-1}" name="rules[${rules_counter-1}]"
-                                        style="border-radius: .375rem" oninput="validate_rules(this, 333)" onfocusout="clear_timer()"
-                                        th:classappend="\${are_rules_valid} ? ok : is-invalid" type="text" class="form-control rules-input rules-input-active "></input>
-                                        <div id="regole-control-feedback" class="invalid-feedback error-home-card">
-                                            <b>It must have the form: a -> b, a => b, a ~> b.</b>
-                                        </div>
-                                    </div>
-                               `);
+                    <span class="input-group-text" id="basic-addon2">Rule ${rules_counter}</span>
+                    <input id="rules${rules_counter-1}" name="rules[${rules_counter-1}]"
+                    oninput="validate_rules(this, 333)" onfocusout="clear_timer()"
+                    type="text" class="form-control rules-input-active input-home-form"
+                </div>
+            `);
             $(".rules-input-active").keypress(r);
         };
 
@@ -171,17 +186,13 @@
             let tar = $(this);
             tar.removeClass("sup-rules-input-active ");
             tar.unbind();
-            //<span class="input-group-text" id="basic-addon2">Sup. rule ${sup_rules_counter}</span>
             tar.parent().after(`<div class="input-group md-3">
-                                        
-                                        <input id="supRules${sup_rules_counter-1}" name="supRules[${sup_rules_counter-1}]" 
-                                        style="border-radius: .375rem" oninput="validate_suprels(this, 333)" onfocusout="clear_timer()"
-                                        th:classappend="\${are_suprules_valid} ? ok : is-invalid" type="text" class="form-control sup-rules-input sup-rules-input-active "></input>
-                                        <div id="regole-control-feedback" class="invalid-feedback error-home-card">
-                                            <b>It must have the form: rx &lt; ry, rx > ry where x,y are numbers.</b>
-                                        </div>
-                                    </div>
-                               `);
+                    <span class="input-group-text" id="basic-addon2">Sup. rule ${sup_rules_counter}</span>
+                    <input id="supRules${sup_rules_counter-1}" name="supRules[${sup_rules_counter-1}]"
+                    oninput="validate_suprels(this, 333)" onfocusout="clear_timer()"
+                    type="text" class="form-control sup-rules-input-active input-home-form"
+                </div>
+            `);
             $(".sup-rules-input-active").keypress(sr);
         };
         $(".facts-input-active").keypress(f);
@@ -223,7 +234,7 @@
     let validate_suprels = function(elem, ms) {
         if (_timer === null) {
             _timer = setInterval(function() {
-                if (!elem.value.match(/^[ ]*r[1-9][0-9]*[ ]*[><][ ]*r[1-9][0-9][ ]*$/)) {
+                if (!elem.value.match(/^[ ]*r[1-9][0-9]*[ ]*[><][ ]*r[1-9][0-9]*[ ]*$/)) {
                     $(elem).addClass("is-invalid");
                 } else {
                     $(elem).removeClass("is-invalid");

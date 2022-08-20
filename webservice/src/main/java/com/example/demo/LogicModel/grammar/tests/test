@@ -1,0 +1,5 @@
+{
+"facts" : ["~a", "b"],
+"rules" : ["a -> c", "~a, b -> d", "b -> a"],
+"supRules" : ["r1 < r2"]
+}
