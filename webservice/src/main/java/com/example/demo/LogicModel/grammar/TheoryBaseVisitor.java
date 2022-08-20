@@ -1,5 +1,4 @@
-package com.example.demo.LogicModel.grammar;
-// Generated from Theory.g4 by ANTLR 4.10.1
+package com.example.demo.LogicModel.grammar;// Generated from Theory.g4 by ANTLR 4.10.1
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 /**
@@ -31,13 +30,6 @@ public class TheoryBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitLiteral(TheoryParser.LiteralContext ctx) { return visitChildren(ctx); }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.</p>
-	 */
 	@Override public T visitUnquotedfacts(TheoryParser.UnquotedfactsContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -59,5 +51,12 @@ public class TheoryBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSuprel(TheoryParser.SuprelContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSuprels(TheoryParser.SuprelsContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitLiteral(TheoryParser.LiteralContext ctx) { return visitChildren(ctx); }
 }

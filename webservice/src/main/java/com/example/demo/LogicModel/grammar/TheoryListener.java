@@ -1,5 +1,4 @@
-package com.example.demo.LogicModel.grammar;
-// Generated from Theory.g4 by ANTLR 4.10.1
+package com.example.demo.LogicModel.grammar;// Generated from Theory.g4 by ANTLR 4.10.1
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -27,16 +26,6 @@ public interface TheoryListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitLogicmodel(TheoryParser.LogicmodelContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link TheoryParser#literal}.
-	 * @param ctx the parse tree
-	 */
-	void enterLiteral(TheoryParser.LiteralContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link TheoryParser#literal}.
-	 * @param ctx the parse tree
-	 */
-	void exitLiteral(TheoryParser.LiteralContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link TheoryParser#unquotedfacts}.
 	 * @param ctx the parse tree
@@ -68,13 +57,23 @@ public interface TheoryListener extends ParseTreeListener {
 	 */
 	void exitRules(TheoryParser.RulesContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link TheoryParser#suprel}.
+	 * Enter a parse tree produced by {@link TheoryParser#suprels}.
 	 * @param ctx the parse tree
 	 */
-	void enterSuprel(TheoryParser.SuprelContext ctx);
+	void enterSuprels(TheoryParser.SuprelsContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link TheoryParser#suprel}.
+	 * Exit a parse tree produced by {@link TheoryParser#suprels}.
 	 * @param ctx the parse tree
 	 */
-	void exitSuprel(TheoryParser.SuprelContext ctx);
+	void exitSuprels(TheoryParser.SuprelsContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link TheoryParser#literal}.
+	 * @param ctx the parse tree
+	 */
+	void enterLiteral(TheoryParser.LiteralContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link TheoryParser#literal}.
+	 * @param ctx the parse tree
+	 */
+	void exitLiteral(TheoryParser.LiteralContext ctx);
 }

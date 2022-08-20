@@ -1,5 +1,4 @@
-package com.example.demo.LogicModel.grammar;
-// Generated from Theory.g4 by ANTLR 4.10.1
+package com.example.demo.LogicModel.grammar;// Generated from Theory.g4 by ANTLR 4.10.1
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -35,18 +34,6 @@ public class TheoryBaseListener implements TheoryListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitLogicmodel(TheoryParser.LogicmodelContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterLiteral(TheoryParser.LiteralContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitLiteral(TheoryParser.LiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -88,13 +75,25 @@ public class TheoryBaseListener implements TheoryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSuprel(TheoryParser.SuprelContext ctx) { }
+	@Override public void enterSuprels(TheoryParser.SuprelsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSuprel(TheoryParser.SuprelContext ctx) { }
+	@Override public void exitSuprels(TheoryParser.SuprelsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLiteral(TheoryParser.LiteralContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLiteral(TheoryParser.LiteralContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

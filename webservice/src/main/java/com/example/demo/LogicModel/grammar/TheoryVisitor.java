@@ -1,5 +1,4 @@
-package com.example.demo.LogicModel.grammar;
-// Generated from Theory.g4 by ANTLR 4.10.1
+package com.example.demo.LogicModel.grammar;// Generated from Theory.g4 by ANTLR 4.10.1
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -23,12 +22,6 @@ public interface TheoryVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitLogicmodel(TheoryParser.LogicmodelContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TheoryParser#literal}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLiteral(TheoryParser.LiteralContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link TheoryParser#unquotedfacts}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -47,9 +40,15 @@ public interface TheoryVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitRules(TheoryParser.RulesContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link TheoryParser#suprel}.
+	 * Visit a parse tree produced by {@link TheoryParser#suprels}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSuprel(TheoryParser.SuprelContext ctx);
+	T visitSuprels(TheoryParser.SuprelsContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link TheoryParser#literal}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLiteral(TheoryParser.LiteralContext ctx);
 }
