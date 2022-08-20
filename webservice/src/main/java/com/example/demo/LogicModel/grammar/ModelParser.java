@@ -12,7 +12,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 public class ModelParser {
     private static class RecognitionExceptionListener extends BaseErrorListener {
-        public static final RecognitionExceptionListener INSTANCE = new RecognitionExceptionListener();
         @Override
         public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e)
             throws ParseCancellationException {
@@ -34,11 +33,11 @@ public class ModelParser {
         parser.removeErrorListeners();
         parser.addErrorListener(new RecognitionExceptionListener());
 
-        ParseTree tree = parser.theory(); 
-        TheoryVisitor<String> visitor = new MyTheoryVisitor();
+        ParseTree tree = parser.theory();
+        
+        MyTheoryVisitor visitor = new MyTheoryVisitor();
         visitor.visit(tree);
-       
-        //System.out.println(tree.toStringTree(parser)); // print tree
+        System.out.println(visitor.getLiterals().toString());
     }
 
     

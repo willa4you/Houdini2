@@ -28,18 +28,6 @@ public class TheoryBaseListener implements TheoryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterVersion(TheoryParser.VersionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitVersion(TheoryParser.VersionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterLogicmodel(TheoryParser.LogicmodelContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -52,13 +40,13 @@ public class TheoryBaseListener implements TheoryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFacts(TheoryParser.FactsContext ctx) { }
+	@Override public void enterLiteral(TheoryParser.LiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitFacts(TheoryParser.FactsContext ctx) { }
+	@Override public void exitLiteral(TheoryParser.LiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -71,6 +59,18 @@ public class TheoryBaseListener implements TheoryListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitUnquotedfacts(TheoryParser.UnquotedfactsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFacts(TheoryParser.FactsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFacts(TheoryParser.FactsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

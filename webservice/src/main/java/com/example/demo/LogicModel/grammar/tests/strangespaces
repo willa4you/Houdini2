@@ -1,2 +1,3 @@
-{ "version" : "0.001", "logicModel" :     {
-     "facts" : [ "a", "___" ], "rules" : [ "a => b" ], "supRules" : [ "r1 > r2" ] } }
+{
+     "facts" : [ "a", "___" ], "rules" : [ "a => b" ], "supRules" : [ "r1 > r2" ] 
+}

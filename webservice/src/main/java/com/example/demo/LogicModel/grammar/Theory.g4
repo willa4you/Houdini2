@@ -1,18 +1,19 @@
 grammar Theory;
 
-theory: LBRACE version CM logicmodel RBRACE EOF;
-version: QT VERSION QT CLN QT DECIMAL QT  ;
-logicmodel : QT LOGICMODEL QT CLN LBRACE 
-    QT FACTS QT CLN LSQUARE facts RSQUARE CM 
+theory: LBRACE logicmodel RBRACE EOF;
+
+//version: QT VERSION QT CLN QT DECIMAL QT  ;
+//logicmodel : QT LOGICMODEL QT CLN LBRACE ...(copy from QT RULES ...)
+
+logicmodel: QT FACTS QT CLN LSQUARE facts RSQUARE CM 
     QT RULES QT CLN LSQUARE rules RSQUARE CM
     QT SUPREL QT CLN LSQUARE suprel RSQUARE 
-    RBRACE;
-
-literal: ALPHANUMERIC ;
-facts:  WS | QT literal QT | QT literal QT CM facts ;
+    ;
+literal: WS | ALPHANUMERIC ;
 unquotedfacts : WS | literal | literal CM unquotedfacts ;
-rules:  WS | QT (WS|unquotedfacts) ARROW literal QT | QT (WS|unquotedfacts) ARROW literal QT CM rules ;
-suprel: WS | QT RULETAG (GT|LT) RULETAG QT | QT RULETAG (GT|LT) RULETAG QT CM suprel ;
+facts:  WS | QT QT | QT literal QT | QT literal QT CM facts ;
+rules:  WS | QT QT |QT (WS|unquotedfacts) ARROW literal QT | QT (WS|unquotedfacts) ARROW literal QT CM rules ;
+suprel: WS | QT QT | QT RULETAG (GT|LT) RULETAG QT | QT RULETAG (GT|LT) RULETAG QT CM suprel ;
 
 VERSION: 'version' ;
 LOGICMODEL : 'logicModel' ;
