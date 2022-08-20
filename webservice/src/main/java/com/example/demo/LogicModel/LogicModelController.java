@@ -139,6 +139,7 @@ public class LogicModelController {
     
     
     ModelParser.parse(JSONcontent); //Here throws ParseCancellationException if wrong
+
     
     /*
     this.validator = new LiteralChecker();
@@ -150,8 +151,7 @@ public class LogicModelController {
       throw new IOException("Some input is wrong.");
     }
     */
-    
-    Theory th = new Theory(this.validator.getLiterals(), this.logicModel);
+    Theory th = new Theory(ModelParser.getLiterals(), this.logicModel);
     Pair<Theory, Extension> computed = new StrictExtensionComputator().computeExtension(th);
 
     this.plusDeltaString = computed.getSecond().getPlusDeltaString();
@@ -192,7 +192,6 @@ public class LogicModelController {
   public String homeSubmit(@ModelAttribute LogicModel logicModel, Model model, RedirectAttributes redirectAttributes) {
     
     //Update data
-    System.out.println(logicModel.toJSONString());
     try {
       this.configFromLogicModel(logicModel);
       return "redirect:/sets";
