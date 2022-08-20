@@ -51,6 +51,7 @@ public class ModelParser {
         visitor.visit(tree);
         
         literals = visitor.getLiterals();
+        
     }
 
     

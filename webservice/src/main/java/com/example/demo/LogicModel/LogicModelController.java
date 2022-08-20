@@ -202,7 +202,6 @@ public class LogicModelController {
 
   @PostMapping("/")
   public String homeSubmit(@ModelAttribute LogicModel logicModel, Model model, RedirectAttributes redirectAttributes) {
-    
     //Update data
     try {
       this.configFromLogicModel(logicModel);

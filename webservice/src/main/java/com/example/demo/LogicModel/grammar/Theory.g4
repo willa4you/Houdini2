@@ -23,7 +23,7 @@ SUPREL: 'supRules' ;
 
 NATURAL: '0' | [1-9][0-9]* ;
 DECIMAL : ([1-9]+[0-9]*'.'[0-9]+|'0.'[0-9]+) ;
-ALPHANUMERIC : [~]?[a-zA-Z_]+ ;
+ALPHANUMERIC : [~]?[a-zA-Z_0-9]+ ;
 ARROW: ('-'|'='|'~')'>' ;
 RULETAG: 'r' NATURAL;
 
