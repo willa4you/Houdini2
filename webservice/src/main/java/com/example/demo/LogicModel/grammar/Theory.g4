@@ -40,7 +40,7 @@ literal: WS | ALPHANUMERIC ;
 /* */
 NATURAL: [1-9][0-9]* ;
 DECIMAL : ([1-9]+[0-9]*'.'[0-9]+|'0.'[0-9]+) ;
-ALPHANUMERIC : [~]?[a-zA-Z_0-9]+ ;
+ALPHANUMERIC : [~]?[a-zA-Z_0-9àèéìòù]+ ;
 ARROW: ('-'|'='|'~')'>' ;
 
 
