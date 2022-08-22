@@ -52,7 +52,7 @@
                                 style="border-radius: .375rem" type="text" class="form-control"
                                 th:classappend="${(f_i.index == facts_length ? 'facts-input ' : 'not-input ') + (are_facts_valid[__${f_i.index}__] ? 'valid ' : 'is-invalid ')}"-->
                                 <input th:field="*{facts[__${f_i.index}__]}" th:attr="label=${f_i.index}"
-                                type="text" class="form-control input-home-form" oninput="validate_facts(this, 200)" onfocusout="clear_timer()"
+                                type="text" class="form-control input-home-form" oninput="validate_facts(this, 100)" onfocusout="clear_timer()"
                                 th:classappend="${(f_i.index == facts_length)} ? 'facts-input-active ' : 'facts-input-not-active '"/>
                                 <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
                                     <b>Use only alphanumeric symbols and '_'. You can start with '~'.</b>
@@ -78,7 +78,7 @@
                                 th:classappend="${(r_i.index == rules_length ? 'rules-input ' : 'not-input ') + (are_rules_valid[__${r_i.index}__] ? 'valid ' : 'is-invalid ')}"
                                 -->
                                 <input th:field="*{rules[__${r_i.index}__]}" th:attr="label=${r_i.index}"
-                                type="text" class="form-control input-home-form" oninput="validate_rules(this, 200)" onfocusout="clear_timer()"
+                                type="text" class="form-control input-home-form" oninput="validate_rules(this, 100)" onfocusout="clear_timer()"
                                 th:classappend="${(r_i.index == rules_length)} ? 'rules-input-active ' : 'rules-input-not-active '">
                                 <div id="regole-control-feedback" class="invalid-feedback error-home-card">
                                     <b>It must have the form: a -> b, a => b, a ~> b.</b>
@@ -104,7 +104,7 @@
                                 th:classappend="${(sr_i.index == suprules_length ? 'sup-rules-input ' : 'not-input ') + (are_suprules_valid[__${sr_i.index}__] ? 'valid ' : 'is-invalid ')}"
                                 -->
                                 <input th:field="*{supRules[__${sr_i.index}__]}" th:attr="label=${sr_i.index}"
-                                type="text" class="form-control input-home-form" oninput="validate_suprels(this, 200)" onfocusout="clear_timer()"
+                                type="text" class="form-control input-home-form" oninput="validate_suprels(this, 100)" onfocusout="clear_timer()"
                                 th:classappend="${(sr_i.index == suprules_length)} ? 'sup-rules-input-active ' : 'sup-rules-input-not-active '"
                                 >
                                 <div id="regole-control-feedback" class="invalid-feedback error-home-card">
@@ -171,7 +171,7 @@
             tar.parent().after(`<div class="input-group md-3">
                                         <span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
                                         <input id="facts${facts_counter-1}" name="facts[${facts_counter-1}]" label="${facts_counter-1}"
-                                        oninput="validate_facts(this, 200)" onfocusout="clear_timer()"
+                                        oninput="validate_facts(this, 100)" onfocusout="clear_timer()"
                                         type="text" class="form-control facts-input-active input-home-form">
                                         <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
                                             <b>Evita i simboli: spazio, virgola, -, _, =, >, &lt;, ~, ¬, \, ', ", ; </b> 
@@ -190,7 +190,7 @@
             tar.parent().after(`<div class="input-group md-3">
                     <span class="input-group-text" id="basic-addon2">Rule ${rules_counter}</span>
                     <input id="rules${rules_counter-1}" name="rules[${rules_counter-1}]" label="${rules_counter-1}"
-                    oninput="validate_rules(this, 200)" onfocusout="clear_timer()"
+                    oninput="validate_rules(this, 100)" onfocusout="clear_timer()"
                     type="text" class="form-control rules-input-active input-home-form"
                 </div>
             `);
@@ -206,7 +206,7 @@
             tar.parent().after(`<div class="input-group md-3">
                     <span class="input-group-text" id="basic-addon2">Sup. rule ${sup_rules_counter}</span>
                     <input id="supRules${sup_rules_counter-1}" name="supRules[${sup_rules_counter-1}]" label="${sup_rules_counter-1}"
-                    oninput="validate_suprels(this, 200)" onfocusout="clear_timer()"
+                    oninput="validate_suprels(this, 100)" onfocusout="clear_timer()"
                     type="text" class="form-control sup-rules-input-active input-home-form"
                 </div>
             `);
@@ -221,7 +221,6 @@
     <script>
     
     function check_form_validity() {
-        console.log(facts_validity);
         //console.log(facts_validity.some(function(e) {e === false;}));
         return !(facts_validity.some(e => e===false) || rules_validity.some(e => e===false) || suprels_validity.some(e => e===false));
     }
@@ -247,7 +246,7 @@
     }
     
     let _timer = null;
-
+    
     let validate_facts = function(elem, ms) {
         if (_timer === null) {
             const index = parseInt(elem.attributes["label"]["value"]);
@@ -303,7 +302,7 @@
     }
     
     $("#logic-form").on("submit", function(e) {
-       if (!check_form_validity()) e.preventDefault();
+        if (!check_form_validity()) e.preventDefault();
     })
     </script>
     
