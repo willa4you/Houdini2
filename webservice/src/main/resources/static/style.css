@@ -56,13 +56,19 @@ body {
     color:#000000;
 }
 
-.calculate-buttom {
+.calculate-button {
     background-color: #015d52;
     /* margin-left: 306px; */
     margin-top: 30px;
     margin-bottom: 30px;
     width: 110px;
     margin-left: 26px;
+}
+
+.calculate-button.disabled{
+    cursor: not-allowed; 
+    pointer-events: all !important;
+    --bs-btn-focus-shadow-rgb: none;
 }
 
 .spinner-home-style {
@@ -77,7 +83,7 @@ body {
     margin-left: 15px;
 }
 
-.upload-buttom {
+.upload-button {
     margin-left: 80px;
     margin-top: 50px;
     margin-bottom: 19px;

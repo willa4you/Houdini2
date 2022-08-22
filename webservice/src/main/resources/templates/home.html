@@ -117,7 +117,7 @@
             </div>    
         </div>
         <div class="row bg-1 row-style" style="background-color: #84bab0; flex-wrap: wrap;">
-            <button id="logic-submit" type="submit" value="Submit" class="btn btn-primary calculate-buttom">CALCULATE</button>
+            <button id="logic-submit" type="submit" value="Submit" class="btn btn-primary calculate-button">CALCULATE</button>
         </div>
     </form>
     <form id="upload-form" enctype="multipart/form-data" action="/upload" th:action="@{/upload}" method="post">
@@ -132,7 +132,7 @@
                     <span class="sr-only"></span>
                 </div>
                 <input class="form-control form-home-upload" type="file" name="file"/>
-                <button type="submit" value="Submit" class="btn btn-primary upload-buttom">UPLOAD</button>
+                <button type="submit" value="Submit" class="btn btn-primary upload-button">UPLOAD</button>
             </div>
         </div>      
     </form>
@@ -251,7 +251,7 @@
         if (_timer === null) {
             const index = parseInt(elem.attributes["label"]["value"]);
             _timer = setInterval(function() {
-                if (!elem.value.match(/^[ ]*(\~)?[a-zA-Z_0-9]*[ ]*$/)) {
+                if (!elem.value.match(/^[ ]*(\~)?[a-zA-Z_0-9àèéìòù]*[ ]*$/)) {
                     $(elem).addClass("is-invalid");
                     set_validity("facts", false, index);
                 } else {
@@ -268,7 +268,7 @@
         if (_timer === null) {
             const index = parseInt(elem.attributes["label"]["value"]);
             _timer = setInterval(function() {
-                if (!elem.value.match(/^[ ]*(\~)?[a-zA-Z0-9_, ~]*[ ]*[-=~]\>[ ]*(\~)?[a-zA-Z_0-9]+[ ]*$/)) {
+                if (!elem.value.match(/^[ ]*(\~)?[a-zA-Z0-9_àèéìòù, ~]*[ ]*[-=~]\>[ ]*(\~)?[a-zA-Z_0-9àèéìòù]+[ ]*$/)) {
                     $(elem).addClass("is-invalid");
                     set_validity("rules", false, index);
                 } else {
