@@ -1,13 +1,13 @@
 package com.example.demo.LogicModel.grammar;
 
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import com.example.demo.LogicModel.Literal;
 import com.example.demo.LogicModel.grammar.TheoryParser.LiteralContext;
 
 public class MyTheoryVisitor extends TheoryBaseVisitor<String> {
-    private Set<Literal> literals = new TreeSet<>();
+    private Set<Literal> literals = new HashSet<Literal>();
     
     public Set<Literal> getLiterals() {
         return this.literals;

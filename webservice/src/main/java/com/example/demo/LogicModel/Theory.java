@@ -24,7 +24,7 @@ public class Theory {
     }
 
     public Theory(Set<Literal> literals, List<String> facts, List<String> rules, List<String> superiorityRelations) {
-        this.literals = literals.stream().filter(l -> l.getLabel().equals("")).collect(Collectors.toSet());
+        this.literals = literals.stream().filter(l -> !l.getLabel().equals("")).collect(Collectors.toSet());
         this.facts = facts.stream().filter(f -> !f.equals("")).map(Literal::new).collect(Collectors.toSet());
 
         Integer rule_counters = 0;

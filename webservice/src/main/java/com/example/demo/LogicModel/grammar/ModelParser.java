@@ -1,7 +1,7 @@
 package com.example.demo.LogicModel.grammar;
 
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import com.example.demo.LogicModel.Literal;
 
@@ -17,7 +17,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 public class ModelParser {
 
-    private static Set<Literal> literals = new TreeSet<>();
+    private static Set<Literal> literals = new HashSet<Literal>();
 
     public static Set<Literal> getLiterals() {
         return literals;
