@@ -10,7 +10,7 @@
     <script type="text/javascript" th:src="@{js/jquery-3.6.0.min.js}"></script>
 </head>
 <body class="body-style">
-    <form id="logic-form" action="#" th:action="@{/}" th:object="${logic_model}" method="post">
+    <form autocomplete="off" id="logic-form" action="#" th:action="@{/}" th:object="${logic_model}" method="post" >
         <nav class="navbar navbar-expand-lg navbar-dark bg-2" >
             
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -251,7 +251,7 @@
         if (_timer === null) {
             const index = parseInt(elem.attributes["label"]["value"]);
             _timer = setInterval(function() {
-                if (!elem.value.match(/^[ ]*(\~)?[a-zA-Z_0-9àèéìòù]*[ ]*$/)) {
+                if (!elem.value.match(/^$|^[ ]*(\~)?[a-zA-Z_0-9àèéìòù]*[ ]*$/)) {
                     $(elem).addClass("is-invalid");
                     set_validity("facts", false, index);
                 } else {
@@ -268,7 +268,7 @@
         if (_timer === null) {
             const index = parseInt(elem.attributes["label"]["value"]);
             _timer = setInterval(function() {
-                if (!elem.value.match(/^[ ]*(\~)?[a-zA-Z0-9_àèéìòù, ~]*[ ]*[-=~]\>[ ]*(\~)?[a-zA-Z_0-9àèéìòù]+[ ]*$/)) {
+                if (!elem.value.match(/^$|^[ ]*(\~)?[a-zA-Z0-9_àèéìòù, ~]*[ ]*[-=~]\>[ ]*(\~)?[a-zA-Z_0-9àèéìòù]+[ ]*$/)) {
                     $(elem).addClass("is-invalid");
                     set_validity("rules", false, index);
                 } else {
@@ -284,7 +284,7 @@
         if (_timer === null) {
             const index = parseInt(elem.attributes["label"]["value"]);
             _timer = setInterval(function() {
-                if (!elem.value.match(/^[ ]*r[1-9][0-9]*[ ]*[><][ ]*r[1-9][0-9]*[ ]*$/)) {
+                if (!elem.value.match(/^$|^[ ]*r[1-9][0-9]*[ ]*[><][ ]*r[1-9][0-9]*[ ]*$/)) {
                     $(elem).addClass("is-invalid");
                     set_validity("suprels", false, index);
                 } else {
