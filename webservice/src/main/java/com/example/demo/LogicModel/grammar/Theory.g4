@@ -15,16 +15,19 @@ logicmodel: QT FACTS QT CLN LSQUARE facts RSQUARE CM
 unquotedfacts : WS | literal | literal CM unquotedfacts ;
 facts:  WS 
     | QT QT 
+    | QT QT CM facts
     | QT literal QT 
     | QT literal QT CM facts ;
 rules:  WS 
     | QT QT 
+    | QT QT CM rules
     | QT unquotedfacts ARROW literal QT 
     | QT ARROW literal QT 
     | QT unquotedfacts ARROW literal QT CM rules 
     | QT ARROW literal QT CM rules ;
 suprels: WS 
     | QT QT 
+    | QT QT CM suprels
     | QT RULETAG (GT|LT) RULETAG QT 
     | QT RULETAG (GT|LT) RULETAG QT CM suprels ;
 
