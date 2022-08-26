@@ -10,14 +10,14 @@ logicmodel: QT FACTS QT CLN LSQUARE facts RSQUARE CM
     QT SUPREL QT CLN LSQUARE suprels RSQUARE 
     ;
 
-
-
 unquotedfacts : WS | literal | literal CM unquotedfacts ;
+
 facts:  WS 
     | QT QT 
     | QT QT CM facts
     | QT literal QT 
     | QT literal QT CM facts ;
+
 rules:  WS 
     | QT QT 
     | QT QT CM rules
@@ -25,6 +25,7 @@ rules:  WS
     | QT ARROW literal QT 
     | QT unquotedfacts ARROW literal QT CM rules 
     | QT ARROW literal QT CM rules ;
+
 suprels: WS 
     | QT QT 
     | QT QT CM suprels
@@ -46,7 +47,6 @@ DECIMAL : ([1-9]+[0-9]*'.'[0-9]+|'0.'[0-9]+) ;
 ALPHANUMERIC : [~]?[a-zA-Z_0-9àèéìòù]+ ;
 ARROW: ('-'|'='|'~')'>' ;
 
-
 CLN: ':';
 LBRACE: '{' ;
 RBRACE : '}' ;
@@ -57,5 +57,3 @@ LT: '<' ;
 QT: '"' ;
 CM: ',' ;
 WS : [ \t\r\n]+ -> skip ;
-
-

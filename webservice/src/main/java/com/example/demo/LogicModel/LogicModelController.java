@@ -172,7 +172,7 @@ public class LogicModelController {
       this.configFromLogicModel(new LogicModel());
     } catch(Exception e) {
       //It's impossibible to have an exception here
-      System.out.println("Exception get home");
+      System.out.println("Exception in GET /");
     }
     return "home";
   }
