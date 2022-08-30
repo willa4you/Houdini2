@@ -201,7 +201,7 @@ body {
 }
 
 .input-home-form{
-    border-radius: .375rem;
+    border-radius: .375rem !important;
 }
 
 /* .mycard .anyClass{
