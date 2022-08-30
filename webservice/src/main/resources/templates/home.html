@@ -12,7 +12,6 @@
 <body class="body-style">
     <form autocomplete="off" id="logic-form" action="#" th:action="@{/}" th:object="${logic_model}" method="post" >
         <nav class="navbar navbar-expand-lg navbar-dark bg-2" >
-            
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <a class="navbar-brand" href="/home">
                     <h1 class="set-title-navbar">
@@ -33,9 +32,7 @@
                 </div>
                 
             </div>
-            
         </nav>
-       
         <div class="row row-style" style="flex-wrap: wrap;">
             <div class="col-3" style="padding: 0px !important; min-width: 300px;">
                 <div class="row bg-1 row-style"style="background-color: #5ba396;">
@@ -47,7 +44,7 @@
                     <div class="card card-home shadow-sm p-3 mb-5 bg-white rounded">
                         <div class="container col-7 variable-list-home">
                             <div th:each="fact, f_i : *{facts}" class="input-group md-3">
-                                <span class="input-group-text" id="basic-addon2">Fact&nbsp;<span th:text=" ${f_i.index+1}"></span></span>
+                                <!--span class="input-group-text" id="basic-addon2">Fact&nbsp;<span th:text=" ${f_i.index+1}"></span></span-->
                                 <!--input th:field="*{facts[__${f_i.index}__]}" 
                                 style="border-radius: .375rem" type="text" class="form-control"
                                 th:classappend="${(f_i.index == facts_length ? 'facts-input ' : 'not-input ') + (are_facts_valid[__${f_i.index}__] ? 'valid ' : 'is-invalid ')}"-->
@@ -98,7 +95,7 @@
                     <div class="card card-home shadow-sm p-3 mb-5 bg-white rounded">
                         <div class="container col-7 variable-list-home">
                             <div th:each="srule, sr_i : *{supRules}" class="input-group md-3">
-                                <span  class="input-group-text" id="basic-addon2">Sup. rule&nbsp;<span th:text=" ${sr_i.index+1}"></span></span>
+                                <!--span  class="input-group-text" id="basic-addon2">Sup. rule&nbsp;<span th:text=" ${sr_i.index+1}"></span></span-->
                                 <!--input th:field="*{supRules[__${sr_i.index}__]}" 
                                 style="border-radius: .375rem" type="text" class="form-control"
                                 th:classappend="${(sr_i.index == suprules_length ? 'sup-rules-input ' : 'not-input ') + (are_suprules_valid[__${sr_i.index}__] ? 'valid ' : 'is-invalid ')}"
@@ -168,8 +165,9 @@
             tar.removeClass("facts-input-active");
 		//<span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
             tar.unbind();
+            //<span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
             tar.parent().after(`<div class="input-group md-3">
-                                        <span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
+                                        <!--span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span-->
                                         <input id="facts${facts_counter-1}" name="facts[${facts_counter-1}]" label="${facts_counter-1}"
                                         oninput="validate_facts(this, 100)" onfocusout="clear_timer()"
                                         type="text" class="form-control facts-input-active input-home-form">
@@ -203,8 +201,9 @@
             let tar = $(this);
             tar.removeClass("sup-rules-input-active ");
             tar.unbind();
+            //<span class="input-group-text" id="basic-addon2">Sup. rule ${sup_rules_counter}</span>
             tar.parent().after(`<div class="input-group md-3">
-                    <span class="input-group-text" id="basic-addon2">Sup. rule ${sup_rules_counter}</span>
+                    <!--span class="input-group-text" id="basic-addon2">Sup. rule ${sup_rules_counter}</span-->
                     <input id="supRules${sup_rules_counter-1}" name="supRules[${sup_rules_counter-1}]" label="${sup_rules_counter-1}"
                     oninput="validate_suprels(this, 100)" onfocusout="clear_timer()"
                     type="text" class="form-control sup-rules-input-active input-home-form"
