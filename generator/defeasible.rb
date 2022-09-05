@@ -23,8 +23,10 @@ end
 
 def output_theory(filepath)
   output = File.open(filepath + ".json", "w")
-  rules_string = "\"rules\" : [#{$rules.map{|r| "\"#{r.toString()}\""}.join(",")}]"
-  sup_string = "\"supRules\" : [#{$superiority_rels.map{|s| "\"#{s.toString()}\""}.join(",")}]"
+  rules_formatted = if $rules.empty? then "\"\"" else $rules.map{|r| "\"#{r.toString()}\""}.join(",") end
+  rules_string = "\"rules\" : [#{rules_formatted}]"
+  sup_formatted = if $superiority_rels.empty? then "\"\"" else $superiority_rels.map{|s| "\"#{s.toString()}\""}.join(",") end
+  sup_string = "\"supRules\" : [#{sup_formatted}]"
   theory_string = "{\n\t\"version\" : \"0.1\",\n\t\"logicModel\" : { \n\t\t\"facts\" : [\"\"],\n\t\t#{rules_string},\n\t\t#{sup_string}\n\t}\n}"
   output << theory_string
 end
