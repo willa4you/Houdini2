@@ -5,7 +5,6 @@ import com.example.demo.Pair;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 public class StrictExtensionComputator implements ExtensionComputator {
 
     @Override
@@ -14,7 +13,7 @@ public class StrictExtensionComputator implements ExtensionComputator {
         injectLiterals(injectableLiterals, extension, theory);
         while(!injectableLiterals.isEmpty()) { //TODO if the theory contains strict rules with empty tail but no facts the loop doesn't start
             injectableLiterals.clear();
-            for (Rule r : theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.STRICT)))) {
+            for (Rule r : theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.STRICT))).values()) {
                 if (r.getTail().isEmpty()) {
                     injectableLiterals.add(r.getHead());
                     r.activate();
@@ -23,19 +22,22 @@ public class StrictExtensionComputator implements ExtensionComputator {
             if (!injectableLiterals.isEmpty())
                 injectLiterals(injectableLiterals, extension, theory);
         }
-        extension.getMinusDelta().addAll(theory.getLiterals());
-        extension.getMinusDelta().removeAll(extension.getPlusDelta());
-        extension.getMinusDelta().removeAll(theory.getHeads(theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.STRICT)))));
-        Set<Literal> candidates = new TreeSet<Literal>(extension.getMinusDelta());
+
+        Set<Literal> candidates = new TreeSet<Literal>(theory.getLiterals());
+        Set<Literal> removeFromCandidates = new TreeSet<>(extension.getPlusDelta());
+        removeFromCandidates.addAll(theory.getHeads(new HashSet<>(theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.STRICT))).values())));
+
         while(!candidates.isEmpty()){
+            candidates.removeAll(removeFromCandidates);
+            candidates.forEach(c -> c.setDeltaState(State.MINUS));
             extension.getMinusDelta().addAll(candidates);
             candidates.clear();
-            for (Rule r: theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.STRICT)))) {
+            removeFromCandidates.clear();
+            for (Rule r: theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.STRICT))).values()) {
                 if (!Collections.disjoint(r.getTail(),extension.getMinusDelta())){
                     candidates.add(r.getHead());
-                    //TODO should we define another state for converted rules? setting them as defeasible changes the input theory
                     r.setType(RuleType.DEFEASIBLE);
-                } else candidates.remove(r.getHead());
+                } else removeFromCandidates.add(r.getHead());
             }
         }
 
@@ -44,13 +46,15 @@ public class StrictExtensionComputator implements ExtensionComputator {
 
     public void injectLiterals(Set<Literal> literals, Extension ext, Theory th){
         for (Literal l : literals) {
-            for (Rule r : th.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.STRICT)))) {
+            for (Rule r : th.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.STRICT))).values()) {
                 if (r.getHead().equals(l)) r.deactivate();
                 if (r.getTail().contains(l)) {
                     r.removeFromTail(l);
                 }
             }
             ext.getPlusDelta().add(l);
+            l.setDeltaState(State.PLUS);
+            l.setPartialState(State.PLUS);
         }
     }
 }

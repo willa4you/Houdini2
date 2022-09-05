@@ -27,7 +27,6 @@ public class Literal implements Comparable<Literal> {
     public Literal(String label) {
         this.label = label;
         boolean startsWithTilde = label.startsWith("~");
-        
         if (!startsWithTilde) {
             this.type = LITERALTYPE.LITERAL;
             //Must call this constructor otherwise there will be recursion
@@ -94,10 +93,11 @@ public class Literal implements Comparable<Literal> {
         this.partialState = partialState;
     }
 
+    public void addRule(String s) {this.rules.add(s);};
+
     @Override
     public boolean equals(Object object) {
         if (!(object instanceof Literal)) return false;
-        //if (!super.equals(object)) return false;
         Literal literal = (Literal) object;
         return (getLabel().equals(literal.getLabel()) && (this.getType().equals(literal.getType())));
     }

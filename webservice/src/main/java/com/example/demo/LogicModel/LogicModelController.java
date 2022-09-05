@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.example.demo.LogicModel.Extension.DefeasibleExtensionComputator;
 import com.example.demo.Pair;
 import com.example.demo.FileUpload.storage.StorageService;
 
@@ -45,7 +46,7 @@ public class LogicModelController {
   private String plusPartialString = "∅";
   private String minusPartialString = "∅";
   private boolean is_there_a_json_error_message = false;
-  
+
   @ModelAttribute("is_there_a_json_error_message")
   private boolean getIsThereAJsonErrorMessage() {
     return this.is_there_a_json_error_message;
@@ -117,7 +118,7 @@ public class LogicModelController {
 
   public void configFromLogicModel(LogicModel logicModel) throws IOException, ParseCancellationException  {
     this.logicModel = logicModel;
-    
+
     List<String> facts = logicModel.getFacts();
     List<String> rules = logicModel.getRules();
     List<String> supRules = logicModel.getSupRules();
@@ -133,31 +134,31 @@ public class LogicModelController {
     this.rulesLength = (rules.size()-1 < 0) ? 0 : rules.size()-1;
     this.supRulesLength = (supRules.size()-1 < 0) ? 0 : supRules.size()-1;
 
-    /* Validating */ 
-    
+    /* Validating */
+
     String JSONcontent = logicModel.toJSONString();
-    
-    
+
+
     ModelParser.parse(JSONcontent); //Here throws ParseCancellationException if wrong
 
-    
+
     /*
     this.validator = new LiteralChecker();
     this.areFactsValid = validator.validate_facts(facts);
     this.areRulesValid = validator.validate_rules(rules);
     this.areSupRulesValid = validator.validate_supRules(supRules, rules);
-    
+
     if (this.getAreFactsValid().contains(false) || this.getAreRulesValid().contains(false) || this.getAreSupRulesValid().contains(false)) {
       throw new IOException("Some input is wrong.");
     }
     */
     Theory th = new Theory(ModelParser.getLiterals(), this.logicModel);
     Pair<Theory, Extension> computed = new StrictExtensionComputator().computeExtension(th);
-
-    this.plusDeltaString = computed.getSecond().getPlusDeltaString();
-    this.minusDeltaString = computed.getSecond().getMinusDeltaString();
-    this.plusPartialString = computed.getSecond().getPlusPartialString();
-    this.minusPartialString = computed.getSecond().getMinusPartialString();
+    Pair<Theory, Extension> completeExtension = new DefeasibleExtensionComputator().computeExtension(computed.getFirst(), computed.getSecond());
+    this.plusDeltaString = completeExtension.getSecond().getPlusDeltaString();
+    this.minusDeltaString = completeExtension.getSecond().getMinusDeltaString();
+    this.plusPartialString = completeExtension.getSecond().getPlusPartialString();
+    this.minusPartialString = completeExtension.getSecond().getMinusPartialString();
   }
 
 	@Autowired
@@ -177,67 +178,45 @@ public class LogicModelController {
     return "home";
   }
 
-  //Use this route to clear model
-  @GetMapping("/home")
-  public String home2Form(Model model) {
-    try {
-      this.configFromLogicModel(new LogicModel());
-      model.addAttribute("logic_model", new LogicModel());
-    } catch(IOException e) {
-      //It's impossibible to have an exception here
-      System.out.print(e);
-    }
-    return "redirect:/";
-  }
-    
+
   @GetMapping("/sets")
   public String setForm(Model model) {
     return "sets";
   }
 
-  @GetMapping("/help")
-  public String helpForm(Model model) {
-    return "help";
-  }
-
   @PostMapping("/")
-  public String homeSubmit(@ModelAttribute LogicModel logicModel, Model model, RedirectAttributes redirectAttributes) {
+  public String homeSubmit(@ModelAttribute LogicModel logicModel, Model model) {
+
     //Update data
     try {
       this.configFromLogicModel(logicModel);
       return "redirect:/sets";
-    } catch(Exception e) {
-      redirectAttributes.addFlashAttribute("json_error_message", e.getMessage());
-      redirectAttributes.addFlashAttribute("is_there_a_json_error_message", true);
+    } catch(IOException e) {
       return "redirect:/";
     }
   }
 
 	@PostMapping("/upload")
 	public String handleFileUpload(@RequestParam("file") MultipartFile file,
-			RedirectAttributes redirectAttributes, Model model) throws IOException {
-    LogicModel parsed_model;
+			RedirectAttributes redirectAttributes, Model model) throws IOException, JSONWrongFormatException {
+
+		//storageService.store(file);
+
     //TODO handle IOException here
+    String content = new String(file.getBytes());
+
+    JSONLogicParser parser = new JSONLogicParser(content);
+
     try {
-      String content = new String(file.getBytes());
-      JSONLogicParser parser = new JSONLogicParser(content);
-      parsed_model = parser.parseJson();
-    } catch(Exception e) {
-      //JSON is not formatted correctly
-      redirectAttributes.addFlashAttribute("json_error_message", e.getMessage());
-      redirectAttributes.addFlashAttribute("is_there_a_json_error_message", true);
-      return "redirect:/";
-    }
-    
-    try {
+      LogicModel parsed_model = parser.parseJson();
       this.configFromLogicModel(parsed_model);
       return "redirect:/sets";
-    } catch(IOException e) {
-      redirectAttributes.addFlashAttribute("is_there_a_json_error_message", true);
-      //JSON is formatted correctly but its facts, rules etc. are NOT
+    } catch(JSONWrongFormatException e) {
+      //JSON is not formatted correctly
+      redirectAttributes.addFlashAttribute("json_error_message", e.getMessage());
       return "redirect:/";
-    } catch(ParseCancellationException e) {
-      redirectAttributes.addFlashAttribute("is_there_a_json_error_message", true);
+    } catch(IOException e) {
+      //JSON is formatted correctly but its facts, rules etc. are NOT
       return "redirect:/";
     }
 	}

@@ -30,7 +30,7 @@
                 <div class="alert alert-danger" style="margin-left: 520px; margin-bottom: 0px;" role="alert" th:if="${is_there_a_json_error_message} == true">
                     There are some errors in the definition of the model. Check the HELP page.
                 </div>
-                
+
             </div>
         </nav>
         <div class="row row-style" style="flex-wrap: wrap;">
@@ -70,7 +70,7 @@
                         <div class="container col-5 variable-list-home-rule">
                             <div th:each="rule, r_i : *{rules}" class="input-group md-3">
                                 <span class="input-group-text" id="basic-addon2">Rule&nbsp;<span th:text=" ${r_i.index+1}"></span></span>
-                                <!--input th:field="*{rules[__${r_i.index}__]}" 
+                                <!--input th:field="*{rules[__${r_i.index}__]}"
                                 style="border-radius: .375rem" type="text" class="form-control"
                                 th:classappend="${(r_i.index == rules_length ? 'rules-input ' : 'not-input ') + (are_rules_valid[__${r_i.index}__] ? 'valid ' : 'is-invalid ')}"
                                 -->
@@ -141,7 +141,7 @@
         var facts_counter = /*[[${facts_length+1}]]*/1;
         var rules_counter = /*[[${rules_length+1}]]*/1;
         var sup_rules_counter = /*[[${suprules_length+1}]]*/1;
-        
+
         var facts_validity = [];
         var rules_validity = [];
         var suprels_validity = [];
@@ -221,10 +221,10 @@
         $(".rules-input-active").keypress(r);
         $(".sup-rules-input-active").keypress(sr);
     </script>
-    
+
 
     <script>
-    
+
     function check_form_validity() {
         //console.log(facts_validity.some(function(e) {e === false;}));
         return !(facts_validity.some(e => e===false) || rules_validity.some(e => e===false) || suprels_validity.some(e => e===false));
@@ -236,7 +236,7 @@
             $("#logic-submit").addClass("disabled");
         }
     }
-          
+
     function set_validity(type, validity, index) {
         if (type === "facts") {
             facts_validity[index] = validity;
@@ -245,13 +245,13 @@
         } else if (type === "suprels") {
             suprels_validity[index] = validity;
         } else {
-           console.error("Wrong type in function 'set_validity'"); 
+           console.error("Wrong type in function 'set_validity'");
         }
-        
+
     }
-    
+
     let _timer = null;
-    
+
     let validate_facts = function(elem, ms) {
         if (_timer === null) {
             const index = parseInt(elem.attributes["label"]["value"]);
@@ -268,7 +268,7 @@
         }
     }
 
-  
+
     let validate_rules= function(elem, ms) {
         if (_timer === null) {
             const index = parseInt(elem.attributes["label"]["value"]);
@@ -305,7 +305,7 @@
         clearInterval(_timer);
         _timer = null;
     }
-    
+
     $("#logic-form").on("submit", function(e) {
         if (!check_form_validity()) e.preventDefault();
     })

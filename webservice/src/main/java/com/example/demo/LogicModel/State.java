@@ -1,6 +1,6 @@
 package com.example.demo.LogicModel;
 
-enum State {
+public enum State {
     UNDECIDED,
     PLUS,
     MINUS,

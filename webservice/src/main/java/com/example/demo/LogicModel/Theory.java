@@ -1,6 +1,7 @@
 package com.example.demo.LogicModel;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Theory {
     private Set<Literal> literals = new HashSet<Literal>();
@@ -24,7 +25,15 @@ public class Theory {
     }
 
     public Theory(Set<Literal> literals, List<String> facts, List<String> rules, List<String> superiorityRelations) {
-        this.literals = literals.stream().filter(l -> !l.getLabel().equals("")).collect(Collectors.toSet());
+        //We keep a stream so we can then add rules to the elements; we will add them to this.literals later
+        List<Literal> list_literals = literals.stream().filter(l -> !l.getLabel().equals("")).flatMap(l -> {
+            return Arrays.asList(l, l.getOpposite()).stream();
+        }).collect(Collectors.toList());
+        /*
+        this.literals = literals.stream().filter(l -> !l.getLabel().equals("")).flatMap(l -> {
+            return Arrays.asList(l, l.getOpposite()).stream();
+        }).collect(Collectors.toSet());
+        */
         this.facts = facts.stream().filter(f -> !f.equals("")).map(Literal::new).collect(Collectors.toSet());
 
         Integer rule_counters = 0;
@@ -37,21 +46,31 @@ public class Theory {
 
             RuleType rtype;
             switch(tail.charAt(tail.length()-1)) {
-                case '-' : rtype = RuleType.STRICT;
-                case '=' : rtype = RuleType.DEFEASIBLE;
-                case '~' : rtype = RuleType.DEFEATER;
-                default : rtype = RuleType.STRICT;
+                case '-' : rtype = RuleType.STRICT; break;
+                case '=' : rtype = RuleType.DEFEASIBLE; break;
+                case '~' : rtype = RuleType.DEFEATER; break;
+                default : rtype = RuleType.STRICT; break;
             }
-    
             List<String> tail_literals = Arrays.asList(tail.substring(0, tail.length() - 1).split(","));
             TreeSet<Literal> set_tail = new TreeSet<>(tail_literals.stream().map(tl -> new Literal(tl.trim())).collect(Collectors.toSet()));
             
             Literal lit_head = new Literal(head);
             String label = rule_counters.toString();
             rule_counters = rule_counters.intValue() + 1;
+            //Now we add this rule's label to all literals 
+            //we cannot avoid looping unless we create some hashmap of the literals
+            for (int index = 0; index < list_literals.size(); index += 1) {
+                Literal new_l = list_literals.get(index);
+                if(new_l.getLabel().equals(head)) {
+                    new_l.addRule(label);
+                    list_literals.set(index, new_l);
+                }
+            }
+            
             this.rules.put(label, new Rule(lit_head, set_tail, rtype));
         };
 
+        this.literals = new HashSet<Literal>(list_literals);
         for (String sr : superiorityRelations) {
             if (sr == "") continue;
             String[] splitted_srule = sr.trim().split(">");
@@ -83,7 +102,9 @@ public class Theory {
     public Set<Literal> getLiterals() {
         return literals;
     }
-
+    public Set<Literal> getLiterals(State s) {
+        return literals.stream().filter(l -> l.getPartialState().equals(s)).collect(Collectors.toSet());
+    }
     public void setLiterals(Set<Literal> literals) {
         this.literals = literals;
     }
@@ -99,8 +120,12 @@ public class Theory {
     public Map<String, Rule> getRules() {
         return rules;
     }
-    public Set<Rule> getRules(RuleState ruleState, ArrayList<RuleType> ruleTypes){
-        return this.rules.values().stream().filter(rule -> ruleTypes.contains(rule.getType()) && rule.getRuleState() == ruleState).collect(Collectors.toSet());
+
+    public Map<String, Rule> getRules(RuleState ruleState){
+        return this.rules.entrySet().stream().filter(rule -> rule.getValue().getRuleState() == ruleState).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+    public Map<String, Rule> getRules(RuleState ruleState, ArrayList<RuleType> ruleTypes){
+        return this.rules.entrySet().stream().filter(rule -> ruleTypes.contains(rule.getValue().getType()) && rule.getValue().getRuleState() == ruleState).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
     public void setRules(Map<String, Rule> rules) {
         this.rules = rules;
