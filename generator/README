@@ -1,0 +1,24 @@
+The available commands are:
+
+To load basic defeasible logic
+create a new file and then
+- require './defeasible'
+
+To populate a theory
+
+- Rule.new('label', 'head', 'body1',...,'bodyN')
+- rule('label', 'head', 'body1',...,'bodyN')
+- sup('label','label')
+
+or call a name of a theory
+
+To show a theory
+- theory
+
+To compute the (positive) extension
+- prove
+- prove('dft') (for triggering the transformation for defeaters)
+
+To show the (positive) extension
+- show_conclusions 
+
