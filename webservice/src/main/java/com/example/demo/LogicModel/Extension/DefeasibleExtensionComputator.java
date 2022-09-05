@@ -3,11 +3,10 @@ package com.example.demo.LogicModel.Extension;
 import com.example.demo.LogicModel.*;
 import com.example.demo.Pair;
 
-import java.lang.reflect.Array;
 import java.util.*;
-import java.util.stream.Collectors;
 
-public class DefeasibleExtensionComputator implements ExtensionComputator{
+public class DefeasibleExtensionComputator implements ExtensionComputator {
+    public double elapsedtime = 0.0;
 
     @Override
     public Pair<Theory, Extension> computeExtension(Theory theory, Extension extension) {
@@ -98,8 +97,9 @@ public class DefeasibleExtensionComputator implements ExtensionComputator{
             extension.getMinusPartial().addAll(untriggerable);
         //TODO we might need to check the rule state when using getRules method
         }
-        long end_time = System.currentTimeMillis();
-        System.out.println((end_time - start_time)/1000.0);
+        long final_time = System.currentTimeMillis();
+        
+        this.elapsedtime = (final_time - start_time)/1000.0;
         return new Pair<Theory, Extension>(theory, extension);
     }
     

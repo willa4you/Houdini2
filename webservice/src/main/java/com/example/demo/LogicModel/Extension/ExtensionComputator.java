@@ -5,6 +5,7 @@ import com.example.demo.LogicModel.Theory;
 public interface ExtensionComputator {
     Theory theory = new Theory();
     Extension extension = new Extension();
+    public double elapsedtime = 0.0;
 
     Pair<Theory, Extension> computeExtension(Theory theory, Extension extension);
 
@@ -15,6 +16,10 @@ public interface ExtensionComputator {
     default Pair<Theory, Extension> computeExtension(Theory theory) {
         return this.computeExtension(theory, new Extension());
     };
+
+    default public double getElapsedtime() {
+        return elapsedtime;
+    }
 
 }
 

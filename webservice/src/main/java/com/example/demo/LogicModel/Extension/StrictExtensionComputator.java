@@ -6,9 +6,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class StrictExtensionComputator implements ExtensionComputator {
-
+    public double elapsedtime = 0.0;
     @Override
     public Pair<Theory, Extension> computeExtension(Theory theory, Extension extension) {
+        long start_time = System.currentTimeMillis();
         Set<Literal> injectableLiterals = theory.getFacts();
         injectLiterals(injectableLiterals, extension, theory);
         while(!injectableLiterals.isEmpty()) { //TODO if the theory contains strict rules with empty tail but no facts the loop doesn't start
@@ -40,7 +41,9 @@ public class StrictExtensionComputator implements ExtensionComputator {
                 } else removeFromCandidates.add(r.getHead());
             }
         }
-
+        long final_time = System.currentTimeMillis();
+        
+        this.elapsedtime = (final_time - start_time)/1000.0;
         return new Pair<Theory, Extension>(theory, extension);
     }
 

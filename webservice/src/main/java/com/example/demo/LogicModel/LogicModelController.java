@@ -153,8 +153,13 @@ public class LogicModelController {
     }
     */
     Theory th = new Theory(ModelParser.getLiterals(), this.logicModel);
-    Pair<Theory, Extension> computed = new StrictExtensionComputator().computeExtension(th);
-    Pair<Theory, Extension> completeExtension = new DefeasibleExtensionComputator().computeExtension(computed.getFirst(), computed.getSecond());
+    StrictExtensionComputator strict_comp = new StrictExtensionComputator();
+    DefeasibleExtensionComputator def_comp = new DefeasibleExtensionComputator();
+    Pair<Theory, Extension> computed = strict_comp.computeExtension(th);
+    Pair<Theory, Extension> completeExtension = def_comp.computeExtension(computed.getFirst(), computed.getSecond());
+    
+    System.out.println(strict_comp.elapsedtime + def_comp.elapsedtime);
+    
     this.plusDeltaString = completeExtension.getSecond().getPlusDeltaString();
     this.minusDeltaString = completeExtension.getSecond().getMinusDeltaString();
     this.plusPartialString = completeExtension.getSecond().getPlusPartialString();
