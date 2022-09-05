@@ -9,7 +9,7 @@ target/
 !**/src/test/**/target/
 .DS_Store*
 node_modules/*
-
+*/demo/theories
 ### STS ###
 .apt_generated
 .classpath
