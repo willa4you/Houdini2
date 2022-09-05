@@ -11,7 +11,7 @@ public class DefeasibleExtensionComputator implements ExtensionComputator{
 
     @Override
     public Pair<Theory, Extension> computeExtension(Theory theory, Extension extension) {
-
+        long start_time = System.currentTimeMillis();
         theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.STRICT))).values().forEach(r -> r.setType(RuleType.DEFEASIBLE));
         Set<Literal> defeasibleHeads = theory.getHeads(new HashSet<>(theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.DEFEASIBLE))).values()));
         extension.getPlusPartial().addAll(extension.getPlusDelta());
@@ -98,6 +98,8 @@ public class DefeasibleExtensionComputator implements ExtensionComputator{
             extension.getMinusPartial().addAll(untriggerable);
         //TODO we might need to check the rule state when using getRules method
         }
+        long end_time = System.currentTimeMillis();
+        System.out.println((end_time - start_time)/1000.0);
         return new Pair<Theory, Extension>(theory, extension);
     }
     
