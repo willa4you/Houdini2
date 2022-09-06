@@ -18,7 +18,7 @@ import com.example.demo.LogicModel.grammar.ModelParser;
 
 public class LocalRunner {
     public static void main(String[] args) {
-        int counter = 999;
+        int counter = 1;
         String string_path = String.format("/home/edoardo/Uni4Justice/webservice/src/main/java/com/example/demo/theories/theory%d.json", counter);
         String conclusion_path = "/home/edoardo/Uni4Justice/webservice/src/main/java/com/example/demo/conclusions_ours.csv";
         String out_path = "/home/edoardo/Uni4Justice/webservice/src/main/java/com/example/demo/times_ours.csv";
@@ -28,7 +28,6 @@ public class LocalRunner {
         List<String> data = new ArrayList<String>();
         List<String> conclusions = new ArrayList<String>();
         data.add("Ours");
-        conclusions.add("Ours");
         while(file.exists()) {
             System.out.println(String.format("<<<<<< %d", counter));
             
