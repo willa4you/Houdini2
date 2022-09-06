@@ -183,6 +183,18 @@ public class LogicModelController {
     return "home";
   }
 
+  //Use this route to clear model
+  @GetMapping("/home")
+  public String home2Form(Model model) {
+    try {
+      this.configFromLogicModel(new LogicModel());
+      model.addAttribute("logic_model", new LogicModel());
+    } catch(IOException e) {
+      //It's impossibible to have an exception here
+      System.out.print(e);
+    }
+    return "redirect:/";
+  }
 
   @GetMapping("/sets")
   public String setForm(Model model) {
