@@ -76,7 +76,7 @@ end
 
 def output_conclusions(filepath='')
   if filepath != ''
-    output = File.open(filepath + ".dt", "w")
-    output << $conclusions.uniq.select{|s| !s.include?("inf")}
+    output = File.open(filepath + ".dt", "a")
+    output << $conclusions.uniq.select{|s| !s.include?("inf")} << "\n"
   end
 end

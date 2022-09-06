@@ -41,7 +41,7 @@ srand(2718)
 # or populate a theory
 
 time = Time.now
-(1..1000).each do |counter|
+(1..2).each do |counter|
     puts "((((( #{counter} )))))"
     clean_theory
     filename = "theories/theory#{counter}"
@@ -59,7 +59,7 @@ time = Time.now
     #theory
     output_theory(filename)
     output_prove("theories/theories_times_#{time}")
-    output_conclusions(filename + "_conclusions")
+    output_conclusions("theories/theories_conclusions_#{time}")
 end
 
 
