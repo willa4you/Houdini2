@@ -27,7 +27,7 @@ public class LocalRunner {
         List<String> data = new ArrayList<String>();
         data.add("ours");
         while(file.exists()) {
-            
+            System.out.println(String.format("<<<<<< %d", counter));
             try {
                 String content = Files.readString(Paths.get(string_path));
 
