@@ -51,13 +51,14 @@ public class Theory {
                 case '~' : rtype = RuleType.DEFEATER; break;
                 default : rtype = RuleType.STRICT; break;
             }
-            List<String> tail_literals = Arrays.asList(tail.substring(0, tail.length() - 1).split(","));
+            //Need also to filter out "" so we have a empty tail for rules in the form " => d"
+            List<String> tail_literals = Arrays.asList(tail.substring(0, tail.length() - 1).split(",")).stream().filter(p -> !p.equals("")).collect(Collectors.toList());
             TreeSet<Literal> set_tail = new TreeSet<>(tail_literals.stream().map(tl -> new Literal(tl.trim())).collect(Collectors.toSet()));
             
             Literal lit_head = new Literal(head);
             String label = rule_counters.toString();
             rule_counters = rule_counters.intValue() + 1;
-            //Now we add this rule's label to all literals 
+            //Now we add this rule's label to all literals
             //we cannot avoid looping unless we create some hashmap of the literals
             for (int index = 0; index < list_literals.size(); index += 1) {
                 Literal new_l = list_literals.get(index);
@@ -66,8 +67,11 @@ public class Theory {
                     list_literals.set(index, new_l);
                 }
             }
-            
+
             this.rules.put(label, new Rule(lit_head, set_tail, rtype));
+            if(set_tail.isEmpty()){
+                this.rules.get(label).activate();
+            }
         };
 
         this.literals = new HashSet<Literal>(list_literals);

@@ -11,8 +11,9 @@ public class StrictExtensionComputator implements ExtensionComputator {
     public Pair<Theory, Extension> computeExtension(Theory theory, Extension extension) {
         long start_time = System.currentTimeMillis();
         Set<Literal> injectableLiterals = theory.getFacts();
+        injectableLiterals.addAll(theory.getHeads(new HashSet<>(theory.getRules(RuleState.ACTIVE, new ArrayList<>(List.of(RuleType.STRICT))).values())));
         injectLiterals(injectableLiterals, extension, theory);
-        while(!injectableLiterals.isEmpty()) { //TODO if the theory contains strict rules with empty tail but no facts the loop doesn't start
+        do{
             injectableLiterals.clear();
             for (Rule r : theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.STRICT))).values()) {
                 if (r.getTail().isEmpty()) {
@@ -22,7 +23,7 @@ public class StrictExtensionComputator implements ExtensionComputator {
             }
             if (!injectableLiterals.isEmpty())
                 injectLiterals(injectableLiterals, extension, theory);
-        }
+        } while(!injectableLiterals.isEmpty());
 
         Set<Literal> candidates = new TreeSet<Literal>(theory.getLiterals());
         Set<Literal> removeFromCandidates = new TreeSet<>(extension.getPlusDelta());
@@ -42,7 +43,7 @@ public class StrictExtensionComputator implements ExtensionComputator {
             }
         }
         long final_time = System.currentTimeMillis();
-        
+
         this.elapsedtime = (final_time - start_time)/1000.0;
         return new Pair<Theory, Extension>(theory, extension);
     }

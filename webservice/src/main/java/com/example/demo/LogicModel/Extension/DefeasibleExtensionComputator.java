@@ -3,16 +3,18 @@ package com.example.demo.LogicModel.Extension;
 import com.example.demo.LogicModel.*;
 import com.example.demo.Pair;
 
+import java.lang.reflect.Array;
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class DefeasibleExtensionComputator implements ExtensionComputator {
-    public double elapsedtime = 0.0;
+public class DefeasibleExtensionComputator implements ExtensionComputator{
 
     @Override
     public Pair<Theory, Extension> computeExtension(Theory theory, Extension extension) {
-        long start_time = System.currentTimeMillis();
+
         theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.STRICT))).values().forEach(r -> r.setType(RuleType.DEFEASIBLE));
         Set<Literal> defeasibleHeads = theory.getHeads(new HashSet<>(theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.DEFEASIBLE))).values()));
+        defeasibleHeads.addAll(theory.getHeads(new HashSet<>(theory.getRules(RuleState.ACTIVE, new ArrayList<>(List.of(RuleType.DEFEASIBLE))).values())));
         extension.getPlusPartial().addAll(extension.getPlusDelta());
         for (Literal l : extension.getMinusDelta()) {
             if(extension.getPlusDelta().contains(l.getOpposite()) || !defeasibleHeads.contains(l)){
@@ -24,7 +26,7 @@ public class DefeasibleExtensionComputator implements ExtensionComputator {
         Set<Literal> triggerable = new TreeSet<>(extension.getPlusPartial());
         Set<Literal> untriggerable = new TreeSet<>(extension.getMinusPartial());
 
-        while(!triggerable.isEmpty() || !untriggerable.isEmpty()) {
+        do{
             for (Rule r : theory.getRules(RuleState.ACTIVABLE).values()) {
                 if (!Collections.disjoint(r.getTail(), untriggerable)) {
                     r.setRuleState(RuleState.DEACTIVATED);
@@ -96,10 +98,7 @@ public class DefeasibleExtensionComputator implements ExtensionComputator {
             extension.getPlusPartial().addAll(triggerable);
             extension.getMinusPartial().addAll(untriggerable);
         //TODO we might need to check the rule state when using getRules method
-        }
-        long final_time = System.currentTimeMillis();
-        
-        this.elapsedtime = (final_time - start_time)/1000.0;
+        } while(!triggerable.isEmpty() || !untriggerable.isEmpty());
         return new Pair<Theory, Extension>(theory, extension);
     }
     

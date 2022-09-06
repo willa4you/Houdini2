@@ -157,9 +157,9 @@ public class LogicModelController {
     DefeasibleExtensionComputator def_comp = new DefeasibleExtensionComputator();
     Pair<Theory, Extension> computed = strict_comp.computeExtension(th);
     Pair<Theory, Extension> completeExtension = def_comp.computeExtension(computed.getFirst(), computed.getSecond());
-    
+
     System.out.println(strict_comp.elapsedtime + def_comp.elapsedtime);
-    
+
     this.plusDeltaString = completeExtension.getSecond().getPlusDeltaString();
     this.minusDeltaString = completeExtension.getSecond().getMinusDeltaString();
     this.plusPartialString = completeExtension.getSecond().getPlusPartialString();
