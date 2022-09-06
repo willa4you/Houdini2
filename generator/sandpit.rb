@@ -1,6 +1,7 @@
 require "./defeasible.rb"
 
-srand(2718)
+#srand(2718)
+srand(3141)
 
 # load a theory, e.g.
 
@@ -41,25 +42,18 @@ srand(2718)
 # or populate a theory
 
 time = Time.now
-(1..2).each do |counter|
+(1..50).each do |counter|
     puts "((((( #{counter} )))))"
     clean_theory
     filename = "theories/theory#{counter}"
     #filename = "theories/theory"
-    %%
-    puts "------#{filename}"
-    Rule.new("r1", "b#{counter}")
-    Rule.new("r4", "c")
-    Rule.new("r2", "a", "b3")
-    Rule.new("r3", "~a", "c")
-    sup("r2","r3")
-    %
+    
     randomtheory
     
     #theory
     output_theory(filename)
-    output_prove("theories/theories_times_#{time}")
-    output_conclusions("theories/theories_conclusions_#{time}")
+    output_prove("theories_times_#{time}")
+    output_conclusions("theories_conclusions_#{time}")
 end
 
 
