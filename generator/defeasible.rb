@@ -1,5 +1,6 @@
 require './theories'
 require './engine'
+$to_print_conclusions = Array.new
 
 def clean_theory
   $rules = Array.new
@@ -74,9 +75,8 @@ def show_conclusions
   puts $conclusions.uniq
 end
 
-def output_conclusions(filepath='')
-  if filepath != ''
-    output = File.open(filepath + ".dt", "a")
-    output << $conclusions.uniq.select{|s| !s.include?("inf")} << "\n"
-  end
+def save_conclusions(filepath='')
+  
+  $to_print_conclusions.push($conclusions.uniq.select{|s| !s.include?("inf")})
+  
 end

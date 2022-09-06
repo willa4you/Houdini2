@@ -100,60 +100,61 @@ def pennDutchCompiled
     crule("nspd")
     crule("bp", "nspd")
     crule("ngs", "nspd")
-    crule("infr1", "bp")
-    crule("busa", "infr1")
-    crule("infr2", "ngs")
-    crule("~busa", "infr2")
-    crule("~infr2", "infr1")
+    crule("i_nfr1", "bp")
+    crule("busa", "i_nfr1")
+    crule("i_nfr2", "ngs")
+    crule("~busa", "i_nfr2")
+    crule("~i_nfr2", "i_nfr1")
 end
 
 def pennDutch
-  rule("s1", "GermanSpeaker", "nativePennDutchSpeaker")
-  rule("r2", "bornPenn", "nativePennDutchSpeaker")
-  rule("s3", "bornAmerica", "bornPenn")
-  rule("r4", "~bornAmerica", "GermanSpeaker")
+  rule("r1", "GermanSpeaker", "nativePennDutchSpeaker") #r1
+  rule("r2", "bornPenn", "nativePennDutchSpeaker") #r2
+  rule("r3", "bornAmerica", "bornPenn") #r3
+  rule("r4", "~bornAmerica", "GermanSpeaker") #r4
 
-  rule("f1", "nativePennDutchSpeaker")
+  rule("r5", "nativePennDutchSpeaker") #r5
 
-  sup("s3", "r4")
+  sup("r3", "r4")
 end
 
 def trafficRules
-  rule("r2a", "rightOfWay_X", "X_onTheRightOf_Y")
-  rule("r2b", "rightOfWay_Y", "Y_onTheRightOf_X")
-  rule("r3a", "~rightOfWay_X", "rightOfWay_Y")
-  rule("r3b", "~rightOfWay_Y", "rightOfWay_X")
-  rule("r4a", 'rightOfWay_X', "emergency_X", "~emergency_Y")
-  rule("r4b", "rightOfWay_Y", "emergency_Y", "~emergency_X")
-  rule("r5a", "~emergency_X")
-  rule("r5b", "~emergency_Y")
+  rule("r1", "rightOfWay_X", "X_onTheRightOf_Y") #r1
+  rule("r2", "rightOfWay_Y", "Y_onTheRightOf_X") #r2
+  rule("r3", "~rightOfWay_X", "rightOfWay_Y") #r3
+  rule("r4", "~rightOfWay_Y", "rightOfWay_X") #r4
+  rule("r5", 'rightOfWay_X', "emergency_X", "~emergency_Y") #r5
+  rule("r6", "rightOfWay_Y", "emergency_Y", "~emergency_X") #r6
+  rule("r7", "~emergency_X") #r7
+  rule("r8", "~emergency_Y") #r8
 
-  rule("r7", "emergency_X", "police_X")
+  rule("r9", "emergency_X", "police_X") #r9
 
-  sup("r3a", "r2a")
-  sup("r3b","r2b")
-  sup("r4a","r3a")
-  sup("r4b","r3b")
+  rule("r10", "Y_onTheRightOf_X") #r10
+  rule("r11", "police_X") #r11
 
-  sup("r7","r5a")
+  sup("r3", "r1")
+  sup("r4","r2")
+  sup("r5","r3")
+  sup("r6","r4")
 
-  rule("r8", "Y_onTheRightOf_X")
-  rule("r9", "police_X")
+  sup("r9","r7")
+
 end
 
 def hotAndWet
-  rule("f1", "hot")
-  rule("f2", "rain")
+  rule("r1", "hot") #r1
+  rule("r2", "rain") #r2
 
-  rule("r1", "jogging")
-  rule("r2", "~jogging", "hot")
-  rule("r3", "~jogging", "rain")
-  rule("r4", "jogging", "hot", "rain")
+  rule("r3", "jogging") #r3
+  rule("r4", "~jogging", "hot") #r4
+  rule("r5", "~jogging", "rain") #r5
+  rule("r6", "jogging", "hot", "rain") #r6
 
-  sup("r2", "r1")
-  sup("r3", "r1")
-  sup("r4", "r2")
   sup("r4", "r3")
+  sup("r5", "r3")
+  sup("r6", "r4")
+  sup("r6", "r5")
 end
 
 def socialNetwork
@@ -170,30 +171,30 @@ def teamDefeat
   rule("r3", "~b", "d")
   rule("r4", "~b", "e")
 
-  rule("f1", "a")
-  rule("f2", "c")
-  rule("f3", "d")
-  rule("f4", "e")
+  rule("r5", "a")
+  rule("r6", "c")
+  rule("r7", "d")
+  rule("r8", "e")
 
   sup("r1", "r3")
   sup("r2", "r4")
 end
 
 def platypus
-  rule("s1", "monotreme", "platypus")
-  rule("s2", "hasFur", "platypus")
-  rule("s3", "laysEgg", "platypus")
-  rule("s4", "hasBill", "platypus")
+  rule("r1", "monotreme", "platypus")
+  rule("r2", "hasFur", "platypus")
+  rule("r3", "laysEgg", "platypus")
+  rule("r4", "hasBill", "platypus")
 
-  rule("r1", "mammal", "monotreme")
-  rule("r2", "mammal", "hasFur")
-  rule("r3", "~mammal", "laysEgg")
-  rule("r4", "~mammal", "hasBill")
+  rule("r5", "mammal", "monotreme") #r5
+  rule("r6", "mammal", "hasFur") #r6
+  rule("r7", "~mammal", "laysEgg") #r7
+  rule("r8", "~mammal", "hasBill") #r8
 
-  rule("f1", "platypus")
+  rule("r9", "platypus") #r9
 
-  sup("r1", "r3")
-  sup("r2", "r4")
+  sup("r5", "r7")
+  sup("r6", "r8")
 end
 
 def presumptionInnocence
@@ -204,8 +205,8 @@ def presumptionInnocence
 
   sup("r3", "r4")
 
-  rule("f1", "evidenceA")
-  rule("f2", "evidenceB")
+  rule("r5", "evidenceA")
+  rule("r6", "evidenceB")
 end
 
 def presumptionInnocenceCompensation
@@ -221,13 +222,13 @@ def presumptionInnocenceCompensation
 
   sup("r5", "r6")
 
-  rule("f1", "evidenceA")
-  rule("f2", "evidenceB")
+  rule("r7", "evidenceA")
+  rule("r8", "evidenceB")
 end
 
 def nautiluses
-  rule("s1", "cephalopods", "nautiluses")
-  rule("s2", "molluscs", "cephalopods")
+  rule("r1", "cephalopods", "nautiluses")
+  rule("r2", "molluscs", "cephalopods")
   rule("r3", "haveShells", "nautiluses")
   rule("r4", "~haveShells", "cephalopods")
   rule("r5", "haveShells", "molluscs")
@@ -235,7 +236,7 @@ def nautiluses
   sup("r3", "r4")
   sup("r4", "r5")
 
-  rule("f1", "nautiluses")
+  rule("r6", "nautiluses")
 end
 
 def theory1
@@ -303,12 +304,12 @@ def theory6
 end
 
 def theory7
-  rule("3","2")
-  rule("2","1")
-  rule("1")
-  rule("a")
-  rule("~a","1")
-  rule("~2","a")
+  crule("q3","q2")
+  crule("q2","q1")
+  crule("q1")
+  crule("a")
+  crule("~a","q1")
+  crule("~q2","a")
 end
 
 
@@ -340,7 +341,7 @@ def theory11
 end
 
 def theory12
-  rule("0", "b")
-  rule("1", "~a", "b")
-  rule("2", "a")
+  rule("r0", "b")
+  rule("r1", "~a", "b")
+  rule("r2", "a")
 end

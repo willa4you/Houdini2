@@ -172,7 +172,7 @@ def output_compute(filepath='')
       #puts "Elapsed time:"
       #puts endtime.to_f - starttime.to_f
       if filepath != ''
-        output = File.open(filepath + ".dt", "a")
+        output = File.open(filepath, "a")
         output << endtime.to_f - starttime.to_f << "\n"
       else
         puts "!!! NO FILEPATH IN output_compute !!!"
@@ -220,7 +220,7 @@ def output_compute(filepath='')
         #puts "Elapsed time:"
         #puts endtime.to_f - starttime.to_f
         if filepath != ''
-          output = File.open(filepath + ".dt", "a")
+          output = File.open(filepath, "a")
           output << endtime.to_f - starttime.to_f << "\n"
         else
           puts "!!! NO FILEPATH IN output_compute !!!"
