@@ -1,4 +1,5 @@
 package com.example.demo;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -14,20 +15,23 @@ import com.example.demo.LogicModel.Extension.Extension;
 import com.example.demo.LogicModel.Extension.StrictExtensionComputator;
 import com.example.demo.LogicModel.grammar.ModelParser;
 
-import org.springframework.web.bind.EscapedErrors;
 
 public class LocalRunner {
     public static void main(String[] args) {
-        int counter = 1;
+        int counter = 999;
         String string_path = String.format("/home/edoardo/Uni4Justice/webservice/src/main/java/com/example/demo/theories/theory%d.json", counter);
-        String out_path = "/home/edoardo/Uni4Justice/webservice/src/main/java/com/example/demo/theories/times.csv";
+        String conclusion_path = "/home/edoardo/Uni4Justice/webservice/src/main/java/com/example/demo/conclusions_ours.csv";
+        String out_path = "/home/edoardo/Uni4Justice/webservice/src/main/java/com/example/demo/times_ours.csv";
 
         File file = new File(string_path);
         
         List<String> data = new ArrayList<String>();
-        data.add("ours");
+        List<String> conclusions = new ArrayList<String>();
+        data.add("Ours");
+        conclusions.add("Ours");
         while(file.exists()) {
             System.out.println(String.format("<<<<<< %d", counter));
+            
             try {
                 String content = Files.readString(Paths.get(string_path));
 
@@ -44,16 +48,21 @@ public class LocalRunner {
                 
                 Double elaps = strict_comp.elapsedtime + def_comp.elapsedtime;
                 data.add(elaps.toString());
+                //Print extension to file
+                conclusions.add(String.format("[%s]", completeExtension.getSecond().getPlusPartialString()));
+                
             }
             catch(Exception e) {
-                System.out.print("~~~~~~~~~~~~~~~~~~~~~~~~~~~ERRRRRRRRRRRRRRRRORRRRRRRRRRRRR~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~ERRRRRRRRRRRRRRRRORRRRRRRRRRRRR~~~~~~~~~~~~~~~~~~~~~~~~~~");
             }
+            
             counter += 1;
             string_path = String.format("/home/edoardo/Uni4Justice/webservice/src/main/java/com/example/demo/theories/theory%d.json", counter);
             file = new File(string_path);
         }
         try {
             Files.write(Paths.get(out_path), data);
+            Files.write(Paths.get(conclusion_path), conclusions);
         } catch(Exception e) {
 
         }

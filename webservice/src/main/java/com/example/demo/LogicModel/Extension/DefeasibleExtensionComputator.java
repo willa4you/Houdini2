@@ -8,10 +8,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class DefeasibleExtensionComputator implements ExtensionComputator{
-
+    public double elapsedtime = 0.0;
     @Override
     public Pair<Theory, Extension> computeExtension(Theory theory, Extension extension) {
-
+        long start_time = System.currentTimeMillis();
         theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.STRICT))).values().forEach(r -> r.setType(RuleType.DEFEASIBLE));
         Set<Literal> defeasibleHeads = theory.getHeads(new HashSet<>(theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.DEFEASIBLE))).values()));
         defeasibleHeads.addAll(theory.getHeads(new HashSet<>(theory.getRules(RuleState.ACTIVE, new ArrayList<>(List.of(RuleType.DEFEASIBLE))).values())));
@@ -99,6 +99,9 @@ public class DefeasibleExtensionComputator implements ExtensionComputator{
             extension.getMinusPartial().addAll(untriggerable);
         //TODO we might need to check the rule state when using getRules method
         } while(!triggerable.isEmpty() || !untriggerable.isEmpty());
+        
+        long final_time = System.currentTimeMillis();
+        this.elapsedtime = (final_time - start_time)/1000.0;
         return new Pair<Theory, Extension>(theory, extension);
     }
     
