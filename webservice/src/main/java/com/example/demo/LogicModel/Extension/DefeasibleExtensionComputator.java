@@ -51,6 +51,11 @@ public class DefeasibleExtensionComputator implements ExtensionComputator{
                     boolean isPlusPartial = true;
                     for (String s : lit.getOpposite().getRules()) {
                         Rule opposite = theory.getRules().get(s);
+                        /*TODO check this: condition 2.3 works when all opposite rules are deactivated, or, for any non-deactivated opposite rule,
+                        //there is an active rule with head the literal that prevails over it. Here, for any opposite rule, we only check that there is 
+                        no active rule that prevails over it, BUT we do not check if it's deactivated (if it is, it's not necessary.) Moreover, I think here
+                        it retrieves ALL the opposite rules, not only those whose head is lit
+                        */ 
                         isPlusPartial = isPlusPartial && !Collections.disjoint(activeRules.keySet(), opposite.getLosesAfter());
                     }
                     if (isPlusPartial) {
@@ -63,6 +68,9 @@ public class DefeasibleExtensionComputator implements ExtensionComputator{
                         continue; // no need to check minusPartial anymore
                     }
                 }
+                //TODO we need to continue checking for +partial here, checking if the active rules have head lit it's not sufficient
+                //(it's an or condition)
+                boolean CHECK_HERE = true;
 
                 // minus partial check
                 boolean isMinusPartial = true;
