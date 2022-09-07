@@ -76,10 +76,10 @@ class Superiority
     $superiority.push([inf,sup])
   end
   def showRel
-    puts "#{self.inf} < #{self.sup}"    
+    puts "#{self.inf} > #{self.sup}"    
   end
   def toString
-    return "#{self.inf} < #{self.sup}" 
+    return "#{self.inf} > #{self.sup}" 
   end
 end
 
