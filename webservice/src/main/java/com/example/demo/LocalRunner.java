@@ -52,7 +52,7 @@ public class LocalRunner {
                 
             }
             catch(Exception e) {
-                System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~ERRRRRRRRRRRRRRRRORRRRRRRRRRRRR~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                System.out.println(e);
             }
             
             counter += 1;
