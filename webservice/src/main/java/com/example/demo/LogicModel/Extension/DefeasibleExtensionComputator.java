@@ -12,10 +12,12 @@ public class DefeasibleExtensionComputator implements ExtensionComputator{
     @Override
     public Pair<Theory, Extension> computeExtension(Theory theory, Extension extension) {
         long start_time = System.currentTimeMillis();
+
         theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.STRICT))).values().forEach(r -> r.setType(RuleType.DEFEASIBLE));
         Set<Literal> defeasibleHeads = theory.getHeads(new HashSet<>(theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.DEFEASIBLE))).values()));
         defeasibleHeads.addAll(theory.getHeads(new HashSet<>(theory.getRules(RuleState.ACTIVE, new ArrayList<>(List.of(RuleType.DEFEASIBLE))).values())));
         extension.getPlusPartial().addAll(extension.getPlusDelta());
+
         for (Literal l : extension.getMinusDelta()) {
             if(extension.getPlusDelta().contains(l.getOpposite()) || !defeasibleHeads.contains(l)){
                 extension.getMinusPartial().add(l);
@@ -87,7 +89,7 @@ public class DefeasibleExtensionComputator implements ExtensionComputator{
                     }
                 }
                 if (isMinusPartial) {
-                    if (lit.getDeltaState() == State.PLUS) {
+                    if (lit.getDeltaState().equals(State.MINUS)) {
                         lit.setPartialState(State.MINUS);
                         untriggerable.add(lit);
                     } else {
@@ -99,7 +101,7 @@ public class DefeasibleExtensionComputator implements ExtensionComputator{
             extension.getMinusPartial().addAll(untriggerable);
         //TODO we might need to check the rule state when using getRules method
         } while(!triggerable.isEmpty() || !untriggerable.isEmpty());
-        
+
         long final_time = System.currentTimeMillis();
         this.elapsedtime = (final_time - start_time)/1000.0;
         return new Pair<Theory, Extension>(theory, extension);
