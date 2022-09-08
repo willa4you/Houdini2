@@ -48,8 +48,9 @@ public class LocalRunner {
                 Double elaps = strict_comp.elapsedtime + def_comp.elapsedtime;
                 data.add(elaps.toString());
                 //Print extension to file
-                conclusions.add(String.format("[%s]", completeExtension.getSecond().getPlusPartialString()));
-                
+                String toadd = String.format("[%s]", completeExtension.getSecond().getPlusPartialString());
+                if (toadd == "∅") toadd = "";
+                conclusions.add(toadd);
             }
             catch(Exception e) {
                 System.out.println(e);
