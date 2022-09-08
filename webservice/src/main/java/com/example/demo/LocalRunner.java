@@ -49,7 +49,7 @@ public class LocalRunner {
                 data.add(elaps.toString());
                 //Print extension to file
                 String toadd = String.format("[%s]", completeExtension.getSecond().getPlusPartialString());
-                if (toadd == "∅") toadd = "";
+                if (toadd == "[∅]") toadd = "[]";
                 conclusions.add(toadd);
             }
             catch(Exception e) {
