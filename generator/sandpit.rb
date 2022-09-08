@@ -70,7 +70,10 @@ ths = [
 time = Time.now
 counter = 1
 
+ths = (1...2000).map{|i| method(:randomtheory)}
+
 theories = TheoryIterator.new(*ths)
+
 
 theories.each do |fn|
 
