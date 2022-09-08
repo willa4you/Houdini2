@@ -1,5 +1,6 @@
 require './theories'
 require './engine'
+
 $to_print_conclusions = Array.new
 
 def clean_theory
@@ -51,7 +52,7 @@ def prove(opt='')
   compute
 end
 
-def output_prove(filepath='', opt='')
+def output_prove(opt='')
   unless $superiority.empty?
     puts "===Remove Superiority==="
     removeSuperiority
@@ -67,7 +68,7 @@ def output_prove(filepath='', opt='')
     $rules = $compiledRules
   end
   prepare_prove  
-  output_compute(filepath)  
+  output_compute()  
 end
 
 def show_conclusions
@@ -75,8 +76,9 @@ def show_conclusions
   puts $conclusions.uniq
 end
 
-def save_conclusions(filepath='')
+def save_conclusions()
   
   $to_print_conclusions.push($conclusions.uniq.select{|s| !s.include?("inf")})
   
 end
+

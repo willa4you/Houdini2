@@ -1,5 +1,7 @@
 require './language'
 
+$to_print_times = Array.new
+
 def makeCells(literal)
   $literals[literal] = Hash.new
   ["ph", "nh", "pb", "nb"].each {|x| $literals[literal][x] = Array.new}
@@ -156,7 +158,13 @@ def compute()
   end
 end
 
-def output_compute(filepath='')
+def save_times(time)
+  
+  $to_print_times.push(time)
+  
+end
+
+def output_compute()
   new_conclusions = Array.new
   used_rules = Array.new
   level = 0
@@ -171,12 +179,7 @@ def output_compute(filepath='')
       endtime = Time.now
       #puts "Elapsed time:"
       #puts endtime.to_f - starttime.to_f
-      if filepath != ''
-        output = File.open(filepath, "a")
-        output << endtime.to_f - starttime.to_f << "\n"
-      else
-        puts "!!! NO FILEPATH IN output_compute !!!"
-      end
+      save_times(endtime.to_f - starttime.to_f)
       break
     end
     $rules.each do |r|
@@ -219,12 +222,7 @@ def output_compute(filepath='')
         endtime = Time.now
         #puts "Elapsed time:"
         #puts endtime.to_f - starttime.to_f
-        if filepath != ''
-          output = File.open(filepath, "a")
-          output << endtime.to_f - starttime.to_f << "\n"
-        else
-          puts "!!! NO FILEPATH IN output_compute !!!"
-        end
+        save_times(endtime.to_f - starttime.to_f)
         break
       end
       if stop

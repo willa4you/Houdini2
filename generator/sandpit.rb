@@ -81,8 +81,8 @@ theories.each do |fn|
     filename = "theories/theory#{counter}"
     output_theory(filename)
 
-    File.open("theories_times_#{time}.csv", "w")
-    output_prove("theories_times_#{time}.csv")
+    
+    output_prove()
 
     
     save_conclusions()
@@ -92,6 +92,11 @@ theories.each do |fn|
 end
 file = File.open("theories_conclusions_#{time}.csv", "w")
 $to_print_conclusions.each do |line|
+    file << line << "\n"
+end
+file = File.open("theories_times_#{time}.csv", "w")
+file << "Ours" << "\n"
+$to_print_times.each do |line|
     file << line << "\n"
 end
 # show the content of a theory
