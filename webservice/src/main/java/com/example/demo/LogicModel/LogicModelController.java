@@ -2,6 +2,7 @@ package com.example.demo.LogicModel;
 
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,9 +12,10 @@ import com.example.demo.LogicModel.Extension.DefeasibleExtensionComputator;
 import com.example.demo.Pair;
 import com.example.demo.FileUpload.storage.StorageService;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.example.demo.JSONParser.JSONLogicParser;
 import com.example.demo.JSONParser.JSONWrongFormatException;
-import com.example.demo.LogicModel.Extension.Extension;
 import com.example.demo.LogicModel.Extension.StrictExtensionComputator;
 import com.example.demo.LogicModel.grammar.ModelParser;
 
@@ -33,7 +35,6 @@ public class LogicModelController {
 
   private final StorageService storageService;
   private LogicModel logicModel = new LogicModel();
-  private LiteralChecker validator = new LiteralChecker();
   private List<Boolean> areFactsValid = new ArrayList<Boolean>(Arrays.asList(true));
   private List<Boolean> areRulesValid = new ArrayList<Boolean>(Arrays.asList(true));
   private List<Boolean> areSupRulesValid = new ArrayList<Boolean>(Arrays.asList(true));
@@ -54,11 +55,6 @@ public class LogicModelController {
   @ModelAttribute("logic_model")
   private LogicModel getLogicModel() {
     return this.logicModel;
-  }
-
-  @ModelAttribute("validator")
-  private LiteralChecker getValidator() {
-    return this.validator;
   }
 
   @ModelAttribute("are_facts_valid")
@@ -138,32 +134,96 @@ public class LogicModelController {
 
     String JSONcontent = logicModel.toJSONString();
 
-
     ModelParser.parse(JSONcontent); //Here throws ParseCancellationException if wrong
 
-
-    /*
-    this.validator = new LiteralChecker();
-    this.areFactsValid = validator.validate_facts(facts);
-    this.areRulesValid = validator.validate_rules(rules);
-    this.areSupRulesValid = validator.validate_supRules(supRules, rules);
-
-    if (this.getAreFactsValid().contains(false) || this.getAreRulesValid().contains(false) || this.getAreSupRulesValid().contains(false)) {
-      throw new IOException("Some input is wrong.");
+    // TODO Creating new JSON (this should be integrated in the previous actions)
+    JsonFactory factory = new JsonFactory();
+    StringWriter jsonObjectWriter = new StringWriter();
+    JsonGenerator generator = factory.createGenerator(jsonObjectWriter);
+    generator.useDefaultPrettyPrinter(); // pretty print JSON
+    generator.writeStartObject(); // start global object
+    generator.writeFieldName("facts");
+    generator.writeStartArray(); // start facts array
+    for (String f : facts) {
+      if (f.equals("")) {continue;}
+      f = f.replaceAll("\\p{Z}",""); // remove ALL whitespaces
+      generator.writeStartObject();
+      generator.writeFieldName("label");
+      generator.writeString(f.startsWith("~") ? f.substring(1) : f);
+      generator.writeFieldName("type");
+      generator.writeString(f.startsWith("~") ? "negative" : "positive");
+      generator.writeEndObject();
     }
-    */
-    Theory th = new Theory(ModelParser.getLiterals(), this.logicModel);
-    StrictExtensionComputator strict_comp = new StrictExtensionComputator();
-    DefeasibleExtensionComputator def_comp = new DefeasibleExtensionComputator();
-    Pair<Theory, Extension> computed = strict_comp.computeExtension(th);
-    Pair<Theory, Extension> completeExtension = def_comp.computeExtension(computed.getFirst(), computed.getSecond());
+    generator.writeEndArray(); // end facts array
+    generator.writeFieldName("rules");
+    generator.writeStartArray(); // start rules array
+    int ir = 1;
+    for (String r : rules) {
+      if (r.equals("")) {continue;}
+      r = r.replaceAll("\\p{Z}",""); // remove ALL whitespaces
+      generator.writeStartObject(); // start rule object
+      generator.writeFieldName("label");
+      generator.writeString("r"+(ir++));
+      generator.writeFieldName("type");
+      switch(r.substring(r.indexOf(">") - 1, r.indexOf(">")).charAt(0)) {
+        case '-' : generator.writeString("strict"); break;
+        case '=' : generator.writeString("defeasible"); break;
+        case '~' : generator.writeString("defeater"); break;
+        default : generator.writeString("strict"); break;
+      }
+      String head = r.substring(r.indexOf(">") + 1);
+      generator.writeFieldName("head");
+      generator.writeStartObject(); // start head object
+      generator.writeFieldName("label");
+      generator.writeString(head.startsWith("~") ? head.substring(1) : head);
+      generator.writeFieldName("type");
+      generator.writeString(head.startsWith("~") ? "negative" : "positive");
+      generator.writeEndObject(); // end head object
+      String[] tail = r.substring(0, r.indexOf(">") - 1).split(",");
+      generator.writeFieldName("tail");
+      generator.writeStartArray(); // start tail literals array
+      for (String l : tail) {
+        if (l.equals("")) {continue;}
+        generator.writeStartObject();
+        generator.writeFieldName("label");
+        generator.writeString(l.startsWith("~") ? l.substring(1) : l);
+        generator.writeFieldName("type");
+        generator.writeString(l.startsWith("~") ? "negative" : "positive");
+        generator.writeEndObject();
+      }
+      generator.writeEndArray(); // end tail literals array
+      generator.writeEndObject(); // end rule object
+    }
+    generator.writeEndArray(); // end rules array
+    generator.writeFieldName("superiorityRelations");
+    generator.writeStartArray(); // start supRelations array
+    for (String sr : supRules) {
+      if (sr.equals("")) {continue;}
+      generator.writeStartObject();
+      generator.writeFieldName("superior");
+      generator.writeString(sr.substring(0, sr.indexOf(">")));
+      generator.writeFieldName("inferior");
+      generator.writeString(sr.substring(sr.indexOf(">") + 1));
+      generator.writeEndObject();
+    }
+    generator.writeEndArray(); // end supRel array
+    generator.writeEndObject(); // end global object
+    generator.close(); // to close the generator
+    String myJSON = jsonObjectWriter.toString();
+    System.out.println(myJSON);
 
-    System.out.println(strict_comp.elapsedtime + def_comp.elapsedtime);
+    // TODO: json should arrive from http post or some web interface
+    Theory theory = new Theory(myJSON);
+    // if we want mantain the original theory we must create a deep copy of it
+    TheoryExtension theoryExtension = new TheoryExtension(theory);
+    theoryExtension.computeExtension();
 
-    this.plusDeltaString = completeExtension.getSecond().getPlusDeltaString();
-    this.minusDeltaString = completeExtension.getSecond().getMinusDeltaString();
-    this.plusPartialString = completeExtension.getSecond().getPlusPartialString();
-    this.minusPartialString = completeExtension.getSecond().getMinusPartialString();
+    // TODO: System.out.println(strict_comp.elapsedtime + def_comp.elapsedtime);
+
+    this.plusDeltaString = theoryExtension.getPlusDeltaString();
+    this.minusDeltaString = theoryExtension.getMinusDeltaString();
+    this.plusPartialString = theoryExtension.getPlusPartialString();
+    this.minusPartialString = theoryExtension.getMinusPartialString();
   }
 
 	@Autowired
