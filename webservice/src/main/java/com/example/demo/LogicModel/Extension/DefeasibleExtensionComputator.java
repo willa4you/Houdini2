@@ -1,6 +1,8 @@
 package com.example.demo.LogicModel.Extension;
 
 import com.example.demo.LogicModel.*;
+import com.example.demo.LogicModel.Rule.RuleType;
+import com.example.demo.LogicModel.Rule.RuleState;
 import com.example.demo.Pair;
 
 import java.lang.reflect.Array;
@@ -10,7 +12,7 @@ import java.util.stream.Collectors;
 public class DefeasibleExtensionComputator implements ExtensionComputator{
     public double elapsedtime = 0.0;
     @Override
-    public Pair<Theory, Extension> computeExtension(Theory theory, Extension extension) {
+    public Pair<Theory, TheoryExtension> computeExtension(Theory theory, TheoryExtension extension) {
         long start_time = System.currentTimeMillis();
 
         theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.STRICT))).values().forEach(r -> r.setType(RuleType.DEFEASIBLE));
@@ -49,7 +51,7 @@ public class DefeasibleExtensionComputator implements ExtensionComputator{
                 // plus partial check
                 if (theory.getHeads(new HashSet<>(activeRules.values())).contains(lit)) {
                     boolean isPlusPartial = true;
-                    for (String s : lit.getOpposite().getRules()) {
+                    for (String s : lit.getOpposite().getRulesIsHeadOf()) {
                         Rule opposite = theory.getRules().get(s);
                         /*TODO check this: condition 2.3 works when all opposite rules are deactivated, or, for any non-deactivated opposite rule,
                         //there is an active rule with head the literal that prevails over it. Here, for any opposite rule, we only check that there is 
@@ -74,7 +76,7 @@ public class DefeasibleExtensionComputator implements ExtensionComputator{
 
                 // minus partial check
                 boolean isMinusPartial = true;
-                for (String s : lit.getRules()) {
+                for (String s : lit.getRulesIsHeadOf()) {
                     Rule r = theory.getRules().get(s);
                     if (r.getType() != RuleType.DEFEATER) {
                         isMinusPartial = false;
@@ -82,7 +84,7 @@ public class DefeasibleExtensionComputator implements ExtensionComputator{
                     }
                 }
                 if (!isMinusPartial) {
-                    for (String s : lit.getOpposite().getRules()) {
+                    for (String s : lit.getOpposite().getRulesIsHeadOf()) {
                         Rule r = theory.getRules().get(s);
                         if (r.getTail().isEmpty()) {
                             isMinusPartial = true;
@@ -112,7 +114,7 @@ public class DefeasibleExtensionComputator implements ExtensionComputator{
 
         long final_time = System.currentTimeMillis();
         this.elapsedtime = (final_time - start_time)/1000.0;
-        return new Pair<Theory, Extension>(theory, extension);
+        return new Pair<Theory, TheoryExtension>(theory, extension);
     }
     
 }

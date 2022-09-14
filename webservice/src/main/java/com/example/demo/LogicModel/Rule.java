@@ -1,85 +1,77 @@
-package com.example.demo.LogicModel;import java.util.*;
+package com.example.demo.LogicModel;
+import java.util.*;
 
-public class Rule {
+public class Rule implements Comparable<Rule>{
+    
+    public enum RuleType{STRICT, DEFEASIBLE, DEFEATER}
 
-    private Literal head;
-    private TreeSet<Literal> tail = new TreeSet<Literal>();
+    private String label;
     private RuleType type;
-    private Set<String> winsOver = new TreeSet<String>();
-    private Set<String> losesAfter = new TreeSet<String>();
+    private Literal head;
+    private TreeSet<Literal> tail;
+    
+    private Set<Rule> winsOver = new TreeSet<Rule>();
+    private Set<Rule> losesAfter = new TreeSet<Rule>();
+    
     // private boolean losesAfterActiveRule; not a property of the rule itself, I guess it shouldn't be here
-    private RuleState ruleState = RuleState.ACTIVABLE;
-    public Rule(Literal head, TreeSet<Literal> tail, RuleType type) {
+    
+    public Rule(String label, RuleType type, Literal head, TreeSet<Literal> tail) {
+        this.label = label;
+        this.type = type;
         this.head = head;
         this.tail = tail;
-        this.type = type;
+    }
+
+    public Rule(String label) {
+        this.label = label;
+    }
+
+    public String getLabel() {
+        return label;
     }
 
     public Literal getHead() {
         return head;
     }
 
-    public void setHead(Literal head) {
-        this.head = head;
-    }
-
     public TreeSet<Literal> getTail() {
         return tail;
-    }
-
-    public void setTail(TreeSet<Literal> tail) {
-        this.tail = tail;
     }
 
     public RuleType getType() {
         return type;
     }
 
-    public void setType(RuleType type) {
-        this.type = type;
-    }
-
-    public RuleState getRuleState() {
-        return ruleState;
-    }
-
-    public void setRuleState(RuleState ruleState) {
-        this.ruleState = ruleState;
-    }
-
-    public Set<String> getWinsOver() {
+    public Set<Rule> getWinsOver() {
         return winsOver;
     }
-
-    public void setWinsOver(Set<String> winsOver) {
-        this.winsOver = winsOver;
+    public void addToWinsOver(Rule inferior) {
+        winsOver.add(inferior);
     }
 
-    public Set<String> getLosesAfter() {
+    public Set<Rule> getLosesAfter() {
         return losesAfter;
     }
 
-    public void setLosesAfter(Set<String> losesAfter) {
-        this.losesAfter = losesAfter;
+    public void addToLosesAfter(Rule superior) {
+        losesAfter.add(superior);
     }
 
     public void removeFromTail(Literal literal){
         this.tail.remove(literal);
     }
-    public void deactivate(){
-        this.ruleState = RuleState.DEACTIVATED;
-    }
 
-    public void activate(){
-        this.ruleState = RuleState.ACTIVE;
-    }
-
+    @Override
     public boolean equals(Object object) {
-        if (this == object) return true;
-        if (!(object instanceof Rule)) return false;
-        if (!super.equals(object)) return false;
-        Rule rule = (Rule) object;
-        return getHead().equals(rule.getHead()) && getTail().equals(rule.getTail()) && getType().equals(rule.getType());
+        if (this == object) {return true;}
+        if (!(object instanceof Rule)) {return false;}
+
+        return this.label.equals(((Rule)object).label); // two rules are the same iff they have the same label
+    }
+
+    @Override
+    public int compareTo(Rule otherRule) {
+        return this.label.compareTo(otherRule.label);
     }
 
     public int hashCode() {

@@ -10,8 +10,8 @@ import java.util.List;
 import com.example.demo.JSONParser.JSONLogicParser;
 import com.example.demo.LogicModel.LogicModel;
 import com.example.demo.LogicModel.Theory;
+import com.example.demo.LogicModel.TheoryExtension;
 import com.example.demo.LogicModel.Extension.DefeasibleExtensionComputator;
-import com.example.demo.LogicModel.Extension.Extension;
 import com.example.demo.LogicModel.Extension.StrictExtensionComputator;
 import com.example.demo.LogicModel.grammar.ModelParser;
 
@@ -42,8 +42,8 @@ public class LocalRunner {
                 Theory th = new Theory(ModelParser.getLiterals(), parsed_model);
                 StrictExtensionComputator strict_comp = new StrictExtensionComputator();
                 DefeasibleExtensionComputator def_comp = new DefeasibleExtensionComputator();
-                Pair<Theory, Extension> computed = strict_comp.computeExtension(th);
-                Pair<Theory, Extension> completeExtension = def_comp.computeExtension(computed.getFirst(), computed.getSecond());
+                Pair<Theory, TheoryExtension> computed = strict_comp.computeExtension(th);
+                Pair<Theory, TheoryExtension> completeExtension = def_comp.computeExtension(computed.getFirst(), computed.getSecond());
                 
                 Double elaps = strict_comp.elapsedtime + def_comp.elapsedtime;
                 data.add(elaps.toString());
