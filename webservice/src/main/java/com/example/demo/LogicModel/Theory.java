@@ -10,7 +10,7 @@ import com.example.demo.LogicModel.Rule.RuleType;
 
 public class Theory {
     private TreeSet<Literal> literals = new TreeSet<Literal>();
-    private Set<Literal> facts = new HashSet<Literal>();
+    private Set<Literal> strictConclusions = new HashSet<Literal>(); // we don't want duplicates
     private TreeSet<Rule> rules = new TreeSet<Rule>(); // there can not be duplicate rules by design
     
     public Theory(String JSONTheoryString) throws IOException {
@@ -30,7 +30,9 @@ public class Theory {
         while(elements.hasNext()){
             JsonNode factNode = elements.next();
             Literal fact = getLiteralAndUpdateLiterals(factNode);
-            facts.add(fact);
+            strictConclusions.add(fact);
+            fact.setPlusDelta();
+            fact.setPlusPartial();
         }
         // end facts
         
@@ -61,14 +63,14 @@ public class Theory {
                 JsonNode tailLiteral = tailElements.next();
                 tailSet.add(getLiteralAndUpdateLiterals(tailLiteral));
             }
-            Rule rule = new Rule(
-                label,
-                ruleType,
-                head,
-                tailSet
-                );
+            Rule rule = new Rule(label, ruleType, head, tailSet);
             head.addRuleIsHeadOf(rule); // adding this rule to the rules this head literal is head of
             rules.add(rule); // adding this rule to the theory rules
+            if (ruleType == RuleType.STRICT && tailSet.isEmpty()) { // rules of type '-> a'
+                head.setPlusDelta();
+                head.setPlusPartial();
+                strictConclusions.add(head);
+            }
         } // end rules while
         // end rules
             
@@ -135,8 +137,8 @@ public class Theory {
         return literals.stream().filter(l -> l.getPartialState().equals(s)).collect(Collectors.toSet());
     }
 
-    public Set<Literal> getFacts() {
-        return facts;
+    public Set<Literal> getStrictConclusions() {
+        return strictConclusions;
     }
 
     public Set<Rule> getRules() {
@@ -161,17 +163,5 @@ public class Theory {
             heads.add(r.getHead());
         }
         return heads;
-    }
-
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (!(object instanceof Theory)) return false;
-        if (!super.equals(object)) return false;
-        Theory theory = (Theory) object;
-        return getFacts().equals(theory.getFacts()) && getRules().equals(theory.getRules()) && getSuperiorityRelations().equals(theory.getSuperiorityRelations());
-    }
-
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), getFacts(), getRules(), getSuperiorityRelations());
     }
 }

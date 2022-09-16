@@ -30,8 +30,6 @@ public class TheoryExtension {
         // TODO: bisogna cazzare le strict rimanenti nelle defeasible in qualche modo
         computeDefeasibleExtension();
 
-        long final_time = System.currentTimeMillis();
-        this.elapsedtime = (final_time - start_time)/1000.0;
     }
     
     private void computeStrictExtension() {
@@ -46,60 +44,33 @@ public class TheoryExtension {
 
     private void computePlusDelta() {
         
-        Set<Literal> strictConclusions = new HashSet<Literal>(); // a Set because we don't want duplicates
-        strictConclusions.addAll(theory.getFacts());
-        strictConclusions.forEach(lit -> {lit.setPlusDelta();}); // setting plus delta to all facts
-
-        // we remove native empty tail strict rules
-        for (Rule strictRule: theory.getRules(RuleType.STRICT)) { // iteration on an ArrayList which is not the theory rules Set
-		    if (strictRule.getTail().isEmpty()) {
-			    strictConclusions.add(strictRule.getHead());
-                strictRule.getHead().setPlusDelta();
-			    theory.removeRule(strictRule); // no problems with iteration because object is not removed from the iterating list
-		    }
-        }
+        Set<Literal> strictConclusions = theory.getStrictConclusions();
 
 	    // TRIGGER PART (Injection)
         // we remove strict conclusion literals from tails and check if a rule get active by an empty tail
         // For the following iteration we need a list so we have to double up the data structures (a set and a list)
         // TODO: This double data structure approach should be optimized
-	    { // begin the arraylist scope
-        ArrayList<Literal> injectables = new ArrayList<>(strictConclusions); // passing to a list for a better iteration
-        int i = 0;
-        while(i < injectables.size()) {
-            Literal injectable = injectables.get(i);
-            for (Rule strictRule: theory.getRules(RuleType.STRICT)) {// iteration on an ArrayList which is not the theory rules Set
-                if (strictRule.getTail().contains(injectable)) {
-                    strictRule.removeFromTail(injectable);
-                    if (strictRule.getTail().isEmpty()) { // we found an empty tail '-> a' rule
-                        if (strictConclusions.add(strictRule.getHead())) { // i will inject this head iff not already a strict conclusions
-                            strictRule.getHead().setPlusDelta(); // an empty tail '-> a' rule makes 'a' a plus Delta
-                            injectables.add(strictRule.getHead()); // we will inject this head so while get longer (analogous to fixpoint)
+        ArrayList<Literal> injectables = new ArrayList<>(strictConclusions);
+        ArrayList<Literal> newInjectables = new ArrayList<>();
+        while(!injectables.isEmpty()) {
+            for (Literal injectable : injectables) {
+                for (Rule strictRule: theory.getRules(RuleType.STRICT)) { // only strict rules
+                    if (strictRule.getTail().contains(injectable)) {
+                        strictRule.removeFromTail(injectable);
+                        if (
+                            strictRule.getTail().isEmpty() && // we found an empty tail '-> a' rule
+                            strictConclusions.add(strictRule.getHead()) // we inject this head iff not already a strict conclusions
+                        ) { 
+                            newInjectables.add(strictRule.getHead()); // while get longer (analogous to fixpoint)
                         }
-                        theory.removeRule(strictRule); // no problems with iteration because object is not removed from the iterating list
                     }
                 }
             }
-            i++;
-        } // end while
-        } // get rid of injectables ArrayList by closing the scope
-
-        // now we remove strict rules having this form:
-        // 1: a, ¬s, ... w -> h (where ¬s is the complementary of a strict conclusion)
-        // consider that if ¬s itself were also a strict conclusion we could not find it in any tail
-        // 2: a, b, c, ... w -> ¬s (where ¬s is the complementary of a strict conclusion)
-        // 3: a, b, c, ... w -> s (where s a strict conclusion)
-        
-        for (Literal s: strictConclusions) {
-            for (Rule r: theory.getRules(RuleType.STRICT)) {// iteration on an ArrayList which is not the theory rules Set
-                if (r.getTail().contains(s.getOpposite()) || r.getHead() == s.getOpposite() || r.getHead() == s)
-                theory.removeRule(r); // no problems with iteration because object is not removed from the iterating list
-            }
+            injectables = newInjectables; // i move new injectables into main list
+            newInjectables.clear(); // i clear the new injectables
         }
-        
+
         plusDelta.addAll(strictConclusions);
-        
-        // UNTRIGGER PART
 
     }
 
