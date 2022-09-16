@@ -63,7 +63,7 @@ public class TheoryExtension {
         // we remove strict conclusion literals from tails and check if a rule get active by an empty tail
         // For the following iteration we need a list so we have to double up the data structures (a set and a list)
         // TODO: This double data structure approach should be optimized
-	    { // defining the arraylist scope
+	    { // begin the arraylist scope
         ArrayList<Literal> injectables = new ArrayList<>(strictConclusions); // passing to a list for a better iteration
         int i = 0;
         while(i < injectables.size()) {
@@ -82,10 +82,9 @@ public class TheoryExtension {
             }
             i++;
         } // end while
-        } // get rid of injectables
+        } // get rid of injectables ArrayList by closing the scope
 
-        // UNTRIGGER PART
-        // now we remove strict rules hav this form:
+        // now we remove strict rules having this form:
         // 1: a, ¬s, ... w -> h (where ¬s is the complementary of a strict conclusion)
         // consider that if ¬s itself were also a strict conclusion we could not find it in any tail
         // 2: a, b, c, ... w -> ¬s (where ¬s is the complementary of a strict conclusion)
@@ -94,11 +93,13 @@ public class TheoryExtension {
         for (Literal s: strictConclusions) {
             for (Rule r: theory.getRules(RuleType.STRICT)) {// iteration on an ArrayList which is not the theory rules Set
                 if (r.getTail().contains(s.getOpposite()) || r.getHead() == s.getOpposite() || r.getHead() == s)
-                    theory.removeRule(r); // no problems with iteration because object is not removed from the iterating list
+                theory.removeRule(r); // no problems with iteration because object is not removed from the iterating list
             }
         }
-
+        
         plusDelta.addAll(strictConclusions);
+        
+        // UNTRIGGER PART
 
     }
 
