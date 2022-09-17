@@ -38,8 +38,24 @@ public class Rule implements Comparable<Rule>{
         return tail;
     }
 
+    public boolean isEmptyTail() {
+        return this.tail.isEmpty();
+    }
+
     public RuleType getType() {
         return type;
+    }
+
+    public boolean isStrict() {
+        return this.type == RuleType.STRICT;
+    }
+
+    public boolean isDefeasible() {
+        return this.type == RuleType.DEFEASIBLE;
+    }
+
+    public boolean isDefeater() {
+        return this.type == RuleType.DEFEATER;
     }
 
     public Set<Rule> getWinsOver() {

@@ -157,8 +157,9 @@ public class Theory {
         this.rules.remove(r);
     }
 
-    public Set<Literal> getHeads(Set<Rule> rules){
+    public Set<Literal> getHeads(RuleType ruletype){
         Set<Literal> heads = new TreeSet<>();
+        this.rules
         for (Rule r:rules) {
             heads.add(r.getHead());
         }

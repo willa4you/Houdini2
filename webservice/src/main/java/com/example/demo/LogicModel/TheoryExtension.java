@@ -1,10 +1,14 @@
 package com.example.demo.LogicModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
+
 import com.example.demo.LogicModel.Rule.RuleType;
 
 public class TheoryExtension {
@@ -48,8 +52,6 @@ public class TheoryExtension {
 
 	    // TRIGGER PART (Injection)
         // we remove strict conclusion literals from tails and check if a rule get active by an empty tail
-        // For the following iteration we need a list so we have to double up the data structures (a set and a list)
-        // TODO: This double data structure approach should be optimized
         ArrayList<Literal> injectables = new ArrayList<>(strictConclusions);
         ArrayList<Literal> newInjectables = new ArrayList<>();
         while(!injectables.isEmpty()) {
@@ -62,12 +64,14 @@ public class TheoryExtension {
                             strictConclusions.add(strictRule.getHead()) // we inject this head iff not already a strict conclusions
                         ) { 
                             newInjectables.add(strictRule.getHead()); // while get longer (analogous to fixpoint)
+                            strictRule.getHead().setPlusDelta();
+                            strictRule.getHead().setPlusPartial();
                         }
                     }
                 }
             }
-            injectables = newInjectables; // i move new injectables into main list
-            newInjectables.clear(); // i clear the new injectables
+            injectables = newInjectables; // we move new injectables into main list
+            newInjectables.clear(); // we clear the new injectables
         }
 
         plusDelta.addAll(strictConclusions);
@@ -76,21 +80,36 @@ public class TheoryExtension {
 
     private void computeMinusDelta() {
         
-        
-        
-        Set<Literal> candidates = new TreeSet<Literal>(theory.getLiterals());
-        Set<Literal> removeFromCandidates = new TreeSet<>(extension.getPlusDelta());
-        removeFromCandidates.addAll(theory.getHeads(new HashSet<>(theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.STRICT))).values())));
+        // We want to know the occurrencies of every strict-non-empty-tail-rule head
+        Map<Literal, Integer> strictHeads = new HashMap<Literal, Integer>();
+        for (Rule rule : theory.getRules(RuleType.STRICT)) {
+            if (strictHeads.containsKey(rule.getHead())) {
+                strictHeads.put(rule.getHead(), strictHeads.get(rule.getHead())+1);
+            } else {
+                strictHeads.put(rule.getHead(), 1);
+            }
+        }
 
-        while(!candidates.isEmpty()){
-            candidates.removeAll(removeFromCandidates);
-            candidates.forEach(c -> c.setDeltaState(State.MINUS));
-            extension.getMinusDelta().addAll(candidates);
-            candidates.clear();
+        Set<Literal> strictHeads = theory.getRules().
+            stream().filter(r -> r.isStrict() && !r.isEmptyTail()).map(r -> r.getHead()).collect(Collectors.toSet());
+        
+        Set<Literal> toMinusDelta = theory.getLiterals().
+            stream().filter(literal -> !(plusDelta.contains(literal) || strictHeads.contains(literal))).collect(Collectors.toSet());
+        
+         
+        for(Literal strictHead : strictHeads)
+            untriggerHeads.put(strictHead, 0);
+        
+
+        while(!toMinusDelta.isEmpty()){
+            toMinusDelta.removeAll(removeFromCandidates);
+            toMinusDelta.forEach(c -> c.setDeltaState(State.MINUS));
+            extension.getMinusDelta().addAll(toMinusDelta);
+            toMinusDelta.clear();
             removeFromCandidates.clear();
             for (Rule r: theory.getRules(RuleState.ACTIVABLE, new ArrayList<>(List.of(RuleType.STRICT))).values()) {
                 if (!Collections.disjoint(r.getTail(),extension.getMinusDelta())){
-                    candidates.add(r.getHead());
+                    toMinusDelta.add(r.getHead());
                     r.setType(RuleType.DEFEASIBLE);
                 } else removeFromCandidates.add(r.getHead());
             }
