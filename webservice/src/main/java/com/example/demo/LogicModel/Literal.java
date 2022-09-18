@@ -60,6 +60,10 @@ public class Literal implements Comparable<Literal> {
         return type;
     }
 
+    public boolean isPositive() {
+        return type == LiteralType.POSITIVE;
+    }
+
     public Literal getOpposite() {
         return opposite;
     }

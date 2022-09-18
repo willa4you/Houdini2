@@ -221,6 +221,7 @@ public class LogicModelController {
     this.minusDeltaString = theoryExtension.getMinusDeltaString();
     this.plusPartialString = theoryExtension.getPlusPartialString();
     this.minusPartialString = theoryExtension.getMinusPartialString();
+    
   }
 
 	@Autowired

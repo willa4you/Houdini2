@@ -19,6 +19,7 @@ public class TheoryExtension {
     Set<Literal> minusDelta = new TreeSet<Literal>();
     Set<Literal> plusPartial = new TreeSet<Literal>();
     Set<Literal> minusPartial = new TreeSet<Literal>();
+    private String nonPresentOpposites = "";
 
     public TheoryExtension (Theory consumableTheory) {
         this.theory = consumableTheory;
@@ -138,11 +139,23 @@ public class TheoryExtension {
         undecidables.forEach(undecidable -> undecidable.setUnidecidableDelta());
         
         // finally, all literals which are not in plusDelta, nor in undecidables, ARE DEFINITELY minusDelta
+        // also, all statements which are the opposite of a present literal, but they're not present in the theory
+        // belong by definition both to -Delta, and to -Partial; in order to represent them at the end of the process,
+        // we produce now the simple String which will represent them
+        
         for(Literal literal : theory.getLiterals()) {
+            // check if literal is -Delta
             if (!plusDelta.contains(literal) && !undecidables.contains(literal)) {
                 minusDelta.add(literal);
+                literal.setMinusDelta();
+            }
+            // check if it has no opposite, so we can ad the missing opposite's representation string for final exposition
+            if (literal.getOpposite() == null) {
+                nonPresentOpposites +=
+                    ((literal.isPositive()) ? "~" + literal.getLabel() : literal.getLabel()) + ", ";
             }
         }
+        nonPresentOpposites = nonPresentOpposites.substring(0, nonPresentOpposites.length() - 2); // last ", "
 
     }
 
@@ -186,9 +199,6 @@ public class TheoryExtension {
         // now it's finally time for the big while fixpoint
         List<Literal> undecidables = new ArrayList<Literal>(); // we use this to store the literals defeasibly undecidables
         while(!triggerables.isEmpty() || !untriggerables.isEmpty()) { // while at least one is not empty
-            System.out.println("triggerables: " + triggerables);
-            System.out.println("untriggerables: " + untriggerables);
-            System.out.println("undiceded: " + undecideds);
             // PHASE 1: we trigger and untrigger the rules with undecided heads
             for(Literal undecided : undecideds) {
                 // TRIGGER
@@ -308,7 +318,6 @@ public class TheoryExtension {
                 } // end second check if !minusPartial
                 // now we're able to tell if, for most of the conditions, this undecided is strongly candidate for -Partial
                 if (isMinusPartial) {
-                    System.out.println(undecided);
                     // there are at least the most important condition to check: undecided must be -Delta
                     if (undecided.isMinusDelta()) { // if it is
                         // we found a defintely -Partial
@@ -333,13 +342,19 @@ public class TheoryExtension {
         return this.printSetString(this.plusDelta);
     }
     public String getMinusDeltaString() {
-        return this.printSetString(this.minusDelta);
+        return
+            this.printSetString(this.minusDelta) +
+            (!this.minusDelta.isEmpty() ? ", " : "") +
+            nonPresentOpposites;
     }
     public String getPlusPartialString() {
         return this.printSetString(this.plusPartial);
     }
     public String getMinusPartialString() {
-        return this.printSetString(this.minusPartial);
+        return
+            this.printSetString(this.minusPartial) +
+            (!this.minusPartial.isEmpty() ? ", " : "") +
+            nonPresentOpposites;
     }
     public String printSetString(Set<Literal> set) {
         if (set.isEmpty()) {
