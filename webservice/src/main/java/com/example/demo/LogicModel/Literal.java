@@ -90,7 +90,7 @@ public class Literal implements Comparable<Literal> {
         this.deltaState = ExtensionState.MINUS;
     }
 
-    public void setUnidecidableDelta() {
+    public void setUndecidableDelta() {
         this.deltaState = ExtensionState.UNDECIDABLE;
     }
 
