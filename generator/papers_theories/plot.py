@@ -17,3 +17,13 @@ fig.set_size_inches(7,5.5)
 sns.violinplot(data=data)
 
 plt.savefig("./violin.pdf", papertype='A4', bbox_inches='tight')
+
+# Box
+
+fig, axes = plt.subplots(nrows=1, ncols=1)
+
+fig.set_size_inches(7,5.5)
+
+sns.boxplot(data=data)
+
+plt.savefig("./boxplot.pdf", papertype='A4', bbox_inches='tight')

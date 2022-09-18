@@ -98,10 +98,12 @@ def compute()
     level += 1
     puts "=====#{level}====="
     if ($rules.empty? or $literals.empty?)
+      %%
       puts "no more inferences to do"
       endtime = Time.now
       puts "Elapsed time:"
       puts endtime.to_f - starttime.to_f
+      %
       break
     end
     $rules.each do |r|
@@ -141,9 +143,11 @@ def compute()
     if new_conclusions.empty?
       puts "no new conclusions"
       if $stopstop
+        %%
         endtime = Time.now
         puts "Elapsed time:"
         puts endtime.to_f - starttime.to_f
+        %
         break
       end
       if stop
@@ -175,7 +179,6 @@ def output_compute()
     level += 1
     #puts "=====#{level}====="
     if ($rules.empty? or $literals.empty?)
-      #puts "no more inferences to do"
       endtime = Time.now
       #puts "Elapsed time:"
       #puts endtime.to_f - starttime.to_f

@@ -21,10 +21,11 @@ facts:  WS
 rules:  WS 
     | QT QT 
     | QT QT CM rules
+    | ((QT unquotedfacts ARROW literal QT CM)|(QT ARROW literal QT CM))+ ((QT QT)|(QT unquotedfacts ARROW literal QT)|(QT ARROW literal QT))  //rules 
+    //| ((QT ARROW literal QT CM)|(QT unquotedfacts ARROW literal QT CM))+ ((QT ARROW literal QT) | (QT unquotedfacts ARROW literal QT)) //rules ;
     | QT unquotedfacts ARROW literal QT 
     | QT ARROW literal QT 
-    | QT unquotedfacts ARROW literal QT CM rules 
-    | QT ARROW literal QT CM rules ;
+    ;
 
 suprels: WS 
     | QT QT 

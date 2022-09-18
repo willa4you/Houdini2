@@ -1,0 +1,8 @@
+{
+	"version" : "0.1",
+	"logicModel" : { 
+		"facts" : [""],
+		"rules" : ["X_onTheRightOf_Y => rightOfWay_X","Y_onTheRightOf_X => rightOfWay_Y","rightOfWay_Y => ~rightOfWay_X","rightOfWay_X => ~rightOfWay_Y","emergency_X,~emergency_Y => rightOfWay_X","emergency_Y,~emergency_X => rightOfWay_Y"," => ~emergency_X"," => ~emergency_Y","police_X => emergency_X"," => Y_onTheRightOf_X"," => police_X"],
+		"supRules" : ["r3 > r1","r4 > r2","r5 > r3","r6 > r4","r9 > r7"]
+	}
+}

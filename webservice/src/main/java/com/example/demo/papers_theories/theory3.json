@@ -1,0 +1,8 @@
+{
+	"version" : "0.1",
+	"logicModel" : { 
+		"facts" : [""],
+		"rules" : [" => hot"," => rain"," => jogging","hot => ~jogging","rain => ~jogging","hot,rain => jogging"],
+		"supRules" : ["r4 > r3","r5 > r3","r6 > r4","r6 > r5"]
+	}
+}

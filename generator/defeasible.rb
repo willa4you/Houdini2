@@ -1,6 +1,5 @@
 require './theories'
 require './engine'
-
 $to_print_conclusions = Array.new
 
 def clean_theory
@@ -54,21 +53,21 @@ end
 
 def output_prove(opt='')
   unless $superiority.empty?
-    puts "===Remove Superiority==="
+    #puts "===Remove Superiority==="
     removeSuperiority
     # $compiledRules.each { |r| r.showRule }
   end
   if opt == 'dft'
-    puts "===Remove Defeaters==="
+    #puts "===Remove Defeaters==="
     removeDefeater
     $rules = $no_defeater
   end
-  puts "===generate data structures==="
+  #puts "===generate data structures==="
   unless $superiority.empty?
     $rules = $compiledRules
   end
   prepare_prove  
-  output_compute()  
+  output_compute
 end
 
 def show_conclusions

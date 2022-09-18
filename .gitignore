@@ -10,6 +10,8 @@ target/
 .DS_Store*
 node_modules/*
 */theories/*
+*/generator/*.zip
+*/grammar/tests/*
 
 ### STS ###
 .apt_generated

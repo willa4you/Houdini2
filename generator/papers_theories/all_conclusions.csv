@@ -1,22 +1,22 @@
 ,delores,ours
-0,"""nspd"", ""bp"", ""ngs"", ""i_nfr1"", ""busa""","bp, i_nfr1, ngs, nspd"
-1,"""~emergency_Y"", ""Y_onTheRightOf_X"", ""police_X"", ""emergency_X"", ""rightOfWay_X"", ""~rightOfWay_Y""","Y_onTheRightOf_X, emergency_X, police_X, rightOfWay_X, ~emergency_Y"
+0,"""nspd"", ""bp"", ""ngs"", ""i_nfr1"", ""busa""","bp, busa, i_nfr1, ngs, nspd"
+1,"""~emergency_Y"", ""Y_onTheRightOf_X"", ""police_X"", ""emergency_X"", ""rightOfWay_X"", ""~rightOfWay_Y""","Y_onTheRightOf_X, emergency_X, police_X, rightOfWay_X, ~emergency_Y, ~rightOfWay_Y"
 2,"""hot"", ""rain"", ""jogging""","hot, jogging, rain"
 3,"""a"", ""d"", ""c"", ""e"", ""b""","a, b, c, d, e"
 4,"""platypus"", ""monotreme"", ""laysEgg"", ""hasFur"", ""hasBill"", ""mammal""","hasBill, hasFur, laysEgg, mammal, monotreme, platypus"
-5,"""evidenceA"", ""evidenceB"", ""~guilty""","evidenceA, evidenceB"
+5,"""evidenceA"", ""evidenceB"", ""~guilty""","evidenceA, evidenceB, ~guilty"
 6,"""Guido_friend_Samir"", ""uni_picture_Pic10"", ""owner_Pic10_Samir"", ""~wedding_Pic10""","Guido_friend_Samir, owner_Pic10_Samir, uni_picture_Pic10, ~wedding_Pic10"
-7,"""evidenceA"", ""evidenceB"", ""~guilty""","evidenceA, evidenceB"
+7,"""evidenceA"", ""evidenceB"", ""~guilty""","compensation, evidenceA, evidenceB, ~guilty"
 8,"""nautiluses"", ""cephalopods"", ""molluscs"", ""haveShells""","cephalopods, haveShells, molluscs, nautiluses"
-9,"""t"", ""~s"", ""~q"", ""~p"", ""~r""",t
+9,"""t"", ""~s"", ""~q"", ""~p"", ""~r""","t, ~p, ~q, ~r, ~s"
 10,"""a"", ""b"", ""d"", ""c""","a, b, c, d"
-11,"""a"", ""nafb"", ""c""",a
-12,"""a""",
-13,"""p"", ""q"", ""r"", ""t""","p, q"
+11,"""a"", ""nafb"", ""c""","a, c, nafb"
+12,"""a""",a
+13,"""p"", ""q"", ""r"", ""t""","p, q, r, t"
 14,,
-15,"""q1"", ""q2"", ""q3""",q1
+15,"""q1"", ""q2"", ""q3""","q1, q2, q3"
 16,,
-17,"""~a""",
+17,"""~a""",~a
 18,,"a, ~a"
 19,"""~f""",~f
 20,"""b""",b

@@ -66,28 +66,27 @@ ths = [
     method(:theory12),
 ]
 
+ths = (1...10001).map{|i| method(:randomtheory)}
+
+
+theories = TheoryIterator.new(*ths)
+
 # or populate a theory
 time = Time.now
 counter = 1
 
-ths = (1...2000).map{|i| method(:randomtheory)}
-
-theories = TheoryIterator.new(*ths)
-
-
 theories.each do |fn|
-
+    puts ">>> #{counter}"
     clean_theory
 
     fn.call
-
+    
     filename = "theories/theory#{counter}"
+    
     output_theory(filename)
 
-    
     output_prove()
 
-    
     save_conclusions()
 
     counter += 1
@@ -98,7 +97,7 @@ $to_print_conclusions.each do |line|
     file << line << "\n"
 end
 file = File.open("theories_times_#{time}.csv", "w")
-file << "Ours" << "\n"
+file << "Delores" << "\n"
 $to_print_times.each do |line|
     file << line << "\n"
 end

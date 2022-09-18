@@ -4,7 +4,7 @@ def randomtheory(n=3000, w=5, cap=200, p=0.025)
   heads = []
   #first w^2 rules are active
   (1...w+1).each do |i|
-    indexes = (1...w+1).map{|n| "a#{(n + w*(i-1))}"}
+    indexes = (1...w+1).map{|q| "a#{(q + w*(i-1))}"}
     head = "b#{i}"
     heads.push(head)
     indexes.each do |l|
@@ -215,15 +215,16 @@ def presumptionInnocenceCompensation
   rule("r3", "guilty", "responsible")
   rule("r4", "~guilty")
 
-  sup("r3", "r4")
-
   rule("r5", "compensation", "~guilty")
   rule("r6", "~compensation")
 
-  sup("r5", "r6")
 
   rule("r7", "evidenceA")
   rule("r8", "evidenceB")
+  
+  sup("r3", "r4")
+  sup("r5", "r6")
+
 end
 
 def nautiluses
