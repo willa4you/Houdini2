@@ -199,22 +199,26 @@ public class TheoryExtension {
         // now it's finally time for the big while fixpoint
         List<Literal> undecidables = new ArrayList<Literal>(); // we use this to store the literals defeasibly undecidables
         while(!triggerables.isEmpty() || !untriggerables.isEmpty()) { // while at least one is not empty
+            System.out.println("triggerables: " + triggerables);
+            System.out.println("untriggerables: " + untriggerables);
+            System.out.println("undecideds: " + undecideds);
             // PHASE 1: we trigger and untrigger the rules with undecided heads
             for(Literal undecided : undecideds) {
                 // TRIGGER
-                for(Literal triggerable : triggerables) {
-                    for(Rule rule : undecided.getRulesIsHeadOf()) {
-                        rule.getTail().remove(triggerable); // we remove the triggered from the tail
-                        if (rule.getTail().isEmpty() && !rule.isDefeater()) { // if this rule is activated and it's not a defeater
-                            undecided.setHasActiveRule(); // sets to true
-                            // ATTENTION: we know we don't have supRels with non existing or non complementary rules
-                            // because the theory constructor ignored them, so it's not necessary to check it
-                            for (Rule rwo : rule.getWinsOver()) {
-                                rwo.setLosesAfterActiveRule();
-                            }
+                for(Rule rule : undecided.getRulesIsHeadOf()) {
+                    for(Literal triggerable : triggerables) {
+                        rule.getTail().remove(triggerable); // we remove the triggerables from the undecided-head rule tails
+                    } // TODO lots of uneuseful trials and computations
+                    // now we check for activated rules (also for irrefutables)
+                    if (rule.getTail().isEmpty() && !rule.isDefeater()) { // if this rule is activated and it's not a defeater
+                        undecided.setHasActiveRule(); // sets to true
+                        // ATTENTION: we know we don't have supRels with non existing or non complementary rules
+                        // because the theory constructor ignored them, so it's not necessary to check it
+                        for (Rule rwo : rule.getWinsOver()) {
+                            rwo.setLosesAfterActiveRule();
                         }
-                    }
-                } // end of TRIGGER
+                    } 
+                } // end of TRIGGER injection
                 // UNTRIGGER
                 for (Literal untriggerable : untriggerables) {
                     Iterator<Rule> iteratorIsHeadOf = undecided.getRulesIsHeadOf().iterator();
@@ -263,6 +267,7 @@ public class TheoryExtension {
                             }
                         }
                     } // when we are here isPlusPartial is some value
+                    // if isPlusPartial is false, we don't know yet, and we wait -Partial controls or further iterations
                     if (isPlusPartial) { // if isPlusPartial we are not done yet
                         // TODO?
                         /* if (opposite != null && opposite.isPlusPartial()) {
