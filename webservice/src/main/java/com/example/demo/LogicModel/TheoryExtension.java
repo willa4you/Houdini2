@@ -136,7 +136,7 @@ public class TheoryExtension {
         // at the end of this process, all remaining rules in candidateToMinusDeltaRules are in strict rules loops
         // all remaining literals in candidateToMinusDeltaHeads are DEFINITELY not plus delta, nor minus delta, then UNDECIDABLE
         Set<Literal> undecidables = candidateToMinusDeltaHeads.keySet();
-        undecidables.forEach(undecidable -> undecidable.setUnidecidableDelta());
+        undecidables.forEach(undecidable -> undecidable.setUndecidableDelta());
         
         // finally, all literals which are not in plusDelta, nor in undecidables, ARE DEFINITELY minusDelta
         // also, all statements which are the opposite of a present literal, but they're not present in the theory
@@ -165,7 +165,6 @@ public class TheoryExtension {
         // the literals have their opposite reference sets to null for optimization purposes.
         // A null opposite reference means that the opposite literal is not present in the theory and by definition
         // it is a -Delta and -Partial literal. Further considerations on null references will be based on this.
-
         // For this task we need two lists for the while fixpoint
         List<Literal> triggerables = new ArrayList<Literal>(); // at each iteration it'll contain new found +Partial literals
         List<Literal> untriggerables = new ArrayList<Literal>(); // at each iteration it'll contain new found -Partial literals
@@ -196,12 +195,11 @@ public class TheoryExtension {
                 undecideds.remove(literal); // this is not undecided anymore
             }
         }
+
         // now it's finally time for the big while fixpoint
         List<Literal> undecidables = new ArrayList<Literal>(); // we use this to store the literals defeasibly undecidables
-        while(!triggerables.isEmpty() || !untriggerables.isEmpty()) { // while at least one is not empty
-            System.out.println("triggerables: " + triggerables);
-            System.out.println("untriggerables: " + untriggerables);
-            System.out.println("undecideds: " + undecideds);
+        do { // we enter a while loop with a mandatory first iteration which explores in order to find irrefutables
+
             // PHASE 1: we trigger and untrigger the rules with undecided heads
             for(Literal undecided : undecideds) {
                 // TRIGGER
@@ -339,7 +337,17 @@ public class TheoryExtension {
 
             } // end of undecideds and end of phase 2
 
-        } // end big fixpoint while
+            // fixpoint re-enters for another iteration if
+            // undecideds is not empty and at least one between triggerables/untriggerables is not empty
+        } while((!triggerables.isEmpty() || !untriggerables.isEmpty()) && !undecideds.isEmpty()); // this is a re-enter condition
+        // fixpoint exits when either undecideds is empty or both triggerables/untriggerables are empty
+
+        // it is possible that, because of defeasible rules loops, some undecided remained undecided
+        // but we have no more triggerables or untriggerables: the undecideds are now defintely not +Partial nor -Partial
+        // therefore defintely UNDECIDABLES
+        for (Literal undecided : undecideds) {
+            undecided.setUndecidablePartial();
+        }
 
     }
 
