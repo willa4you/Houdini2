@@ -8,14 +8,13 @@ public class Rule implements Comparable<Rule>{
     private String label;
     private RuleType type;
     private Literal head;
-    private TreeSet<Literal> tail;
+    private HashSet<Literal> tail;
     
     private Set<Rule> winsOver = new TreeSet<Rule>();
     private Set<Rule> losesAfter = new TreeSet<Rule>();
+    private boolean isLosingAfterActiveRule = false;
     
-    // private boolean losesAfterActiveRule; not a property of the rule itself, I guess it shouldn't be here
-    
-    public Rule(String label, RuleType type, Literal head, TreeSet<Literal> tail) {
+    public Rule(String label, RuleType type, Literal head, HashSet<Literal> tail) {
         this.label = label;
         this.type = type;
         this.head = head;
@@ -34,7 +33,7 @@ public class Rule implements Comparable<Rule>{
         return head;
     }
 
-    public TreeSet<Literal> getTail() {
+    public HashSet<Literal> getTail() {
         return tail;
     }
 
@@ -77,6 +76,16 @@ public class Rule implements Comparable<Rule>{
         this.tail.remove(literal);
     }
 
+    public boolean isLosingAfterActiveRule() {
+        return isLosingAfterActiveRule;
+    }
+    /**
+     * Sets the information that this rule loses after an active rule to true.
+     */
+    public void setLosesAfterActiveRule() {
+        isLosingAfterActiveRule = true;
+    }
+
     @Override
     public boolean equals(Object object) {
         if (this == object) {return true;}
@@ -94,4 +103,16 @@ public class Rule implements Comparable<Rule>{
         return Objects.hash(super.hashCode(), getHead(), getTail(), getType());
     }
 
+    @Override
+    public String toString() {
+        String ruleString = "";
+        for (Literal tailLiteral : tail){ruleString += tailLiteral.toString() + ", ";}
+        ruleString = ruleString.substring(0, ruleString.length() - 2); // remove last ", "
+        switch(type) {
+            case STRICT: ruleString += " -> "; break;
+            case DEFEASIBLE: ruleString += " => "; break;
+            case DEFEATER: ruleString += " ~> "; break;
+        }
+        return ruleString + head.toString();
+    }
 }

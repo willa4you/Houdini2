@@ -32,7 +32,7 @@ public class Theory {
             Literal fact = getLiteralAndUpdateLiterals(factNode);
             strictConclusions.add(fact);
             fact.setPlusDelta();
-            fact.setPlusPartial();
+            fact.setPlusPartial(); // early assignment
         }
         // end facts
         
@@ -57,18 +57,18 @@ public class Theory {
             }
             Literal head = getLiteralAndUpdateLiterals(ruleNode.get("head"));
             JsonNode tailNode = ruleNode.get("tail");
-            TreeSet<Literal> tailSet = new TreeSet<>();
+            HashSet<Literal> tail = new HashSet<>();
             Iterator<JsonNode> tailElements = tailNode.elements();
             while(tailElements.hasNext()) {
                 JsonNode tailLiteral = tailElements.next();
-                tailSet.add(getLiteralAndUpdateLiterals(tailLiteral));
+                tail.add(getLiteralAndUpdateLiterals(tailLiteral));
             }
-            Rule rule = new Rule(label, ruleType, head, tailSet);
+            Rule rule = new Rule(label, ruleType, head, tail);
             head.addRuleIsHeadOf(rule); // adding this rule to the rules this head literal is head of
             rules.add(rule); // adding this rule to the theory rules
-            if (ruleType == RuleType.STRICT && tailSet.isEmpty()) { // rules of type '-> a'
+            if (ruleType == RuleType.STRICT && tail.isEmpty()) { // rules of type '-> a'
                 head.setPlusDelta();
-                head.setPlusPartial();
+                head.setPlusPartial(); // early assignment
                 strictConclusions.add(head);
             }
         } // end rules while
@@ -146,23 +146,16 @@ public class Theory {
     }
 
     public List<Rule> getRules(RuleType ruleType) {
-        return getRules(new ArrayList<RuleType>(Arrays.asList(ruleType)));
+        return this.rules.stream().
+            filter(rule -> rule.getType() == ruleType).collect(Collectors.toList());
     }
 
-    public List<Rule> getRules(ArrayList<RuleType> ruleTypes) {
-        return this.rules.stream().filter(rule -> ruleTypes.contains(rule.getType())).collect(Collectors.toList());
+    public List<Rule> getRules(RuleType ruleType1, RuleType ruleType2) {
+        return this.rules.stream().
+            filter(rule -> (rule.getType() == ruleType1 || rule.getType() == ruleType2)).collect(Collectors.toList());
     }
 
     public void removeRule(Rule r) {
         this.rules.remove(r);
-    }
-
-    public Set<Literal> getHeads(RuleType ruletype){
-        Set<Literal> heads = new TreeSet<>();
-        this.rules
-        for (Rule r:rules) {
-            heads.add(r.getHead());
-        }
-        return heads;
     }
 }

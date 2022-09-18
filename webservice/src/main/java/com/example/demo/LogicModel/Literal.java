@@ -21,8 +21,8 @@ public class Literal implements Comparable<Literal> {
     private String label;
     private LiteralType type;
     private Literal opposite;
-    private Set<Rule> rulesIsHeadOf = new TreeSet<Rule>();
-    // private boolean hasActiveRules; not a property of the literal itself, I guess it shouldn't be here
+    private List<Rule> rulesIsHeadOf = new ArrayList<Rule>();
+    private boolean hasActiveRule;
     private ExtensionState deltaState = ExtensionState.UNDECIDED;
     private ExtensionState partialState = ExtensionState.UNDECIDED;
 
@@ -68,7 +68,7 @@ public class Literal implements Comparable<Literal> {
         this.opposite = opposite;
     }
 
-    public Set<Rule> getRulesIsHeadOf() {
+    public List<Rule> getRulesIsHeadOf() {
         return rulesIsHeadOf;
     }
 
@@ -86,6 +86,10 @@ public class Literal implements Comparable<Literal> {
         this.deltaState = ExtensionState.MINUS;
     }
 
+    public void setUnidecidableDelta() {
+        this.deltaState = ExtensionState.UNDECIDABLE;
+    }
+
     public void setPlusPartial() {
         this.partialState = ExtensionState.PLUS;
     }
@@ -94,12 +98,34 @@ public class Literal implements Comparable<Literal> {
         this.partialState = ExtensionState.MINUS;
     }
 
+    public void setUndecidablePartial() {
+        this.partialState = ExtensionState.UNDECIDABLE;
+    }
+
     public ExtensionState getPartialState() {
         return partialState;
     }
 
     public void setPartialState(ExtensionState partialState) {
         this.partialState = partialState;
+    }
+
+    public boolean isMinusDelta() {
+        return this.deltaState == ExtensionState.MINUS;
+    }
+
+    public boolean isPlusPartial() {
+        return this.partialState == ExtensionState.PLUS;
+    }
+
+    public boolean hasActiveRule() {
+        return hasActiveRule;
+    }
+    /**
+     * Sets the information that this literal has at least one active rule to true.
+     */
+    public void setHasActiveRule() {
+        hasActiveRule = true;
     }
 
     @Override

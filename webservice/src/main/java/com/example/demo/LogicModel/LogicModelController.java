@@ -8,15 +8,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.example.demo.LogicModel.Extension.DefeasibleExtensionComputator;
-import com.example.demo.Pair;
 import com.example.demo.FileUpload.storage.StorageService;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.example.demo.JSONParser.JSONLogicParser;
 import com.example.demo.JSONParser.JSONWrongFormatException;
-import com.example.demo.LogicModel.Extension.StrictExtensionComputator;
 import com.example.demo.LogicModel.grammar.ModelParser;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -210,7 +207,7 @@ public class LogicModelController {
     generator.writeEndObject(); // end global object
     generator.close(); // to close the generator
     String myJSON = jsonObjectWriter.toString();
-    System.out.println(myJSON);
+    //System.out.println(myJSON);
 
     // TODO: json should arrive from http post or some web interface
     Theory theory = new Theory(myJSON);
