@@ -267,7 +267,7 @@ public class TheoryExtension {
                     } // when we are here isPlusPartial is some value
                     // if isPlusPartial is false, we don't know yet, and we wait -Partial controls or further iterations
                     if (isPlusPartial) { // if isPlusPartial we are not done yet
-                        // TODO?
+                        // TODO ?
                         /* if (opposite != null && opposite.isPlusPartial()) {
                           this is a cycle in superiority rules  
                         } */
