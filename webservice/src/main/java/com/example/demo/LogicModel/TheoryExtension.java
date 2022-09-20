@@ -75,7 +75,7 @@ public class TheoryExtension {
 
     private void computeMinusDelta() {
         
-        // to compute minus delta, we want to work only with stict rules
+        // to compute minus delta, we want to work only with strict rules
         // having non-empty tail and whose head literal is not already plus delta decided
         
         List<Rule> candidateToMinusDeltaRules = theory.getRules().
@@ -149,7 +149,7 @@ public class TheoryExtension {
                 minusDelta.add(literal);
                 literal.setMinusDelta();
             }
-            // check if it has no opposite, so we can ad the missing opposite's representation string for final exposition
+            // check if it has no opposite, so we can add the missing opposite's representation string for final exposition
             if (literal.getOpposite() == null) {
                 nonPresentOpposites +=
                     ((literal.isPositive()) ? "~" + literal.getLabel() : literal.getLabel()) + ", ";
