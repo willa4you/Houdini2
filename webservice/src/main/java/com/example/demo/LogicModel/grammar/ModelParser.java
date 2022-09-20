@@ -16,12 +16,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 
 public class ModelParser {
-
-    private static Set<Literal> literals = new HashSet<Literal>();
-
-    public static Set<Literal> getLiterals() {
-        return literals;
-    }
     
     private static class RecognitionExceptionListener extends BaseErrorListener {
         @Override
@@ -49,8 +43,6 @@ public class ModelParser {
         
         MyTheoryVisitor visitor = new MyTheoryVisitor();
         visitor.visit(tree);
-        
-        literals = visitor.getLiterals();
         
     }
 

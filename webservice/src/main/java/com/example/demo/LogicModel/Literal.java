@@ -3,19 +3,7 @@ import java.util.*;
 
 public class Literal implements Comparable<Literal> {
 
-    public enum LiteralType {
-        POSITIVE,
-        NEGATIVE;
-
-        public LiteralType opposite() {
-            switch(this) {
-                case POSITIVE : return NEGATIVE;
-                case NEGATIVE : return POSITIVE;
-                default: return POSITIVE;
-            }
-        };
-    };
-
+    public enum LiteralType {POSITIVE, NEGATIVE};
     public enum ExtensionState {UNDECIDED, PLUS, MINUS, UNDECIDABLE}
 
     private String label;
@@ -29,27 +17,6 @@ public class Literal implements Comparable<Literal> {
     public Literal(String label, LiteralType type) {
         this.label = label;
         this.type = type;
-    }
-
-    public Literal(String label) {
-        this.label = label;
-        boolean startsWithTilde = label.startsWith("~");
-        if (!startsWithTilde) {
-            this.type = LiteralType.POSITIVE;
-            //Must call this constructor otherwise there will be recursion
-            this.opposite = new Literal("~".concat(label), LiteralType.NEGATIVE, this);
-        }
-        else {
-            this.type = LiteralType.NEGATIVE;
-            //Must call this constructor otherwise there will be recursion
-            this.opposite = new Literal(label.substring(1), LiteralType.POSITIVE, this);
-        }
-    }
-    
-    public Literal(String label, LiteralType type, Literal opposite) {
-        this.label = label;
-        this.type = type;
-        this.opposite = opposite;
     }
     
     public String getLabel() {

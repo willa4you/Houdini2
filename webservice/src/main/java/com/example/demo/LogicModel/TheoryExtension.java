@@ -172,7 +172,7 @@ public class TheoryExtension {
         List<Literal> triggerables = new ArrayList<Literal>(); // at each iteration it'll contain new found +Partial literals
         List<Literal> untriggerables = new ArrayList<Literal>(); // at each iteration it'll contain new found -Partial literals
         
-        // we need a list containing the defeasible undecided literals (it'll update at every while iteration getting shorter)
+        // we need a set containing the defeasible undecided literals (it'll update at every while iteration getting shorter)
         // At the beginning they are all literals except the plusDelta which already are plusPartial
         Set<Literal> undecideds = theory.getLiterals().
             stream().filter(lit -> !plusDelta.contains(lit)).collect(Collectors.toCollection(HashSet::new));
@@ -200,7 +200,6 @@ public class TheoryExtension {
         }
 
         // now it's finally time for the big while fixpoint
-        List<Literal> undecidables = new ArrayList<Literal>(); // we use this to store the literals defeasibly undecidables
         do { // we enter a while loop with a mandatory first iteration which explores in order to find irrefutables
 
             // PHASE 1: we trigger and untrigger the rules with undecided heads
@@ -209,7 +208,7 @@ public class TheoryExtension {
                 for(Rule rule : undecided.getRulesIsHeadOf()) {
                     for(Literal triggerable : triggerables) {
                         rule.getTail().remove(triggerable); // we remove the triggerables from the undecided-head rule tails
-                    } // TODO lots of uneuseful trials and computations
+                    } // TODO lots of uneuseful iterations we could avoid if we knew the tails triggerable belongs
                     // now we check for activated rules (also for irrefutables)
                     if (rule.getTail().isEmpty() && !rule.isDefeater()) { // if this rule is activated and it's not a defeater
                         undecided.setHasActiveRule(); // sets to true
@@ -226,7 +225,7 @@ public class TheoryExtension {
                     while(iteratorIsHeadOf.hasNext()) {
                         Rule rule = iteratorIsHeadOf.next();
                         if (rule.getTail().contains(untriggerable)) { // when a rule is untriggered, it is defintely removed
-                            // remove all the superiority relations with r
+                            // remove all the superiority relations in other rules involving this rule
 						    for(Rule rwo : rule.getWinsOver()) {
 							    rwo.getLosesAfter().remove(rule);
 						    }
@@ -281,12 +280,11 @@ public class TheoryExtension {
                             triggerables.add(undecided);
                         } else { // if the opposite is not -Delta, this cannot be a +Partial
                             undecided.setUndecidablePartial();
-                            undecidables.add(undecided);
                         }
-                        iteratorUndecideds.remove(); // we remove it anyway because it's not undecided anymore
+                        iteratorUndecideds.remove(); // we remove it from undecideds in any case because it's not undecided anymore
                         continue; // we step into the next undecided in while: we don't need to control -Partial anymore
                     }
-                }
+                } // end of undecided has active rule
                 // MINUS PARTIAL CONTROLS
                 // preconditions: if a literal is a-Delta and the complementary is +Delta, we already decided it as a
                 // -Partial by populating the untriggerables on step zero (before the fixpoint): this respects the [def(2.2)]
@@ -299,7 +297,7 @@ public class TheoryExtension {
                         isMinusPartial = false; // if the undecided literal is head of a non defeater, we're not sure it is -Partial
                     }
                 }
-                // if at this point isMinusPartial is true, the information is sufficient
+                // if at this point isMinusPartial is true, this information is sufficient
                 // if there are rules this undecided literal is head of, we must perform some furher controls
                 // these controls involve comparisons with rules of the complementary literal, so it there is no one, we skip them
                 if (!isMinusPartial && undecided.getOpposite() != null) {
@@ -333,9 +331,8 @@ public class TheoryExtension {
                     } else { // if it is not
                         // undecided is definitely undecidable, not +Partial nor -Partial
                         undecided.setUndecidablePartial();
-                        undecidables.add(undecided);
                     }
-                    iteratorUndecideds.remove(); // we remove it anyway because it's not undecided anymore
+                    iteratorUndecideds.remove(); // we remove it from undecideds in any case because it's not undecided anymore
                 }
 
             } // end of undecideds and end of phase 2
@@ -348,6 +345,8 @@ public class TheoryExtension {
         // it is possible that, because of defeasible rules loops, some undecided remained undecided
         // but we have no more triggerables or untriggerables: the undecideds are now defintely not +Partial nor -Partial
         // therefore defintely UNDECIDABLES
+        // TODO: we can check if undecideds is not empty when we exit the do-while fixpoint, in order to give the information
+        // there were rule loops in the defeasible rules (not every undecidable literal actually is that state because of loops)
         for (Literal undecided : undecideds) {
             undecided.setUndecidablePartial();
         }
