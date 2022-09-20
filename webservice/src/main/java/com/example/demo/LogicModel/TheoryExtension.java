@@ -155,7 +155,10 @@ public class TheoryExtension {
                     ((literal.isPositive()) ? "~" + literal.getLabel() : literal.getLabel()) + ", ";
             }
         }
-        nonPresentOpposites = nonPresentOpposites.substring(0, nonPresentOpposites.length() - 2); // last ", "
+        
+        if (nonPresentOpposites.length() > 0) {
+            nonPresentOpposites = nonPresentOpposites.substring(0, nonPresentOpposites.length() - 2); // last ", "
+        }
 
     }
 
