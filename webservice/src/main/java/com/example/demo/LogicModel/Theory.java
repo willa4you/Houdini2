@@ -83,7 +83,7 @@ public class Theory {
             Rule inferior = new Rule(supRelNode.get("inferior").asText()); // temporary to check presence of rule
             // we want to avoid relations reffering to non existing rules
             if (rules.contains(superior) && rules.contains(inferior)) { // this is only based on labels, we use temporary rules
-                // if they are present (as labels) i get the real ones
+                // if they are present (as labels) we get the real ones
                 superior = rules.ceiling(superior);
                 inferior = rules.ceiling(inferior);
                 // now we also want to avoid to store superiority relations about non complementary heads

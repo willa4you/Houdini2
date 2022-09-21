@@ -19,6 +19,8 @@ public class TheoryExtension {
     Set<Literal> minusDelta = new TreeSet<Literal>();
     Set<Literal> plusPartial = new TreeSet<Literal>();
     Set<Literal> minusPartial = new TreeSet<Literal>();
+    Set<Literal> inLoopRulesDelta;
+    Set<Literal> inLoopRulesPartial;
     private String nonPresentOpposites = "";
 
     public TheoryExtension (Theory consumableTheory) {
@@ -26,12 +28,15 @@ public class TheoryExtension {
     }
 
     /**
-     * Computes the extension of the given theory. The theory associated with this extension computator will be consumed by the process.
+     * Computes the extension of the given theory.
+     * The theory passed to this extension computator will be consumed by the process.
+     * @return A reference to the object itself.
      */
-    public void computeExtension() {
+    public TheoryExtension computeExtension() {
 
         computeStrictExtension();
         computeDefeasibleExtension();
+        return this;
 
     }
     
@@ -135,8 +140,8 @@ public class TheoryExtension {
 
         // at the end of this process, all remaining rules in candidateToMinusDeltaRules are in strict rules loops
         // all remaining literals in candidateToMinusDeltaHeads are DEFINITELY not plus delta, nor minus delta, then UNDECIDABLE
-        Set<Literal> undecidables = candidateToMinusDeltaHeads.keySet();
-        undecidables.forEach(undecidable -> undecidable.setUndecidableDelta());
+        inLoopRulesDelta = candidateToMinusDeltaHeads.keySet();
+        inLoopRulesDelta.forEach(undecidable -> undecidable.setUndecidableDelta());
         
         // finally, all literals which are not in plusDelta, nor in undecidables, ARE DEFINITELY minusDelta
         // also, all statements which are the opposite of a present literal, but they're not present in the theory
@@ -145,7 +150,7 @@ public class TheoryExtension {
         
         for(Literal literal : theory.getLiterals()) {
             // check if literal is -Delta
-            if (!plusDelta.contains(literal) && !undecidables.contains(literal)) {
+            if (!plusDelta.contains(literal) && !inLoopRulesDelta.contains(literal)) {
                 minusDelta.add(literal);
                 literal.setMinusDelta();
             }
@@ -155,9 +160,9 @@ public class TheoryExtension {
                     ((literal.isPositive()) ? "~" + literal.getLabel() : literal.getLabel()) + ", ";
             }
         }
-        
+        // removing last ", "
         if (nonPresentOpposites.length() > 0) {
-            nonPresentOpposites = nonPresentOpposites.substring(0, nonPresentOpposites.length() - 2); // last ", "
+            nonPresentOpposites = nonPresentOpposites.substring(0, nonPresentOpposites.length() - 2);
         }
 
     }
@@ -346,39 +351,53 @@ public class TheoryExtension {
         // but we have no more triggerables or untriggerables: the undecideds are now defintely not +Partial nor -Partial
         // therefore defintely UNDECIDABLES
         // TODO: we can check if undecideds is not empty when we exit the do-while fixpoint, in order to give the information
-        // there were rule loops in the defeasible rules (not every undecidable literal actually is that state because of loops)
-        for (Literal undecided : undecideds) {
-            undecided.setUndecidablePartial();
-        }
+        // there were rule loops in the defeasible rules (being in a loop is not the only reason for a literal to be undecidable)
+        inLoopRulesPartial = undecideds;
+        inLoopRulesPartial.forEach(unpar -> unpar.setUndecidablePartial());
 
     }
 
     public String getPlusDeltaString() {
-        return this.printSetString(this.plusDelta);
+        return (plusDelta.isEmpty()) ? "∅" : printSetString(plusDelta);
     }
+
     public String getMinusDeltaString() {
-        return
-            this.printSetString(this.minusDelta) +
-            (!this.minusDelta.isEmpty() ? ", " : "") +
-            nonPresentOpposites;
-    }
-    public String getPlusPartialString() {
-        return this.printSetString(this.plusPartial);
-    }
-    public String getMinusPartialString() {
-        return
-            this.printSetString(this.minusPartial) +
-            (!this.minusPartial.isEmpty() ? ", " : "") +
-            nonPresentOpposites;
-    }
-    public String printSetString(Set<Literal> set) {
-        if (set.isEmpty()) {
+        if (minusDelta.isEmpty() && nonPresentOpposites.isEmpty()) {
             return "∅";
         }
         else {
-            String s = set.toString();
-            return s.substring(1, s.length()-1);
+            return printSetString(minusDelta) +
+            ((minusDelta.isEmpty() || nonPresentOpposites.isEmpty()) ? "" : ", ") +
+            nonPresentOpposites;
         }
+    }
+
+    public String getPlusPartialString() {
+        return (plusPartial.isEmpty()) ? "∅" : printSetString(plusPartial);
+    }
+
+    public String getMinusPartialString() {
+        if (minusPartial.isEmpty() && nonPresentOpposites.isEmpty()) {
+            return "∅";
+        }
+        else {
+            return printSetString(minusPartial) +
+            ((minusPartial.isEmpty() || nonPresentOpposites.isEmpty()) ? "" : ", ") +
+            nonPresentOpposites;
+        }
+    }
+
+    public String getInLoopRulesDeltaString() {
+        return (inLoopRulesDelta.isEmpty()) ? "∅" : printSetString(inLoopRulesDelta);
+    }
+
+    public String getInLoopRulesPartialString() {
+        return (inLoopRulesPartial.isEmpty()) ? "∅" : printSetString(inLoopRulesPartial);
+    }
+
+    public String printSetString(Set<Literal> set) {
+        String s = set.toString();
+        return s.substring(1, s.length() - 1);
     }
     
 }

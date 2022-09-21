@@ -43,6 +43,8 @@ public class LogicModelController {
   private String minusDeltaString = "∅";
   private String plusPartialString = "∅";
   private String minusPartialString = "∅";
+  private String undecidableDeltaBecauseOfLoops;
+  private String undecidablePartialBecauseOfLoops;
   private boolean is_there_a_json_error_message = false;
 
   @ModelAttribute("is_there_a_json_error_message")
@@ -107,6 +109,16 @@ public class LogicModelController {
   @ModelAttribute("minus_partial_string")
   private String getMinusPartialString() {
     return this.minusPartialString;
+  }
+
+  @ModelAttribute("undecidable_delta_loops_string")
+  private String getUndecidableDeltaBecauseOfLoops() {
+    return this.undecidableDeltaBecauseOfLoops;
+  }
+
+  @ModelAttribute("undecidable_partial_loops_string")
+  private String getUndecidablePartialBecauseOfLoops() {
+    return this.undecidablePartialBecauseOfLoops;
   }
 
   public void configFromLogicModel(LogicModel logicModel) throws IOException, ParseCancellationException  {
@@ -211,17 +223,16 @@ public class LogicModelController {
 
     // TODO: json should arrive from http post or some web interface
     Theory theory = new Theory(myJSON);
-    // if we want mantain the original theory we must create a deep copy of it
-    TheoryExtension theoryExtension = new TheoryExtension(theory);
-    theoryExtension.computeExtension();
-
-    // TODO: System.out.println(strict_comp.elapsedtime + def_comp.elapsedtime);
+    // TODO: if we want mantain the original theory we must create a deep copy of it
+    TheoryExtension theoryExtension = new TheoryExtension(theory).computeExtension();
+    new Validator().validate(theory.getLiterals());
 
     this.plusDeltaString = theoryExtension.getPlusDeltaString();
     this.minusDeltaString = theoryExtension.getMinusDeltaString();
     this.plusPartialString = theoryExtension.getPlusPartialString();
     this.minusPartialString = theoryExtension.getMinusPartialString();
-    
+    this.undecidableDeltaBecauseOfLoops = theoryExtension.getInLoopRulesDeltaString();
+    this.undecidablePartialBecauseOfLoops = theoryExtension.getInLoopRulesPartialString();
   }
 
 	@Autowired
