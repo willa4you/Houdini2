@@ -12,7 +12,7 @@ public class Literal implements Comparable<Literal> {
     private String label;
     private LiteralType type;
     private Literal opposite;
-    private List<Rule> rulesIsHeadOf = new ArrayList<Rule>();
+    private List<Rule> rulesIsHeadOf = new ArrayList<Rule>(); // it performs only adds and iterations, so a List is enough
     private boolean hasActiveRule;
     private ExtensionState deltaState = ExtensionState.UNDECIDED;
     private ExtensionState partialState = ExtensionState.UNDECIDED;

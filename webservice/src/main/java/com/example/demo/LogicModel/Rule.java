@@ -10,8 +10,8 @@ public class Rule implements Comparable<Rule>{
     private Literal head;
     private HashSet<Literal> tail;
     
-    private Set<Rule> winsOver = new TreeSet<Rule>();
-    private Set<Rule> losesAfter = new TreeSet<Rule>();
+    private Set<Rule> winsOver = new HashSet<Rule>(); // at some point we want to remove objects in O(1)
+    private Set<Rule> losesAfter = new HashSet<Rule>(); // at some point we want to remove objects in O(1)
     private boolean isLosingAfterActiveRule = false;
     
     public Rule(String label, RuleType type, Literal head, HashSet<Literal> tail) {
@@ -60,6 +60,7 @@ public class Rule implements Comparable<Rule>{
     public Set<Rule> getWinsOver() {
         return winsOver;
     }
+
     public void addToWinsOver(Rule inferior) {
         winsOver.add(inferior);
     }

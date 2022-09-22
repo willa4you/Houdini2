@@ -133,6 +133,7 @@ public class Theory {
     public Set<Literal> getLiterals() {
         return literals;
     }
+    
     public Set<Literal> getLiterals(ExtensionState s) {
         return literals.stream().filter(l -> l.getPartialState().equals(s)).collect(Collectors.toSet());
     }
