@@ -45,6 +45,8 @@ public class LogicModelController {
   private String minusPartialString = "∅";
   private String undecidableDeltaBecauseOfLoops;
   private String undecidablePartialBecauseOfLoops;
+  private String literalsInvolvedInSupRelCycles;
+  private String literalsValidation;
   private boolean is_there_a_json_error_message = false;
 
   @ModelAttribute("is_there_a_json_error_message")
@@ -119,6 +121,16 @@ public class LogicModelController {
   @ModelAttribute("undecidable_partial_loops_string")
   private String getUndecidablePartialBecauseOfLoops() {
     return this.undecidablePartialBecauseOfLoops;
+  }
+
+  @ModelAttribute("literalsInvolvedInSupRelCycles_string")
+  private String getLiteralsInvolvedInSupRelCycles() {
+    return this.literalsInvolvedInSupRelCycles;
+  }
+
+  @ModelAttribute("literalsValidation_string")
+  private String getLiteralsValidation() {
+    return this.literalsValidation;
   }
 
   public void configFromLogicModel(LogicModel logicModel) throws IOException, ParseCancellationException  {
@@ -225,7 +237,7 @@ public class LogicModelController {
     Theory theory = new Theory(myJSON);
     // TODO: if we want mantain the original theory we must create a deep copy of it
     TheoryExtension theoryExtension = new TheoryExtension(theory).computeExtension();
-    new Validator().validate(theory.getLiterals());
+    Validator validator = new Validator().validate(theory.getLiterals());
 
     this.plusDeltaString = theoryExtension.getPlusDeltaString();
     this.minusDeltaString = theoryExtension.getMinusDeltaString();
@@ -233,6 +245,8 @@ public class LogicModelController {
     this.minusPartialString = theoryExtension.getMinusPartialString();
     this.undecidableDeltaBecauseOfLoops = theoryExtension.getInLoopRulesDeltaString();
     this.undecidablePartialBecauseOfLoops = theoryExtension.getInLoopRulesPartialString();
+    this.literalsInvolvedInSupRelCycles = validator.getLiteralsInvolvedInSupRelCycles();
+    this.literalsValidation = validator.getLiteralsValidation();
   }
 
 	@Autowired
