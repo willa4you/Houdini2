@@ -153,89 +153,14 @@ public class LogicModelController {
 
     /* Validating */
 
-    String JSONcontent = logicModel.toJSONString();
-
+    String JSONcontent = logicModel.toJSONString(); // BASIC STYLE JSON
     ModelParser.parse(JSONcontent); //Here throws ParseCancellationException if wrong
-
-    // TODO Creating new JSON (this should be integrated in the previous actions)
-    JsonFactory factory = new JsonFactory();
-    StringWriter jsonObjectWriter = new StringWriter();
-    JsonGenerator generator = factory.createGenerator(jsonObjectWriter);
-    generator.useDefaultPrettyPrinter(); // pretty print JSON
-    generator.writeStartObject(); // start global object
-    generator.writeFieldName("facts");
-    generator.writeStartArray(); // start facts array
-    for (String f : facts) {
-      if (f.equals("")) {continue;}
-      f = f.replaceAll("\\p{Z}",""); // remove ALL whitespaces
-      generator.writeStartObject();
-      generator.writeFieldName("label");
-      generator.writeString(f.startsWith("~") ? f.substring(1) : f);
-      generator.writeFieldName("type");
-      generator.writeString(f.startsWith("~") ? "negative" : "positive");
-      generator.writeEndObject();
-    }
-    generator.writeEndArray(); // end facts array
-    generator.writeFieldName("rules");
-    generator.writeStartArray(); // start rules array
-    int ir = 1;
-    for (String r : rules) {
-      if (r.equals("")) {continue;}
-      r = r.replaceAll("\\p{Z}",""); // remove ALL whitespaces
-      generator.writeStartObject(); // start rule object
-      generator.writeFieldName("label");
-      generator.writeString("r"+(ir++));
-      generator.writeFieldName("type");
-      switch(r.substring(r.indexOf(">") - 1, r.indexOf(">")).charAt(0)) {
-        case '-' : generator.writeString("strict"); break;
-        case '=' : generator.writeString("defeasible"); break;
-        case '~' : generator.writeString("defeater"); break;
-        default : generator.writeString("strict"); break;
-      }
-      String head = r.substring(r.indexOf(">") + 1);
-      generator.writeFieldName("head");
-      generator.writeStartObject(); // start head object
-      generator.writeFieldName("label");
-      generator.writeString(head.startsWith("~") ? head.substring(1) : head);
-      generator.writeFieldName("type");
-      generator.writeString(head.startsWith("~") ? "negative" : "positive");
-      generator.writeEndObject(); // end head object
-      String[] tail = r.substring(0, r.indexOf(">") - 1).split(",");
-      generator.writeFieldName("tail");
-      generator.writeStartArray(); // start tail literals array
-      for (String l : tail) {
-        if (l.equals("")) {continue;}
-        generator.writeStartObject();
-        generator.writeFieldName("label");
-        generator.writeString(l.startsWith("~") ? l.substring(1) : l);
-        generator.writeFieldName("type");
-        generator.writeString(l.startsWith("~") ? "negative" : "positive");
-        generator.writeEndObject();
-      }
-      generator.writeEndArray(); // end tail literals array
-      generator.writeEndObject(); // end rule object
-    }
-    generator.writeEndArray(); // end rules array
-    generator.writeFieldName("superiorityRelations");
-    generator.writeStartArray(); // start supRelations array
-    for (String sr : supRules) {
-      if (sr.equals("")) {continue;}
-      generator.writeStartObject();
-      generator.writeFieldName("superior");
-      generator.writeString(sr.substring(0, sr.indexOf(">")));
-      generator.writeFieldName("inferior");
-      generator.writeString(sr.substring(sr.indexOf(">") + 1));
-      generator.writeEndObject();
-    }
-    generator.writeEndArray(); // end supRel array
-    generator.writeEndObject(); // end global object
-    generator.close(); // to close the generator
-    String myJSON = jsonObjectWriter.toString();
-    //System.out.println(myJSON);
-
-    // TODO: json should arrive from http post or some web interface
-    Theory theory = new Theory(myJSON);
-    // TODO: if we want mantain the original theory we must create a deep copy of it
+    
+    JSONcontent = logicModel.toCustomJSONString(); // THIS IS AN ATTEMPT TO FORMALIZE JSON FORMAT
+    System.out.println(JSONcontent.replace(" ", ""));
+    
+    // TODO: json could arrive from http post or some web REST/SOAP interface
+    Theory theory = new Theory(JSONcontent);
     TheoryExtension theoryExtension = new TheoryExtension(theory).computeExtension();
     Validator validator = new Validator().validate(theory.getLiterals());
 

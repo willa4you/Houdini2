@@ -4,8 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.example.demo.Pair;
-import static com.example.demo.LogicModel.Literal.ExtensionState;
 import static com.example.demo.LogicModel.Literal.ExtensionCase;
 // using static imports can make the code better readable, but pay attention to not overlap values among enums or use keywords
 import static com.example.demo.LogicModel.Literal.ExtensionState.*;
@@ -22,11 +20,11 @@ public class Validator {
      * Computes the validation of the literals in the theory.
      * @return A reference to the object itself.
      */
-    public Validator validate (Set<Literal> setLiterals) {
+    public Validator validate (List<Literal> literals) {
         Set<Literal> alreadyExposedLiterals = new HashSet<>();
         Object[][] couple = new Object[2][4]; // we want a general-type array, we will cast later
         // at every iteration, elements of the array are overwritten (so we use the same memory)
-        for(Literal literal : setLiterals) {
+        for(Literal literal : literals) {
             if (alreadyExposedLiterals.contains(literal)) {continue;}
             int thisLiteralRow = 0, oppositeLiteralRow = 1; // we assume this literal is positive
             if (!literal.isPositive()) { // but we want the positive to be the first row, so in case it's not, we switch

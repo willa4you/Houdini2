@@ -1,13 +1,13 @@
 package com.example.demo.LogicModel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static com.example.demo.LogicModel.Rule.RuleType.*;
@@ -15,12 +15,13 @@ import static com.example.demo.LogicModel.Rule.RuleType.*;
 public class TheoryExtension {
     
     Theory theory;
-    Set<Literal> plusDelta; // this is not defined because we will reference directly the theory strictConclusions set
-    Set<Literal> minusDelta = new TreeSet<Literal>();
-    Set<Literal> plusPartial = new TreeSet<Literal>();
-    Set<Literal> minusPartial = new TreeSet<Literal>();
-    Set<Literal> inLoopRulesDelta;
-    Set<Literal> inLoopRulesPartial;
+    // plusDelta is not created here because we will reference directly to the theory strictConclusions set
+    Set<Literal> plusDelta; // we need a Set for contains in O(1): strictConclusions set of theory object will be directly used
+    List<Literal> minusDelta = new ArrayList<Literal>();
+    List<Literal> plusPartial = new ArrayList<Literal>();
+    List<Literal> minusPartial = new ArrayList<Literal>();
+    Set<Literal> inLoopRulesDelta; // we need a Set for future contains in O(1)
+    List<Literal> inLoopRulesPartial;
     private String nonPresentOpposites = "";
 
     public TheoryExtension (Theory consumableTheory) {
@@ -47,27 +48,33 @@ public class TheoryExtension {
 
     private void computePlusDelta() {
         
-        plusDelta = theory.getStrictConclusions(); // this was null until now; from now on we use directly theory strictConclusions set
+        // plusDelta Set is null at the construction of this object; from now on we use directly theory strictConclusions hashset
+        plusDelta = theory.getStrictConclusions();
         plusPartial.addAll(plusDelta); // early assignment for optimization
 
 	    // TRIGGER PART (Injection)
         // we remove strict conclusion literals from tails and check if a rule get active by an empty tail
         ArrayList<Literal> injectables = new ArrayList<>(plusDelta);
         ArrayList<Literal> newInjectables = new ArrayList<>();
+        List<Rule> strictRulesToInject = theory.getRules().stream().
+            filter(r -> r.isStrict() && !r.isEmptyTail()).collect(Collectors.toList())
+        ;
         while(!injectables.isEmpty()) {
             for (Literal injectable : injectables) {
-                for (Rule strictRule: theory.getRules(STRICT)) { // only strict rules
-                    if (strictRule.getTail().contains(injectable)) {
-                        strictRule.removeFromTail(injectable);
-                        if (
-                            strictRule.getTail().isEmpty() && // we found an empty tail '-> a' rule
-                            plusDelta.add(strictRule.getHead()) // we inject this head iff not already a strict conclusions
-                        ) { 
-                            Literal newStrictConclusion = strictRule.getHead();
-                            newInjectables.add(newStrictConclusion); // while get longer (analogous to fixpoint)
-                            newStrictConclusion.setPlusDelta();
-                            newStrictConclusion.setPlusPartial(); // early assignment
-                            plusPartial.add(newStrictConclusion); // early assignment
+                Iterator<Rule> strictRulesToInjectIterator = strictRulesToInject.iterator();
+                while (strictRulesToInjectIterator.hasNext()) {
+                    Rule strictRuleToInject = strictRulesToInjectIterator.next();
+                    if (strictRuleToInject.getTail().contains(injectable)) {
+                        strictRuleToInject.removeFromTail(injectable);
+                        if (strictRuleToInject.getTail().isEmpty()) { // we got an empty tail '-> a' rule
+                            if (plusDelta.add(strictRuleToInject.getHead())) { // we'll inject this head iff not already a strict conclusions
+                                Literal newStrictConclusion = strictRuleToInject.getHead();
+                                newInjectables.add(newStrictConclusion); // while get longer (analogous to fixpoint)
+                                newStrictConclusion.setPlusDelta();
+                                newStrictConclusion.setPlusPartial(); // early assignment
+                                plusPartial.add(newStrictConclusion); // early assignment
+                            }
+                            strictRulesToInjectIterator.remove(); // if we got an empty tail rule, we remove it from rules to inject
                         }
                     }
                 }
@@ -75,17 +82,16 @@ public class TheoryExtension {
             injectables = newInjectables; // we move new injectables into main list
             newInjectables.clear(); // we clear the new injectables
         }
-
     }
 
     private void computeMinusDelta() {
         
         // to compute minus delta, we want to work only with strict rules
         // having non-empty tail and whose head literal is not already plus delta decided
-        
         List<Rule> candidateToMinusDeltaRules = theory.getRules().
-            stream().filter(r -> r.isStrict() && !r.isEmptyTail() && !plusDelta.contains(r.getHead())).collect(Collectors.toList());
-        
+            stream().filter(r -> r.isStrict() && !r.isEmptyTail() && !plusDelta.contains(r.getHead())).
+            collect(Collectors.toList())
+        ;
         
         // now we collect all candidateToMinusDeltaRules heads and we count the occurencies
         Map<Literal, Integer> candidateToMinusDeltaHeads = new HashMap<Literal, Integer>();
@@ -147,7 +153,7 @@ public class TheoryExtension {
         // also, all statements which are the opposite of a present literal, but they're not present in the theory
         // belong by definition both to -Delta, and to -Partial; in order to represent them at the end of the process,
         // we produce now the simple String which will represent them
-        
+        // TODO all literals only in defeasible rules are already -Delta i should not iterate over them
         for(Literal literal : theory.getLiterals()) {
             // check if literal is -Delta
             if (!plusDelta.contains(literal) && !inLoopRulesDelta.contains(literal)) {
@@ -179,8 +185,8 @@ public class TheoryExtension {
         
         // we need a set containing the defeasible undecided literals (it'll update at every while iteration getting shorter)
         // At the beginning they are all literals except the plusDelta which already are plusPartial
-        Set<Literal> undecideds = theory.getLiterals().
-            stream().filter(lit -> !plusDelta.contains(lit)).collect(Collectors.toCollection(HashSet::new));
+        List<Literal> undecideds = theory.getLiterals().
+            stream().filter(lit -> !plusDelta.contains(lit)).collect(Collectors.toCollection(ArrayList::new));
 
         // We also need a Set with all strict and defeasible (non defeaters) heads (from now on we call them defeasible heads)
         Set<Literal> defeasibleHeads = theory.getRules(DEFEASIBLE, STRICT). // non defeater, only Rsd
@@ -191,7 +197,24 @@ public class TheoryExtension {
 
         // in untriggerable we want literals q which are
         // (q is -delta [def(1)] AND (q is not defeasibleHead [def(2.1)] OR ¬q is +delta [def(2.2)]))
-        // these we find are for sure -Partial literals
+        // these are for sure -Partial literals
+        Iterator<Literal> undecidedsIterator = undecideds.iterator();
+        while (undecidedsIterator.hasNext()) {
+            Literal undecided = undecidedsIterator.next();
+            if (
+                undecided.isMinusDelta() && // q is -delta [def(1)] AND
+                (
+                !defeasibleHeads.contains(undecided) || // q is not defeasibleHead Rsd [def(2.1)]
+                (undecided.getOpposite() != null && plusDelta.contains(undecided.getOpposite())) // ¬q is +delta [def(2.2)] (if ¬q is null it is not +Delta for sure)
+                )
+            ) {
+                untriggerables.add(undecided);
+                undecided.setMinusPartial(); // everytime we discover an untriggerable, we found a -Partial
+                minusPartial.add(undecided);
+                undecidedsIterator.remove(); // this is not undecided anymore, we remove it from undecideds
+            }
+        }
+        /* This alternative method iterate over the minusDelta list, but removing from undecideds would cost O(n)
         for(Literal literal : minusDelta) { // q is -delta
             if (
                 !defeasibleHeads.contains(literal) || // q is not defeasibleHead Rsd
@@ -202,7 +225,7 @@ public class TheoryExtension {
                 minusPartial.add(literal);
                 undecideds.remove(literal); // this is not undecided anymore
             }
-        }
+        } */
 
         // now it's finally time for the big while fixpoint
         do { // we enter a while loop with a mandatory first iteration which explores in order to find irrefutables
@@ -395,9 +418,9 @@ public class TheoryExtension {
         return (inLoopRulesPartial.isEmpty()) ? "∅" : printSetString(inLoopRulesPartial);
     }
 
-    public String printSetString(Set<Literal> set) {
-        String s = set.toString();
-        return s.substring(1, s.length() - 1);
+    public String printSetString(Collection<Literal> collection) {
+        String collectionString = collection.toString();
+        return collectionString.substring(1, collectionString.length() - 1);
     }
     
 }
