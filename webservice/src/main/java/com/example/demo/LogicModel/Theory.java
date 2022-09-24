@@ -32,7 +32,7 @@ public class Theory {
         Iterator<JsonNode> elements = factsNode.elements();
         while(elements.hasNext()){
             JsonNode factNode = elements.next();
-            Literal fact = manageFoundedJSONLiterals(factNode, mapOfLiterals);
+            Literal fact = getLiteralAndUpdateTheory(factNode, mapOfLiterals);
             strictConclusions.add(fact);
             fact.setPlusDelta();
             fact.setPlusPartial(); // early assignment
@@ -60,16 +60,17 @@ public class Theory {
                 case "defeater" : ruleType = RuleType.DEFEATER; break;
                 default : ruleType = RuleType.STRICT; break; // TODO: this should be already checked
             }
-            Literal head = manageFoundedJSONLiterals(ruleNode.get("head"), mapOfLiterals);
+            Literal head = getLiteralAndUpdateTheory(ruleNode.get("head"), mapOfLiterals);
             JsonNode tailNode = ruleNode.get("tail");
             HashSet<Literal> tail = new HashSet<>(); // TODO: should duplicate literals in a tail be allowed?
+            Rule rule = new Rule(ruleLabel, ruleType, head, tail);
+            head.addToRulesIsHeadOf(rule); // adding this rule to the rules this literal is head of
             Iterator<JsonNode> tailElements = tailNode.elements();
             while(tailElements.hasNext()) {
-                JsonNode tailLiteral = tailElements.next();
-                tail.add(manageFoundedJSONLiterals(tailLiteral, mapOfLiterals));
+                Literal tailLiteral = getLiteralAndUpdateTheory(tailElements.next(), mapOfLiterals);
+                tail.add(tailLiteral);
+                tailLiteral.addToRulesIsTailOf(rule);
             }
-            Rule rule = new Rule(ruleLabel, ruleType, head, tail);
-            head.addRuleIsHeadOf(rule); // adding this rule to the rules this literal is head of
             // also, we want already check if this is an empty tail strict rule, because, in case, the head is a strict conclusion
             if (ruleType == RuleType.STRICT && tail.isEmpty()) { // rules of type '-> a'
                 head.setPlusDelta();
@@ -117,7 +118,7 @@ public class Theory {
      * @param mapOfLiterals A Map containing the already created literals (modified by the process)
      * @return The literal object, new or existing, associated to the literal JSON object.
      */
-    private Literal manageFoundedJSONLiterals(JsonNode literalNode, Map<Literal, Literal> mapOfLiterals) {
+    private Literal getLiteralAndUpdateTheory(JsonNode literalNode, Map<Literal, Literal> mapOfLiterals) {
         String literalLabel = literalNode.get("label").asText();
         String literalType = literalNode.get("type").asText();
         // first we create an instance of an object associated to the JSON literal

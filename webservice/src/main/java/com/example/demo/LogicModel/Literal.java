@@ -13,6 +13,7 @@ public class Literal implements Comparable<Literal> {
     private LiteralType type;
     private Literal opposite;
     private List<Rule> rulesIsHeadOf = new ArrayList<Rule>(); // it performs only adds and iterations, so a List is enough
+    private List<Rule> rulesIsTailOf = new ArrayList<Rule>();
     private boolean hasActiveRule;
     private ExtensionState deltaState = ExtensionState.UNDECIDED;
     private ExtensionState partialState = ExtensionState.UNDECIDED;
@@ -47,7 +48,13 @@ public class Literal implements Comparable<Literal> {
         return rulesIsHeadOf;
     }
 
-    public void addRuleIsHeadOf(Rule r) {this.rulesIsHeadOf.add(r);};
+    public List<Rule> getRulesIsTailOf() {
+        return rulesIsTailOf;
+    }
+
+    public void addToRulesIsHeadOf(Rule r) {this.rulesIsHeadOf.add(r);};
+
+    public void addToRulesIsTailOf(Rule r) {this.rulesIsTailOf.add(r);}
 
     public ExtensionState getDeltaState() {
         return deltaState;

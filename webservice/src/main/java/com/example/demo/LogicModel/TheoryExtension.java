@@ -53,45 +53,41 @@ public class TheoryExtension {
         plusPartial.addAll(plusDelta); // early assignment for optimization
 
 	    // TRIGGER PART (Injection)
-        // we remove strict conclusion literals from tails and check if a rule get active by an empty tail
-        ArrayList<Literal> injectables = new ArrayList<>(plusDelta);
-        ArrayList<Literal> newInjectables = new ArrayList<>();
-        List<Rule> strictRulesToInject = theory.getRules().stream().
-            filter(r -> r.isStrict() && !r.isEmptyTail()).collect(Collectors.toList())
-        ;
+        // we remove strict conclusion literals from tails and check if a strict rule get active by an empty tail
+        ArrayList<Literal> injectables = new ArrayList<>(plusDelta); // we start injecting the plusDelta literals
+        ArrayList<Literal> newInjectables = new ArrayList<>(); // new found +Delta literals will be stored here until the end of every iteration
         while(!injectables.isEmpty()) {
             for (Literal injectable : injectables) {
-                Iterator<Rule> strictRulesToInjectIterator = strictRulesToInject.iterator();
-                while (strictRulesToInjectIterator.hasNext()) {
-                    Rule strictRuleToInject = strictRulesToInjectIterator.next();
-                    if (strictRuleToInject.getTail().contains(injectable)) {
-                        strictRuleToInject.removeFromTail(injectable);
-                        if (strictRuleToInject.getTail().isEmpty()) { // we got an empty tail '-> a' rule
-                            if (plusDelta.add(strictRuleToInject.getHead())) { // we'll inject this head iff not already a strict conclusions
-                                Literal newStrictConclusion = strictRuleToInject.getHead();
-                                newInjectables.add(newStrictConclusion); // while get longer (analogous to fixpoint)
-                                newStrictConclusion.setPlusDelta();
-                                newStrictConclusion.setPlusPartial(); // early assignment
-                                plusPartial.add(newStrictConclusion); // early assignment
-                            }
-                            strictRulesToInjectIterator.remove(); // if we got an empty tail rule, we remove it from rules to inject
+                for (Rule ruleToInject : injectable.getRulesIsTailOf()) { // all rules: strict, defeasible, defeaters
+                    ruleToInject.removeFromTail(injectable);
+                    if (ruleToInject.isStrict() && ruleToInject.getTail().isEmpty()) { // we got an empty tail '-> a' rule
+                        if (plusDelta.add(ruleToInject.getHead())) { // add returns false iff head was already in plus delta and therefore already injected too
+                            Literal newStrictConclusion = ruleToInject.getHead();
+                            newInjectables.add(newStrictConclusion); // while get longer (analogous to fixpoint)
+                            newStrictConclusion.setPlusDelta();
+                            newStrictConclusion.setPlusPartial(); // early assignment
+                            plusPartial.add(newStrictConclusion); // early assignment
                         }
                     }
                 }
+                injectable.getRulesIsTailOf().clear();
             }
-            injectables = newInjectables; // we move new injectables into main list
+            injectables = newInjectables; // we get rid of the injected list and set new injectables as the main list
             newInjectables.clear(); // we clear the new injectables
         }
     }
 
     private void computeMinusDelta() {
         
-        // to compute minus delta, we want to work only with strict rules
-        // having non-empty tail and whose head literal is not already plus delta decided
+        // now, why everything non +PlusDelta is not automatically -Delta? Because of possible loops in strict rules.
+        // In order to find them we want to work only with strict rules
+        // having non-empty tail and whose head literal is not already plus delta decided.
         List<Rule> candidateToMinusDeltaRules = theory.getRules().
-            stream().filter(r -> r.isStrict() && !r.isEmptyTail() && !plusDelta.contains(r.getHead())).
-            collect(Collectors.toList())
+        stream().filter(r -> r.isStrict() && !r.isEmptyTail() && !plusDelta.contains(r.getHead())).
+        collect(Collectors.toList())
         ;
+        // heaads of those rules can be either -Delta or undecidableDelta
+        // we will find and remove all the -Delta heads until the remainings will be defintely the undecidables (if present)
         
         // now we collect all candidateToMinusDeltaRules heads and we count the occurencies
         Map<Literal, Integer> candidateToMinusDeltaHeads = new HashMap<Literal, Integer>();
