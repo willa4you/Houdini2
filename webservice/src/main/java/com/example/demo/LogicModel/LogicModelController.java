@@ -2,7 +2,6 @@ package com.example.demo.LogicModel;
 
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,8 +9,6 @@ import java.util.stream.Collectors;
 
 import com.example.demo.FileUpload.storage.StorageService;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.example.demo.JSONParser.JSONLogicParser;
 import com.example.demo.JSONParser.JSONWrongFormatException;
 import com.example.demo.LogicModel.grammar.ModelParser;
@@ -160,9 +157,8 @@ public class LogicModelController {
     System.out.println(JSONcontent.replace(" ", ""));
     
     // TODO: json could arrive from http post or some web REST/SOAP interface
-    Theory theory = new Theory(JSONcontent);
-    TheoryExtension theoryExtension = new TheoryExtension(theory).computeExtension();
-    Validator validator = new Validator().validate(theory.getLiterals());
+    TheoryExtension theoryExtension = new TheoryExtension(JSONcontent).computeExtension();
+    Validator validator = new Validator().validate(theoryExtension.getLiterals());
 
     this.plusDeltaString = theoryExtension.getPlusDeltaString();
     this.minusDeltaString = theoryExtension.getMinusDeltaString();
