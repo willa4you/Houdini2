@@ -7,22 +7,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.example.demo.LogicModel.Rule.RuleType;
 import static com.example.demo.LogicModel.Rule.RuleType.*;
-import static com.example.demo.LogicModel.Literal.ExtensionCase.*;
-import static com.example.demo.LogicModel.Literal.ExtensionState.*;
 import static com.example.demo.LogicModel.Literal.LiteralType.*;
 
 public class TheoryExtension {
-    
-
-
 
     private List<Literal> literals = new ArrayList<Literal>(); // constructor already checks there will be no duplicates
-    private HashSet<Literal> onlyDefeasibleLiterals = new HashSet<Literal>();
     private List<Rule> rules = new ArrayList<Rule>(); // there can not be duplicate rules by design: if duplicate name is found, program halts
     
-    // plusDelta is the only set populated since by the constructor
-    // we don't want duplicates and later we'll need to do contains in O(1)
-    private Set<Literal> plusDelta = new HashSet<Literal>();
+    
+    private Set<Literal> plusDelta = new HashSet<Literal>(); // we don't want duplicates and later we'll need to do contains in O(1)
     List<Literal> minusDelta = new ArrayList<Literal>(); // no contains, no removes, only adds and iterations
     List<Literal> plusPartial = new ArrayList<Literal>(); // no contains, no removes, only adds and iterations
     List<Literal> minusPartial = new ArrayList<Literal>(); // no contains, no removes, only adds and iterations
@@ -65,7 +58,7 @@ public class TheoryExtension {
             if(mapOfRules.get(ruleLabel) != null) {
                 System.out.println("Rules with the same name are not allowed in a well formed theory.");
                 System.exit(1);
-                // TODO: here we must throw an exception or something throw new Exception("Bla bla.");
+                // TODO: here we must throw an exception or something;
             }
             RuleType ruleType;
             switch(ruleNode.get("type").asText()) {
@@ -114,12 +107,12 @@ public class TheoryExtension {
                     superior.addToWinsOver(inferior);
                     inferior.addToLosesAfter(superior);
                 } else { // non complementary heads
-                    // TODO: WARNING superiority relations with non complementary heads
+                    // TODO: WARNING superiority relations with non complementary heads exception
                     System.out.println("Non complementary head rules found in a superiority relation:");
                     System.out.println(supRelNode.asText());
                 }
             } else { // wrong rule name
-                // TODO: WARNING superiority relations with wrong name
+                // TODO: WARNING superiority relations with wrong name exception
                 System.out.println("Wrong rule name found in a superiority relation:");
                 System.out.println(supRelNode.asText());
             }
@@ -241,8 +234,8 @@ public class TheoryExtension {
         // count in how many candidate rules they're present as head
         Map<Literal, Integer> candidateHeads = new HashMap<Literal, Integer>();
 
-        // we need also the set of certainly -Delta literals we can try and inject to untrigger
-        // the rules during the first iteration and try and find possible new -Delta heads to later inject too
+        // we need also the set of certainly -Delta literals we can try and inject to untrigger rules
+        // during the first iteration
         // The set of those literals must contain all candidates rules tail literals
         // which are not head of any candidate rule: we'll referer to these literals as 'orphans'
         Set<Literal> orphans = new HashSet<>();
@@ -255,13 +248,14 @@ public class TheoryExtension {
                 } else { // if this is the first time we check this head
                     candidateHeads.put(rule.getHead(), 1); // set first occurency
                 }
-                // now, all the tail literals of this rule are potentially orphans
+                // temporary, all the tail literals are potentially orphans
                 orphans.addAll(rule.getTail());
-                // but of course the head we just found is definitely not an orphan so we want to remove from the orphans
-                orphans.remove(rule.getHead());
             }
         }
         
+        // now we remove the heads of candidates rules from the orphans
+        candidateHeads.keySet().forEach(literal -> orphans.remove(literal));
+
 	    // UNTRIGGER PART (Injection)
         // injectables present in tails deactivate rules: when a candidate head decrease to zero rules,
         // all of its rules have been deactivated and the head becomes a new injectable which will deactivate more rules
@@ -294,7 +288,6 @@ public class TheoryExtension {
         // also, all statements which are the opposite of a present literal, but they're not present in the theory
         // belong by definition both to -Delta, and to -Partial; in order to represent them at the end of the process,
         // we produce now the simple String which will represent them
-        // TODO all literals only in defeasible rules are already -Delta: can i find them during the parsing?
         
         for(Literal literal : literals) { // we iterate over all literals
             
@@ -329,15 +322,14 @@ public class TheoryExtension {
         List<Literal> triggerables = new ArrayList<Literal>(); // at each iteration it'll contain new found +Partial literals
         List<Literal> untriggerables = new ArrayList<Literal>(); // at each iteration it'll contain new found -Partial literals
         
-        // we need a set containing all the defeasible undecided literals (it'll get shorter at every while iteration)
-        // At the beginning these are all literals, except the plusPartial which are already decided
-        // (we use plusDelta as a trick, because at this point plusDelta = plusPartial, but plusDelta contains are O(1))
-        // TODO: this iteration could be avoided if defeasibleUndecideds starts as all literals and we remove the +Delta every time we found one
-        // TODO triggerables, untriggerables e defeasibleUndecideds si possono popolare con un'iterazione sola sui literals
-        List<Literal> defeasibleUndecideds = literals.
-            stream().filter(lit -> !plusDelta.contains(lit)).collect(Collectors.toCollection(ArrayList::new));
+        // we need a list containing all the defeasible undecided literals (it'll get shorter at every while iteration)
+        List<Literal> defeasibleUndecideds = new ArrayList<Literal>();
 
-        // We also need a Set with all strict and defeasible (non defeaters) heads (from now on we call them defeasible heads)
+        // At the beginning these undecideds are all literals, except the +Partials which are obviously already decided,
+        // and except the literals we can tell -Partial at step zero, which are literals q such as
+        // (q is -delta [def(1)] AND (q is not defeasibleHead [def(2.1)] OR ¬q is +delta [def(2.2)]))
+
+        // Hence we need a Set with all strict and defeasible (non defeaters) heads (from now on we call them defeasible heads)
         Set<Literal> defeasibleHeads = new HashSet<Literal>();
         for (Rule rule : rules) {
             if (rule.isStrict() || rule.isDefeasible()) { // non defeater, only Rsd
@@ -345,40 +337,29 @@ public class TheoryExtension {
             }
         }
 
-        // step zero: we fill the triggerables list with initial elements
-        triggerables.addAll(plusDelta); // simply plusDelta [def(1)]: they already have been early set plusPartial
+        // so now we split all literals into these three groups
+        for(Literal literal : literals) {
 
-        // in untriggerable we want literals q which are
-        // (q is -delta [def(1)] AND (q is not defeasibleHead [def(2.1)] OR ¬q is +delta [def(2.2)]))
-        // these are for sure -Partial literals
-        Iterator<Literal> undecidedsIterator = defeasibleUndecideds.iterator();
-        while (undecidedsIterator.hasNext()) {
-            Literal undecided = undecidedsIterator.next();
-            if (
-                undecided.isMinusDelta() && // q is -delta [def(1)] AND
-                (
-                !defeasibleHeads.contains(undecided) || // q is not defeasibleHead Rsd [def(2.1)]
-                (undecided.getOpposite() != null && plusDelta.contains(undecided.getOpposite())) // ¬q is +delta [def(2.2)] (if ¬q is null it is not +Delta for sure)
-                )
-            ) {
-                untriggerables.add(undecided);
-                undecided.setMinusPartial(); // everytime we discover an untriggerable, we found a -Partial
-                minusPartial.add(undecided);
-                undecidedsIterator.remove(); // this is not undecided anymore, we remove it from undecideds
+            // first check: literal is +Partial
+            if (literal.isPlusPartial()) { // at this point they're simply the plusDelta [def(1)]
+                triggerables.add(literal); // we already set them +Partial
             }
-        }
-        /* This alternative method iterate over the minusDelta list, but removing from undecideds would cost O(n)
-        for(Literal literal : minusDelta) { // q is -delta
-            if (
-                !defeasibleHeads.contains(literal) || // q is not defeasibleHead Rsd
-                (literal.getOpposite() != null && plusDelta.contains(literal.getOpposite())) // ¬q is +delta
+            // second check: literal is -Partial at step zero
+            else if (
+                literal.isMinusDelta() && // q is -delta [def(1)] AND
+                (
+                !defeasibleHeads.contains(literal) || // q is not defeasibleHead Rsd [def(2.1)] OR
+                (literal.getOpposite() != null && plusDelta.contains(literal.getOpposite())) // ¬q is +delta [def(2.2)] (if ¬q is null it is not +Delta for sure)
+                )
             ) {
                 untriggerables.add(literal);
                 literal.setMinusPartial(); // everytime we discover an untriggerable, we found a -Partial
                 minusPartial.add(literal);
-                undecideds.remove(literal); // this is not undecided anymore
+            } else { // if literal is not triggerable/untriggerable at step/zero, it's a yet undecided
+                defeasibleUndecideds.add(literal);
             }
-        } */
+            
+        }
 
         // now it's finally time for the big while fixpoint
         do { // we enter a while loop with a mandatory first iteration (in order to find irrefutables)
@@ -566,11 +547,11 @@ public class TheoryExtension {
         }
     }
 
-    public String getInLoopRulesDeltaString() {
+    public String getUndecidablesDeltaInStrictRulesLoop() {
         return (undecidablesDeltaInStrictRulesLoop.isEmpty()) ? "∅" : printSetString(undecidablesDeltaInStrictRulesLoop);
     }
 
-    public String getInLoopRulesPartialString() {
+    public String getUndecidablesPartialInRulesLoop() {
         return (undecidablesPartialInRulesLoop.isEmpty()) ? "∅" : printSetString(undecidablesPartialInRulesLoop);
     }
 

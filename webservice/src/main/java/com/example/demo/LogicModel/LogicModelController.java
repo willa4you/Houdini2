@@ -164,8 +164,8 @@ public class LogicModelController {
     this.minusDeltaString = theoryExtension.getMinusDeltaString();
     this.plusPartialString = theoryExtension.getPlusPartialString();
     this.minusPartialString = theoryExtension.getMinusPartialString();
-    this.undecidableDeltaBecauseOfLoops = theoryExtension.getInLoopRulesDeltaString();
-    this.undecidablePartialBecauseOfLoops = theoryExtension.getInLoopRulesPartialString();
+    this.undecidableDeltaBecauseOfLoops = theoryExtension.getUndecidablesDeltaInStrictRulesLoop();
+    this.undecidablePartialBecauseOfLoops = theoryExtension.getUndecidablesPartialInRulesLoop();
     this.literalsInvolvedInSupRelCycles = validator.getLiteralsInvolvedInSupRelCycles();
     this.literalsValidation = validator.getLiteralsValidation();
   }
