@@ -156,7 +156,7 @@ public class LogicModelController {
     JSONcontent = logicModel.toCustomJSONString(); // THIS IS AN ATTEMPT TO FORMALIZE JSON FORMAT
     System.out.println(JSONcontent.replace(" ", ""));
     
-    // TODO: json could arrive from http post or some web REST/SOAP interface
+    // TODO: json could arrive from http post or some web REST/SOAP interface or upload
     TheoryExtension theoryExtension = new TheoryExtension(JSONcontent).computeExtension();
     Validator validator = new Validator().validate(theoryExtension.getLiterals());
 

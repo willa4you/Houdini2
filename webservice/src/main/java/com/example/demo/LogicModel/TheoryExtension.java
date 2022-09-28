@@ -196,8 +196,8 @@ public class TheoryExtension {
         
 	    // TRIGGER PART (Injection)
         // we remove strict conclusion literals from rule tails and check if a strict rule get active by an empty tail
-        ArrayList<Literal> injectables = new ArrayList<>(plusDelta); // we start injecting the plusDelta literals
-        ArrayList<Literal> newInjectables = new ArrayList<>(); // new found +Delta literals will be stored here until the end of every iteration
+        ArrayList<Literal> injectables = new ArrayList<Literal>(plusDelta); // we start injecting the plusDelta literals
+        ArrayList<Literal> newInjectables = new ArrayList<Literal>(); // new found +Delta literals will be stored here until the end of every iteration
         while(!injectables.isEmpty()) {
             for (Literal injectable : injectables) {
                 for (Rule ruleToInject : injectable.getRulesIsTailOf()) { // all rules: strict, defeasible, defeaters
@@ -213,9 +213,9 @@ public class TheoryExtension {
                 }
                 // injectable.getRulesIsTailOf().clear();
             }
-
+            
             injectables = newInjectables; // we get rid of the injected list and set new injectables as the main list
-            newInjectables.clear(); // we clear the new injectables
+            newInjectables = new ArrayList<Literal>(); // we clear the new injectables
         
         } // end while injectables
         
@@ -226,7 +226,7 @@ public class TheoryExtension {
         // now, why everything non +PlusDelta is not automatically -Delta? Because of possible loops in strict rules.
         // In order to find them we want to work only with strict rules (1),
         // whose head literal is not already plus delta decided (2): we'll call them candidate rules.
-        // Heaads of those rules can be either -Delta or undecidableDelta: we'll call them candidate heads.
+        // Heads of those rules can be either -Delta or undecidableDelta: we'll call them candidate heads.
         // We will find and remove from candidate heads, all the heads defintely -Delta (having a -Delta in every tail 
         // of rules they're head of) until the remainings will be defintely the undecidables (if present)
 
@@ -275,7 +275,7 @@ public class TheoryExtension {
                 }
             } // end for loop on injectables
             injectables = newInjectables; // injectables points to the newInjectable list
-            newInjectables.clear(); // newInjectables is cleared
+            newInjectables = new ArrayList<Literal>(); // newInjectables is cleared
         } // end fixpoint while
 
         // at the end of this process, all remaining heads, are heads of rules which are in strict rules loops
@@ -325,7 +325,7 @@ public class TheoryExtension {
         // we need a list containing all the defeasible undecided literals (it'll get shorter at every while iteration)
         List<Literal> defeasibleUndecideds = new ArrayList<Literal>();
 
-        // At the beginning these undecideds are all literals, except the +Partials which are obviously already decided,
+        // At the beginning these undecideds are all literals, except the +Delta which are obviously already decided,
         // and except the literals we can tell -Partial at step zero, which are literals q such as
         // (q is -delta [def(1)] AND (q is not defeasibleHead [def(2.1)] OR ¬q is +delta [def(2.2)]))
 
@@ -379,7 +379,7 @@ public class TheoryExtension {
                         for (Rule rwo : rule.getWinsOver()) {
                             rwo.setLosesAfterActiveRule(); // every rule losing after this rule knows that it's losing after an active rule
                         }
-                    } 
+                    }
                 } // end of TRIGGER injection
                 // UNTRIGGER
                 for (Literal untriggerable : untriggerables) {
@@ -454,6 +454,7 @@ public class TheoryExtension {
                 // we are not expecting to find these literals here, inside the fixpoint computation
                 boolean isMinusPartial = true; // we assume it is and we try to falsify this assumption
                 // first check: if this literal is head either of no rule, or only defeaters, it is a -Partial [def(2.1)]
+                // TODO: maybe this for is not necessary because we already checked
                 for(Rule rule : undecided.getRulesIsHeadOf()) {
                     if (!rule.isDefeater()) {
                         isMinusPartial = false; // if the undecided literal is head of a non defeater, we're not sure it is -Partial
