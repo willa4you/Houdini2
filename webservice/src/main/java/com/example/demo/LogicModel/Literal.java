@@ -12,9 +12,10 @@ public class Literal implements Comparable<Literal> {
     private String label;
     private LiteralType type;
     private Literal opposite;
-    private List<Rule> rulesIsHeadOf = new ArrayList<Rule>(); // it performs only adds and iterations, so a List is enough
-    private List<Rule> rulesIsTailOf = new ArrayList<Rule>();
+    private Set<Rule> rulesIsHeadOf = new HashSet<Rule>(); 
+    private List<Rule> rulesIsTailOf = new ArrayList<Rule>(); // it performs only adds and iterations, so a List is enough
     private boolean hasActiveRule;
+    private boolean isAmbiguous;
     private ExtensionState deltaState = ExtensionState.UNDECIDED;
     private ExtensionState partialState = ExtensionState.UNDECIDED;
     private ExtensionCase extensionCase;
@@ -22,6 +23,7 @@ public class Literal implements Comparable<Literal> {
     public Literal(String label, LiteralType type) {
         this.label = label;
         this.type = type;
+        this.isAmbiguous = false;
     }
     
     public String getLabel() {
@@ -44,7 +46,15 @@ public class Literal implements Comparable<Literal> {
         return type == LiteralType.POSITIVE;
     }
 
-    public List<Rule> getRulesIsHeadOf() {
+    public boolean isAmbiguous() {
+        return this.isAmbiguous;
+    }
+
+    public void setAmbiguous() {
+        this.isAmbiguous = true;
+    }
+
+    public Set<Rule> getRulesIsHeadOf() {
         return rulesIsHeadOf;
     }
 
@@ -100,7 +110,7 @@ public class Literal implements Comparable<Literal> {
         else if (deltaState == MINUS && partialState == PLUS) {extensionCase = CASE_D;}
         else if (deltaState == MINUS && partialState == UNDECIDABLE) {extensionCase = CASE_E;}
         else if (deltaState == MINUS && partialState == MINUS) {extensionCase = CASE_F;}
-        else {extensionCase = CASE_X;} // TODO: in case X we should throw and ecception and terminate
+        else {extensionCase = CASE_X;} // TODO: in case X we should throw an ecception and terminate
     }
 
     public ExtensionCase getExtensionCase() {

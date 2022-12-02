@@ -100,8 +100,9 @@ public class Rule implements Comparable<Rule>{
         return this.label.compareTo(otherRule.label);
     }
 
+    @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getHead(), getTail(), getType());
+        return Objects.hash(this.label);
     }
 
     @Override

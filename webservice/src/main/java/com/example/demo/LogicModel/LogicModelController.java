@@ -44,6 +44,8 @@ public class LogicModelController {
   private String undecidablePartialBecauseOfLoops;
   private String literalsInvolvedInSupRelCycles;
   private String literalsValidation;
+  private String ambiguityPropagationString;
+  private String ambiguousLiterals;
   private boolean is_there_a_json_error_message = false;
 
   @ModelAttribute("is_there_a_json_error_message")
@@ -130,6 +132,16 @@ public class LogicModelController {
     return this.literalsValidation;
   }
 
+  @ModelAttribute("ambiguityPropagation_string")
+  private String getAmbiguityPropagationString() {
+    return this.ambiguityPropagationString;
+  }
+
+  @ModelAttribute("ambiguous_literals_string")
+  private String getAmbiguousLiterals() {
+    return this.ambiguousLiterals;
+  }
+
   public void configFromLogicModel(LogicModel logicModel) throws IOException, ParseCancellationException  {
     this.logicModel = logicModel;
 
@@ -157,7 +169,11 @@ public class LogicModelController {
     System.out.println(JSONcontent.replace(" ", ""));
     
     // TODO: json could arrive from http post or some web REST/SOAP interface or upload
-    TheoryExtension theoryExtension = new TheoryExtension(JSONcontent).computeExtension();
+
+    boolean ambiguityPropagation = true; // TODO this must come from web interface
+    ambiguityPropagationString = ambiguityPropagation ? "ON" : "OFF";
+
+    TheoryExtension theoryExtension = new TheoryExtension(JSONcontent, ambiguityPropagation).computeExtension();
     Validator validator = new Validator().validate(theoryExtension.getLiterals());
 
     this.plusDeltaString = theoryExtension.getPlusDeltaString();
@@ -168,6 +184,7 @@ public class LogicModelController {
     this.undecidablePartialBecauseOfLoops = theoryExtension.getUndecidablesPartialInRulesLoop();
     this.literalsInvolvedInSupRelCycles = validator.getLiteralsInvolvedInSupRelCycles();
     this.literalsValidation = validator.getLiteralsValidation();
+    this.ambiguousLiterals = theoryExtension.getAmbiguousLiterals();
   }
 
 	@Autowired

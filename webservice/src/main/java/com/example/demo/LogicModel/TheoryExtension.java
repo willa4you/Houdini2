@@ -1,7 +1,6 @@
 package com.example.demo.LogicModel;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.io.IOException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,9 +10,10 @@ import static com.example.demo.LogicModel.Literal.LiteralType.*;
 
 public class TheoryExtension {
 
+    private boolean ambiguityPropagation;
+
     private List<Literal> literals = new ArrayList<Literal>(); // constructor already checks there will be no duplicates
     private List<Rule> rules = new ArrayList<Rule>(); // there can not be duplicate rules by design: if duplicate name is found, program halts
-    
     
     private Set<Literal> plusDelta = new HashSet<Literal>(); // we don't want duplicates and later we'll need to do contains in O(1)
     List<Literal> minusDelta = new ArrayList<Literal>(); // no contains, no removes, only adds and iterations
@@ -21,10 +21,13 @@ public class TheoryExtension {
     List<Literal> minusPartial = new ArrayList<Literal>(); // no contains, no removes, only adds and iterations
     Set<Literal> undecidablesDeltaInStrictRulesLoop; // we need a Set for future contains in O(1)
     List<Literal> undecidablesPartialInRulesLoop;
+    Set<Literal> ambiguousLiterals = new HashSet<Literal>(); // we don't want duplicates
     private String nonPresentOpposites = "";
 
-    public TheoryExtension (String JSONTheoryString) throws IOException {
+    public TheoryExtension (String JSONTheoryString, boolean ambiguityPropagation) throws IOException {
         
+        this.ambiguityPropagation = ambiguityPropagation;
+
         // important: in order to retrieve the original literal every time we encounter the same JSON literal
         // we implement a Map where key = value, which allows us to look for a literal and retrieve it
         Map<Literal, Literal> mapOfLiterals = new HashMap<>();
@@ -54,7 +57,7 @@ public class TheoryExtension {
             JsonNode ruleNode = elements.next();
             String ruleLabel = ruleNode.get("label").asText();
             
-            // checking if there are two rules with the same name and because it's forbidden
+            // checking if there are two rules with the same name because it's forbidden
             if(mapOfRules.get(ruleLabel) != null) {
                 System.out.println("Rules with the same name are not allowed in a well formed theory.");
                 System.exit(1);
@@ -65,7 +68,7 @@ public class TheoryExtension {
                 case "strict" : ruleType = STRICT; break;
                 case "defeasible" : ruleType = DEFEASIBLE; break;
                 case "defeater" : ruleType = DEFEATER; break;
-                default : ruleType = STRICT; break; // TODO: this should be already checked
+                default : ruleType = STRICT; // TODO: this should be already checked
             }
             Literal head = getLiteralAndUpdateTheory(ruleNode.get("head"), mapOfLiterals);
             JsonNode tailNode = ruleNode.get("tail");
@@ -82,9 +85,16 @@ public class TheoryExtension {
                 tailLiteral.addToRulesIsTailOf(rule);
             }
 
-            // checking if this is an empty tail strict rule, because, in case, the head is a strict conclusion
-            if (ruleType == STRICT && tail.isEmpty()) { // rules of type '-> a'
-                setPlusDeltaAndPlusPartial(head); // head is like a fact
+            // if this is an empty tail rule, we can early assign some conclusions
+            if (tail.isEmpty()) {
+                if (ruleType == DEFEASIBLE) {// rules of type '=> a'
+                    head.setHasActiveRule(); // head literals is now known to have an active rule
+                }
+                else if (ruleType == STRICT) {// rules of type '-> a'
+                    head.setHasActiveRule(); // head literals is now known to have an active rule
+                    setPlusDeltaAndPlusPartial(head); // head is like a fact
+                }
+                // defeaters with empty tail don't need any assignment
             }
 
             rules.add(rule); // adding this rule to the theory global list rules
@@ -106,12 +116,16 @@ public class TheoryExtension {
                     // superiority relations are stored into rules themselves: no needs for explicit objects
                     superior.addToWinsOver(inferior);
                     inferior.addToLosesAfter(superior);
+                    // if superior rule is active, inferior must know
+                    if ((superior.isDefeasible() || superior.isStrict()) && superior.isEmptyTail()) {
+                        inferior.setLosesAfterActiveRule();
+                    }
                 } else { // non complementary heads
                     // TODO: WARNING superiority relations with non complementary heads exception
                     System.out.println("Non complementary head rules found in a superiority relation:");
                     System.out.println(supRelNode.asText());
                 }
-            } else { // wrong rule name
+            } else { // wrong rule names
                 // TODO: WARNING superiority relations with wrong name exception
                 System.out.println("Wrong rule name found in a superiority relation:");
                 System.out.println(supRelNode.asText());
@@ -314,10 +328,11 @@ public class TheoryExtension {
 
     private void computeDefeasibleExtension() {
 
-        // ATTENTION: for this task we would need to check complementary literals, but let's consider that some of
-        // the literals have their opposite reference sets to null for optimization purposes.
+        // ATTENTION: for this task we would need to check complementary literals;
+        // it is important to remember that some of the literals have their opposite reference sets to null for optimization purposes.
         // A null opposite reference means that the opposite literal is not present in the theory and by definition
-        // it is a -Delta and -Partial literal. Further considerations on null references will base on this precondition.
+        // it is a -Delta and -Partial literal. Further considerations on null references will be based on this precondition.
+
         // For this task we'll need two lists for the while fixpoint: both +Partial and -Partial are computed in the same process.
         List<Literal> triggerables = new ArrayList<Literal>(); // at each iteration it'll contain new found +Partial literals
         List<Literal> untriggerables = new ArrayList<Literal>(); // at each iteration it'll contain new found -Partial literals
@@ -325,8 +340,9 @@ public class TheoryExtension {
         // we need a list containing all the defeasible undecided literals (it'll get shorter at every while iteration)
         List<Literal> defeasibleUndecideds = new ArrayList<Literal>();
 
-        // At the beginning these undecideds are all literals, except the +Delta which are obviously already decided,
-        // and except the literals we can tell -Partial at step zero, which are literals q such as
+        // At first, these undecideds are all literals which are NOT in +Delta (already directly decided as +Partial),
+        // and ALSO except the literals we can decide as -Partial at a specific step zero, before entering fixpoint.
+        // These are literals q such as
         // (q is -delta [def(1)] AND (q is not defeasibleHead [def(2.1)] OR ¬q is +delta [def(2.2)]))
 
         // Hence we need a Set with all strict and defeasible (non defeaters) heads (from now on we call them defeasible heads)
@@ -337,7 +353,7 @@ public class TheoryExtension {
             }
         }
 
-        // so now we split all literals into these three groups
+        // so now we split all literals into these three groups (triggerables, untriggerables and defeasibleUndecideds)
         for(Literal literal : literals) {
 
             // first check: literal is +Partial
@@ -355,50 +371,58 @@ public class TheoryExtension {
                 untriggerables.add(literal);
                 literal.setMinusPartial(); // everytime we discover an untriggerable, we found a -Partial
                 minusPartial.add(literal);
-            } else { // if literal is not triggerable/untriggerable at step/zero, it's a yet undecided
+            } else { // if literal is not triggerable nor untriggerable at step/zero, it's a yet undecided
                 defeasibleUndecideds.add(literal);
             }
             
         }
-
         // now it's finally time for the big while fixpoint
         do { // we enter a while loop with a mandatory first iteration (in order to find irrefutables)
-
             // PHASE 1: we trigger and untrigger the rules with undecided heads
-            for(Literal undecided : defeasibleUndecideds) {
-                // TRIGGER
-                for(Rule rule : undecided.getRulesIsHeadOf()) {
-                    for(Literal triggerable : triggerables) {
-                        rule.getTail().remove(triggerable); // we remove the triggerables from the undecided-head rule tails
-                    }
-                    // now we check for activated rules (also for irrefutables)
-                    if (rule.getTail().isEmpty() && !rule.isDefeater()) { // if this rule is activated and it's not a defeater
-                        undecided.setHasActiveRule(); // sets to true: the undecided knows is head of an active rule
+            // TRIGGER
+            for(Literal triggerable : triggerables) {
+                for(Rule ruleIsTailOf : triggerable.getRulesIsTailOf()) {
+                    ruleIsTailOf.removeFromTail(triggerable); // a certain +Partial triggerable can be removed from tails
+                    // now we check if this rule gets activated
+                    if (ruleIsTailOf.isEmptyTail() && !ruleIsTailOf.isDefeater()) { // if this rule is activated and it's not a defeater
+                        ruleIsTailOf.getHead().setHasActiveRule(); // sets to true: the literal knows is head of an active rule
                         // ATTENTION: we know we don't have supRels with non existing or non complementary rules
-                        // because the theory constructor ignored them, so it's not necessary to check it
-                        for (Rule rwo : rule.getWinsOver()) {
-                            rwo.setLosesAfterActiveRule(); // every rule losing after this rule knows that it's losing after an active rule
+                        for (Rule rwo : ruleIsTailOf.getWinsOver()) {
+                            rwo.setLosesAfterActiveRule(); // every inferior rule now knows that it's losing after an active rule
                         }
                     }
-                } // end of TRIGGER injection
-                // UNTRIGGER
-                for (Literal untriggerable : untriggerables) {
-                    Iterator<Rule> iteratorIsHeadOf = undecided.getRulesIsHeadOf().iterator();
-                    while(iteratorIsHeadOf.hasNext()) {
-                        Rule rule = iteratorIsHeadOf.next();
-                        if (rule.getTail().contains(untriggerable)) { // when a rule is untriggered, it is defintely removed
-                            // remove all the superiority relations in other rules involving this rule
-						    for(Rule rwo : rule.getWinsOver()) {
-							    rwo.getLosesAfter().remove(rule);
-						    }
-						    for(Rule rla : rule.getLosesAfter()) {
-							    rla.getWinsOver().remove(rule);
-						    }
-						    iteratorIsHeadOf.remove(); // the rule and its supRel are defintely removed
+                }
+            } // end of TRIGGER injection
+            // UNTRIGGER
+            for(Literal untriggerable : untriggerables) {
+                for(Rule ruleIsTailOf : untriggerable.getRulesIsTailOf()) { // when a rule is untriggered, must be defintely removed
+                    // remove all the superiority relations in other rules involving this rule
+                    for(Rule rwo : ruleIsTailOf.getWinsOver()) {
+                        rwo.getLosesAfter().remove(ruleIsTailOf);
+                    }
+                    for(Rule rla : ruleIsTailOf.getLosesAfter()) {
+                        rla.getWinsOver().remove(ruleIsTailOf);
+                    }
+                    ruleIsTailOf.getHead().getRulesIsHeadOf().remove(ruleIsTailOf); // head literal doesn't consider this rule anymore
+
+                    // AMBIGUITY PROPAGATION
+                    // An ambiguity can be propagated only by -Partial literals (firsts to become ambiguous are -Partial by definition)
+                    // an ambiguity propagation can occure when we untrigger a rule deriving by an ambiguous literal:
+                    // this elimination comes from a literal which is -Partial, but somehow it was derived, or derivable,
+                    // THEREFORE it's not completely false too...
+                    // THEN the head of this rule is compromised, AND ALSO its opposite! (But not for ambiguity blocking)
+                    if (ambiguityPropagation && untriggerable.isAmbiguous()) {
+                        ruleIsTailOf.getHead().setAmbiguous();
+                        ambiguousLiterals.add(ruleIsTailOf.getHead());
+                        if (ruleIsTailOf.getHead().getOpposite() != null) {
+                            ruleIsTailOf.getHead().getOpposite().setAmbiguous();
+                            ambiguousLiterals.add(ruleIsTailOf.getHead().getOpposite());
                         }
                     }
-                } // end UNTRIGGER
-            } // end of PHASE 1
+
+                }
+            } // end UNTRIGGER
+            // end of PHASE 1
             
             // our lists fulfilled their purpose: phase 2 maybe will add literals again
             triggerables.clear();
@@ -409,7 +433,7 @@ public class TheoryExtension {
             Iterator<Literal> iteratorUndecideds = defeasibleUndecideds.iterator();
             while(iteratorUndecideds.hasNext()) {
                 Literal undecided = iteratorUndecideds.next();
-                // PLUS PARTIAL CONTROLS
+                // -------------- PLUS PARTIAL CONTROLS --------------
                 if (undecided.hasActiveRule()) {
                     boolean isPlusPartial;
                     Literal opposite = undecided.getOpposite();
@@ -436,10 +460,20 @@ public class TheoryExtension {
                           this is a cycle in superiority rules  
                         } */
                         if (opposite == null || opposite.isMinusDelta()) { // if the opposite is -Delta [def(2.2)]
-                            // we found a defintely +partial literal
-                            undecided.setPlusPartial();
-                            plusPartial.add(undecided);
-                            triggerables.add(undecided);
+                            
+                            // AMBIGUITY PROPAGATION CHECK
+                            // if a literal is ambiguous AND we are computing with ambiguity propagation
+                            // NOW it's time to put it in -Partial IN CONTRAST WITH THE AMBIGUITY BLOCKING
+                            if (ambiguityPropagation && undecided.isAmbiguous()) {
+                                undecided.setMinusPartial();
+                                minusPartial.add(undecided);
+                                untriggerables.add(undecided);
+                            } else {
+                               // we found a definitve +Partial literal
+                                undecided.setPlusPartial();
+                                plusPartial.add(undecided);
+                                triggerables.add(undecided); 
+                            }
                         } else { // if the opposite is not -Delta, this cannot be a +Partial
                             undecided.setUndecidablePartial();
                         }
@@ -448,22 +482,26 @@ public class TheoryExtension {
                     }
                 } // end of undecided has active rule
 
-                // MINUS PARTIAL CONTROLS
+                // -------------- MINUS PARTIAL CONTROLS --------------
                 // preconditions: if a literal is a-Delta and the complementary is +Delta, we already decided it as a
                 // -Partial by populating the untriggerables on step zero (before the fixpoint): this respects the [def(2.2)]
                 // we are not expecting to find these literals here, inside the fixpoint computation
                 boolean isMinusPartial = true; // we assume it is and we try to falsify this assumption
                 // first check: if this literal is head either of no rule, or only defeaters, it is a -Partial [def(2.1)]
-                // TODO: maybe this for is not necessary because we already checked
+                // TODO: maybe this loop is not necessary because we already checked
                 for(Rule rule : undecided.getRulesIsHeadOf()) {
                     if (!rule.isDefeater()) {
                         isMinusPartial = false; // if the undecided literal is head of a non defeater, we're not sure it is -Partial
                         break; // one is enough
                     }
                 }
-                // if at this point isMinusPartial is true, this information is sufficient;
+                // if at this point isMinusPartial is true, this information is sufficient
+
                 // otherwise, if there are rules this undecided literal is head of, we must perform some furher controls;
                 // these controls involve comparisons with rules of the complementary literal: if there is no one, we skip them
+                // having isMinusPartial == false and no opposite, means that we must do nothing and wait for now:
+                // if there are Rsd that this literal is head of and no opposite, either these rules will get untriggered and
+                // disappear (and this literal will become -Partial), or they will be activated and this literal will be +Partial
                 if (!isMinusPartial && undecided.getOpposite() != null) {
                     // second check: this undecided literal has the chance to be decided -Partial if an ACTIVE [def(2.3.1)]
                     // rule/defeater for the complementary [def(2.3)] either it doesn't lose against rules of this undecided
@@ -492,6 +530,20 @@ public class TheoryExtension {
                         undecided.setMinusPartial();
                         minusPartial.add(undecided);
                         untriggerables.add(undecided);
+
+                        // AMBIGUITY
+                        // now, a literal can be -Partial for many reasons, BUT... if BOTH this literal AND
+                        // its opposite have an ACTIVE RULE (Rsd), then there must be missing sup rels,
+                        // then both of them have to go to -Partial, THEREFORE they're AMBIGUOUS
+                        if(undecided.hasActiveRule() && undecided.getOpposite() != null && undecided.getOpposite().hasActiveRule()) {
+                            undecided.setAmbiguous();
+                            ambiguousLiterals.add(undecided);
+                            undecided.getOpposite().setAmbiguous();
+                            ambiguousLiterals.add(undecided.getOpposite());
+                            System.out.println("Ambiguous: '" + undecided + "' and '" + undecided.getOpposite()+"'");
+                            // TODO this happens twice, for p and ~p, but it's not a problem
+                        }
+
                     } else { // if it is not
                         // undecided is definitely undecidable, not +Partial nor -Partial
                         undecided.setUndecidablePartial();
@@ -554,6 +606,10 @@ public class TheoryExtension {
 
     public String getUndecidablesPartialInRulesLoop() {
         return (undecidablesPartialInRulesLoop.isEmpty()) ? "∅" : printSetString(undecidablesPartialInRulesLoop);
+    }
+
+    public String getAmbiguousLiterals() {
+        return (ambiguousLiterals.isEmpty()) ? "∅" : printSetString(ambiguousLiterals);
     }
 
     public String printSetString(Collection<Literal> collection) {
