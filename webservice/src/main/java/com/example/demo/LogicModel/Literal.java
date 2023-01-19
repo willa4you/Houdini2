@@ -2,11 +2,13 @@ package com.example.demo.LogicModel;
 import java.util.*;
 import static com.example.demo.LogicModel.Literal.ExtensionCase.*;
 import static com.example.demo.LogicModel.Literal.ExtensionState.*;
+import static com.example.demo.LogicModel.Literal.AmbiguityState.*;
 
 public class Literal implements Comparable<Literal> {
 
     public enum LiteralType {POSITIVE, NEGATIVE};
     public enum ExtensionState {UNDECIDED, PLUS, MINUS, UNDECIDABLE}
+    public static enum AmbiguityState {UNAMBIGUOUS, BASE_CASE, BY_ANTECEDENTS, BY_OPPOSITE}
     public static enum ExtensionCase {CASE_A, CASE_B, CASE_C, CASE_D, CASE_E, CASE_F, CASE_X}
 
     private String label;
@@ -15,15 +17,15 @@ public class Literal implements Comparable<Literal> {
     private Set<Rule> rulesIsHeadOf = new HashSet<Rule>(); 
     private List<Rule> rulesIsTailOf = new ArrayList<Rule>(); // it performs only adds and iterations, so a List is enough
     private boolean hasActiveRule;
-    private boolean isAmbiguous;
-    private ExtensionState deltaState = ExtensionState.UNDECIDED;
-    private ExtensionState partialState = ExtensionState.UNDECIDED;
+    private AmbiguityState ambiguity;
+    private ExtensionState deltaState = UNDECIDED;
+    private ExtensionState partialState = UNDECIDED;
     private ExtensionCase extensionCase;
 
     public Literal(String label, LiteralType type) {
         this.label = label;
         this.type = type;
-        this.isAmbiguous = false;
+        this.ambiguity = UNAMBIGUOUS;
     }
     
     public String getLabel() {
@@ -46,12 +48,12 @@ public class Literal implements Comparable<Literal> {
         return type == LiteralType.POSITIVE;
     }
 
-    public boolean isAmbiguous() {
-        return this.isAmbiguous;
+    public AmbiguityState getAmbiguity() {
+        return this.ambiguity;
     }
 
-    public void setAmbiguous() {
-        this.isAmbiguous = true;
+    public void setAmbiguity(AmbiguityState ambiguityState) {
+        this.ambiguity = ambiguityState;
     }
 
     public Set<Rule> getRulesIsHeadOf() {

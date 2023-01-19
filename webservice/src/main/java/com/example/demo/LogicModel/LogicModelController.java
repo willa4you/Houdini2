@@ -170,7 +170,7 @@ public class LogicModelController {
     
     // TODO: json could arrive from http post or some web REST/SOAP interface or upload
 
-    boolean ambiguityPropagation = true; // TODO this must come from web interface
+    boolean ambiguityPropagation = false; // TODO this must come from web interface
     ambiguityPropagationString = ambiguityPropagation ? "ON" : "OFF";
 
     TheoryExtension theoryExtension = new TheoryExtension(JSONcontent, ambiguityPropagation).computeExtension();

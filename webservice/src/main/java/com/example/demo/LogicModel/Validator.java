@@ -92,15 +92,15 @@ public class Validator {
             }
 
             literalsValidation += (literal.isPositive()) ?  // positive first
-                "{(" + literalString + "  " + literal.getDeltaState() +
-                "  " + literal.getPartialState() + "  " + literalCase + "), (" +
-                oppositeString + "  " + ((literal.getOpposite() == null) ? MINUS : literal.getOpposite().getDeltaState()) +
-                "  " + ((literal.getOpposite() == null) ? MINUS : literal.getOpposite().getPartialState()) + "  " + oppositeCase + "), " + coupleValidation + "}, "
+                "{(" + literalString + "  " + ((literal.getDeltaState() == PLUS) ? "+Δ" : "-Δ") +
+                "  " + ((literal.getPartialState() == PLUS) ? "+∂" : "-∂") + "  " + literalCase + "), (" +
+                oppositeString + "  " + ((literal.getOpposite() == null) ? "-Δ" : ((literal.getDeltaState() == PLUS) ? "+Δ" : "-Δ")) +
+                "  " + ((literal.getOpposite() == null) ? "-∂" : ((literal.getPartialState() == PLUS) ? "+∂" : "-∂")) + "  " + oppositeCase + "), " + coupleValidation + "}, "
                 :
-                "{(" + oppositeString + "  " + ((literal.getOpposite() == null) ? MINUS : literal.getOpposite().getDeltaState()) +
-                "  " + ((literal.getOpposite() == null) ? MINUS : literal.getOpposite().getPartialState()) + "  " + oppositeCase + "), (" +
-                literalString + "  " + literal.getDeltaState() +
-                "  " + literal.getPartialState() + "  " + literalCase + "), " + coupleValidation + "}, "
+                "{(" + oppositeString + "  " + ((literal.getOpposite() == null) ? "-Δ" : ((literal.getDeltaState() == PLUS) ? "+Δ" : "-Δ")) +
+                "  " + ((literal.getOpposite() == null) ? "-∂" : ((literal.getPartialState() == PLUS) ? "+∂" : "-∂")) + "  " + oppositeCase + "), (" +
+                literalString + "  " + ((literal.getDeltaState() == PLUS) ? "+Δ" : "-Δ") +
+                "  " + ((literal.getPartialState() == PLUS) ? "+∂" : "-∂") + "  " + literalCase + "), " + coupleValidation + "}, "
             ;
 
             if (literal.getOpposite() != null) {alreadyCheckedLiterals.add(literal.getOpposite());}

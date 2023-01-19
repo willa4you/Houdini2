@@ -13,6 +13,7 @@ public class Rule implements Comparable<Rule>{
     private Set<Rule> winsOver = new HashSet<Rule>(); // at some point we want to remove objects in O(1)
     private Set<Rule> losesAfter = new HashSet<Rule>(); // at some point we want to remove objects in O(1)
     private boolean isLosingAfterActiveRule = false;
+    private int numOfAmbiguousAntecedents = 0;
     
     public Rule(String label, RuleType type, Literal head, HashSet<Literal> tail) {
         this.label = label;
@@ -85,6 +86,14 @@ public class Rule implements Comparable<Rule>{
      */
     public void setLosesAfterActiveRule() {
         isLosingAfterActiveRule = true;
+    }
+
+    public int getNumOfAmbiguousAntecedents() {
+        return this.numOfAmbiguousAntecedents;
+    }
+
+    public void incrementAmbiguousAntecedents() {
+        this.numOfAmbiguousAntecedents++;
     }
 
     @Override
