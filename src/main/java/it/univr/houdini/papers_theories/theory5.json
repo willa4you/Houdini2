@@ -1,0 +1,8 @@
+{
+	"version" : "0.1",
+	"logicModel" : { 
+		"facts" : [""],
+		"rules" : ["platypus => monotreme","platypus => hasFur","platypus => laysEgg","platypus => hasBill","monotreme => mammal","hasFur => mammal","laysEgg => ~mammal","hasBill => ~mammal"," => platypus"],
+		"supRules" : ["r5 > r7","r6 > r8"]
+	}
+}

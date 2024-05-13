@@ -1,0 +1,8 @@
+{
+	"version" : "0.1",
+	"logicModel" : { 
+		"facts" : [""],
+		"rules" : [" => nspd","nspd => bp","nspd => ngs","bp => i_nfr1","i_nfr1 => busa","ngs => i_nfr2","i_nfr2 => ~busa","i_nfr1 => ~i_nfr2"],
+		"supRules" : [""]
+	}
+}

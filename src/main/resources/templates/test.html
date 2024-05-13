@@ -1,0 +1,871 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head> 
+    <title>Houdini</title> 
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link href='https://fonts.googleapis.com/css?family=Bree Serif' rel='stylesheet'>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #7FFFD4;
+        }
+        .header {
+            text-align: right;
+            padding: 20px;
+            font-size: 2em;
+        }
+        .menu {
+            overflow: hidden;
+            background-color: #333;
+        }
+        .menu li {
+            float: left;
+            list-style-type: none;
+            padding: 14px 16px;
+        }
+        .menu li a {
+            color: white;
+            text-decoration: none;
+        }
+        .main {
+            display: flex;
+            padding: 20px;
+        }
+        .textbox {
+            flex: 2;
+            margin-right: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }        
+        .toolbar {
+            background-color: #f0f0f0;
+            display: flex;
+            border-right: 2px solid black;
+            border-left: 2px solid black;
+        }
+        .up {
+            border-top: 2px solid black;
+        }
+        .down {
+            border-bottom: 2px solid black;
+            padding: 5px;
+        }
+        .toolbar button:hover:enabled {
+            background-color: lightgray;
+        }
+        .toolbar button:active:enabled {
+            background-color: gray;
+        }
+        .toolbar button:disabled img {
+            filter: grayscale(80%);
+        }
+        .toolbar-big-button {
+            border-width: 0px;
+            margin-right: 0px;
+            height: 90px;
+            width: 90px;
+        }
+        .toolbar-double-big-button {
+            border-width: 0px;
+            margin-right: 0px;
+            height: 90px;
+            width: 180px;
+        }
+        .toolbar-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        }
+        .toolbar-container-row {
+            height: 45px;
+            display: flex;
+            justify-content: space-between;
+            vertical-align: middle;
+        }
+        .toolbar-small-button {
+            border-width: 0px;
+            margin-right: 0px;
+            height: 45px;
+            width: 45px;
+            font-size: large;
+        }
+        .wide-button {
+            width: 135px;
+        }
+        .vertical-line {
+        border-left: 1px solid darkgrey;
+        height: 90%;
+        align-self:center;
+        }
+        .textbox textarea {
+            width: 100%;
+            box-sizing: border-box;
+            height: 50vh;
+            resize: none;
+            font-family: 'Bree Serif';
+            font-size: 32px;
+            outline: none;
+            border: 2px solid black;
+            -webkit-transition: 0.5s;
+            transition: 0.5s;
+        }
+        .info {
+            -webkit-transition: 0.5s;
+            transition: 0.5s;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .stats div {
+            display: flex;
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+        .stats span {
+            display: flex;
+            margin-left: 5px;
+        }
+        .tabs {
+            display: flex;
+        }
+        .tab {
+            width: 15%;
+            padding-top: 10px;
+            padding-bottom: 7px;
+            padding-right: 30px;
+            padding-left: 30px;
+            text-align: center;
+            cursor: pointer;
+            background-color: #D0E4F5; /* azzurro carta da zucchero */
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            border-left: 2px solid black;
+            border-right: 2px solid black;
+            border-top: 2px solid black;
+            display: flex;
+            justify-content: center;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 10px;
+            background-color: #D0E4F5; /* azzurro carta da zucchero */
+            border-left: 2px solid black;
+            border-right: 2px solid black;
+            border-bottom: 2px solid black;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .inside-content {
+            width: 92%;
+            height: 22vh;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 15px;
+            display: flex;
+            background-color: royalblue;
+        }
+        .inside-content-content {
+            flex-grow: 1;
+            overflow: auto;
+            margin-left: 10px;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">Nome del sito</div>
+    <ul class="menu">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#news">News</a></li>
+        <li><a href="#contact">Contatti</a></li>
+    </ul>
+    <form name="main_form" id="main_form" action="#" method="post" style="padding: 0px; margin: 0px;">
+    <div class="main">
+        <div class="textbox">
+            <div class="toolbar up">
+                <button type="button" class = "toolbar-big-button" onclick="insertChar('a')"><img src="/imgs/open.png" style="width: 50%;"/><br>Upload</button>
+                <button type="button" class = "toolbar-big-button" onclick="insertChar('b')"><img src="/imgs/json.png" style="width: 50%;"/><br>Download</button>
+                <div class="vertical-line"></div>
+                <button type="button" class = "toolbar-big-button" id="btn_normalize" onclick="normalizeTheory()"><img src="/imgs/normalize.png" style="width: 50%;"/><br>Normalize</button>
+                <div class="vertical-line"></div>
+                <div class="toolbar-container">
+                    <button type="button" class = "toolbar-small-button wide-button" onclick="insertChar('~')">~</button>
+                    <div class="toolbar-container-row">
+                        <button type="button" class = "toolbar-small-button" onclick="insertChar('→')">→</button>
+                        <button type="button" class = "toolbar-small-button" onclick="insertChar('⇒')">⇒</button>
+                        <button type="button" class = "toolbar-small-button" onclick="insertChar('↝')">↝</button>
+                    </div>
+                </div>
+                <div class="vertical-line"></div>
+                <div class="toolbar-container">
+                    <div class="toolbar-container-row">
+                        <input type="checkbox" id="ambiguityPropagation" name="ambiguityPropagation">
+                        <label for="ambiguityPropagation" style="margin-left: 5px; margin-right: 5px; display: flex; align-items: center;">
+                            <div>Ambiguity Propagation</div>
+                        </label>
+                    </div>
+                </div>
+                <button type="button" class = "toolbar-double-big-button" id="btn_computeExtension" onclick="computeExtension()"><img src="/imgs/extension.png" style="width: 50%;"/><br>Compute Extension</button>
+                <div class="vertical-line"></div>
+                <button class = "toolbar-big-button" onclick="insertChar('h')"><img src="/imgs/help.png" style="width: 50%;"/><br>Help</button>
+                <div class="vertical-line"></div>
+            </div>
+            <textarea spellcheck="false" id="theoryarea" name="theoryarea" oninput="onInput()" placeholder="Insert theory here..."></textarea>
+            <div class="toolbar down" style="display: flex; justify-content: flex-end;">
+                <div class="stats" id="stats" style="display: flex;">
+                    <div><span>literals: </span><span id="literals"></span></div>
+                    <div><span>propositions: </span><span id="propositions"></span></div>
+                    <div><span>deontics: </span><span id="deontics"></span></div>
+                    <div><span>facts: </span><span id="facts"></span></div>
+                    <div><span>→: </span><span id="stricts"></span></div>
+                    <div><span>⇒: </span><span id="defeasibles"></span></div>
+                    <div><span>↝: </span><span id="defeaters"></span></div>
+                </div>
+                <div class="vertical-line" style="margin: 5px;"></div>
+                <div>Ln : <span id="row">1</span> - Col : <span id="col">1</span></div>
+            </div>
+        </div>
+        <div class="info" id="info">
+            <div class="tabs">
+                <div class="tab" id="tab_info">Tab 1</div>
+                <div class="tab" id="tab_warn_err" style="border-bottom: 2px solid black;">
+                    <img src="/imgs/warning.png" style="width: 15px; height: 15px; margin-right: 5px;"/><div id="warnings_count">0</div>
+                    <img src="/imgs/error.png" style="width: 15px; height: 15px; margin-left: 10px; margin-right: 5px;"/><div id="errors_count">0</div>
+                </div>
+                <div style="width: 70%; border-bottom: 2px solid black;"></div>
+            </div>
+            <div class="content" id="content_info">
+                <div class="inside-content">
+                    <div class="inside-content-title" id="content_title1"></div>
+                    <div class="inside-content-content" id="content_info1"></div>
+                </div>
+                <div class="inside-content">
+                    <div class="inside-content-title" id="content_title2"></div>
+                    <div class="inside-content-content" id ="content_info2"></div>
+                </div>
+            </div>
+            <div class="content" id="content_warn_err" style="display: none;">
+                <div class="inside-content" style="background-color: khaki;">
+                    <div class="inside-content-title"><img src="/imgs/warning.png" style="width: 50px;"/></div>
+                    <div class="inside-content-content" id="content_warnings"></div>
+                </div>
+                <div class="inside-content" style="background-color: hsl(0, 84%, 45%);">
+                    <div class="inside-content-title"><img src="/imgs/error.png" style="width: 50px;"/></div>
+                    <div class="inside-content-content" id ="content_errors" style="color: white;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>
+
+<script>
+    // --- ENUMS
+    const TypeOfDeontic = Object.freeze({ 
+        OBLIGATION: "O", 
+        PERMISSION: "P"
+    });
+    const Polarity = Object.freeze({
+        POSITIVE: 1,
+        NEGATIVE: -1
+    });
+    const TypeOfRule = Object.freeze({
+        STRICT: "strict",
+        DEFEASIBLE: "defeasible",
+        DEFEATER: "defeater"
+    });
+    const Errors = Object.freeze({
+        SYNTAX_ERROR : "Sintax Error",
+        DUPLICATE_RULE_LABEL : "Duplicate rule label",
+        DUPLICATE_RULE : "Duplicate rule",
+    });
+    const Warnings = Object.freeze({
+        DUPLICATE_FACT : "Duplicate fact",
+        DUPLICATE_LITERAL_IN_ANTECEDENT : "Duplicate literal in antecedent",
+        NON_COMPLEMENTARY_SUPREL : "Superiority relation: non complementary heads ",
+        NON_EXISTENT_LABEL_IN_SUPREL : "Superiority relation: no rule found with label ",
+        DUPLICATE_SUPREL : "Duplicate superiority relation"
+    });
+    // --- STRUCTURAL CLASSES AND FUNCTIONS
+    class MyMap extends Map { // a map with an additional method checking the non-presence of a key (because I don't like the exclamation mark in coding)
+        hasNot(key) {return !this.has(key);}
+    }
+    function isFalseThat(x) {return !x;} // because I REALLY don't like exclamation mark in coding (it's too small and sometimes can be mistaken for a letter like I or l)
+    // --- PROJECT CLASSES
+    class Error_ {
+        constructor(code, line) {
+            this.code = code;
+            this.line = line;
+        }
+    }
+    class Warning extends Error_ {
+        constructor(code, line) {
+            super(code, line);
+        }
+    }
+    class Literal {
+        constructor(polarity) {
+            this.polarity = polarity;
+            this.textPositions = [];
+            this.opposite = null; // reference to opposite (if in theory)
+            this.isHeadOf = []; // objects of rules this literal is head of
+            this.isAntecedentOf = new Set(); // objects of rules this literal is antecedent of
+            this.factInLines = []; // lines of the textarea this literal is written as fact (potentially duplicated, so we track)
+        }
+        static isPositive(text) {
+            return isFalseThat(text.startsWith("~"));
+        }
+        static getPolarity(text) {
+            return this.isPositive(text) ? Polarity.POSITIVE : Polarity.NEGATIVE;
+        }
+        static getOppositeText(text) {
+            return text.startsWith("~") ? text.substring(1) : ("~" + text);
+        }
+    }
+    class PropositionalLiteral extends Literal {
+        constructor(polarity, proposition) {
+            super(polarity);
+            this.proposition = proposition;
+            this.textPositionsWhereIsLiteral = [];
+            this.deonticsIsPropositionOf = []; // objects of deontics that are about this literal
+        }
+        toString() {
+            return ((this.polarity == Polarity.NEGATIVE) ? "~" : "") + this.proposition;
+        }
+        toJSON() {
+            return ({polarity: this.polarity, proposition: this.proposition});
+        }
+        static getProposition(propositionalTxt) {
+            return Literal.isPositive(propositionalTxt) ? propositionalTxt : propositionalTxt.substring(1);
+        }
+    }
+    class DeonticLiteral extends Literal {
+        constructor(polarity, typeOfDeontic, propositional) {
+            super(polarity);
+            this.typeOfDeontic = typeOfDeontic;
+            this.propositional = propositional; // reference to propositional literal
+        }
+        toString() {
+            return ((this.polarity == Polarity.NEGATIVE) ? "~" : "") + ((this.typeOfDeontic == TypeOfDeontic.OBLIGATION) ? "O" : "P") + "(" + this.propositional.toString() + ")";
+        }
+        toJSON() {
+            return ({polarity: this.polarity, typeOfDeontic: this.typeOfDeontic, propositional: this.propositional});
+        }
+        static getTypeOfDeontic(text) {
+            return text.includes("O(") ? TypeOfDeontic.OBLIGATION : TypeOfDeontic.PERMISSION;
+        }
+        static getPropositionalText(deonticText) {
+            return deonticText.substring(deonticText.indexOf("(") + 1, deonticText.indexOf(")"));
+        }
+    }
+    class Rule {
+        constructor(label, typeOfRule, textPosition, textLine) {
+            this.label = label;
+            this.typeOfRule = typeOfRule;
+            this.antecedent = new Set(); // set of literal objects
+            this.head; // object of literal
+            this.textPositions = [textPosition]; // position in textarea
+            this.textLine = textLine; // line position in textarea
+            this.winsOver = []; // contains a list of objects
+            this.losesAfter = []; // contains a list of objects
+        }
+        toJSON() {
+            return ({label: this.label, typeOfRule: this.typeOfRule, antecedent: Array.from(this.antecedent), head: this.head});
+        }
+        static getTypeOfRule(textOfRule) {
+            if (textOfRule.includes("→")) {return TypeOfRule.STRICT;}
+            if (textOfRule.includes("⇒")) {return TypeOfRule.DEFEASIBLE;}
+            return TypeOfRule.DEFEATER; // ↝ is last option: we expect not to check anything that is not a rule
+        }
+        static getRuleParts(ruleText) {
+            const labelSeparatorIndex = ruleText.indexOf(":");
+            let label; let delabeledRuleText;
+            if (labelSeparatorIndex != -1) {
+                label = ruleText.substring(0, labelSeparatorIndex).replaceAll(" ", "");
+                delabeledRuleText = ruleText.substring(labelSeparatorIndex+1).replaceAll(" ", "");
+            } else {
+                label = "";
+                delabeledRuleText = ruleText.replaceAll(" ", "");
+            }
+            return {label, labelSeparatorIndex, delabeledRuleText};
+        }
+    }
+    class SuperiorityRelation {
+        constructor (winner, loser, textareaLine, textareaPosition) {
+            this.winner = winner;
+            this.loser = loser;
+            this.textareaLine = textareaLine;
+            this.textareaPosition = textareaPosition;
+        }
+        toJSON() {
+            return ({winner: this.winner.label, loser: this.loser.label});
+        }
+    }
+    class LiteralsMap extends MyMap {
+        setLiteral(text, startingPosition) {
+            const literalTxt = text.replaceAll(" ", ""); // all actual stored literal values and map keys are spaceless values
+            const literalObj = (this.has(literalTxt)) ? this.get(literalTxt) : this.newLiteral(literalTxt);
+            // potentially lots of spaces before and after literal itself in textarea, and before and after the proposition of a deontic
+            // e.g: "   P(   a     )    "
+            // so in order to find correct textarea position we must step forward a number of positions until first non-space characters
+            literalObj.textPositions.push(startingPosition + text.search(/\S/)); // adding textarea position to literal object
+            if (literalObj instanceof PropositionalLiteral) { // if literal is propositional, we add position also to a special list recording occurences of proposition as classic defeasible
+                literalObj.textPositionsWhereIsLiteral.push(startingPosition + text.search(/\S/));
+            } else { // if it's a deontic, there's no second list, but we must add textarea position to the general list of the propositional argument also
+                literalObj.propositional.textPositions.push(startingPosition + text.indexOf("(") + text.substring(text.indexOf("(") + 1).search(/\S/));
+            }
+            return literalObj;
+        }
+        newLiteral(literalTxt) {
+            const literalObj = (literalTxt.includes("(")) ? this.newDeontic(literalTxt) : this.newPropositional(literalTxt);
+            if (this.has(Literal.getOppositeText(literalTxt))) { // a new literal always must check for its opposite
+                const oppositeObj = this.get(Literal.getOppositeText(literalTxt));
+                literalObj.opposite = oppositeObj;
+                oppositeObj.opposite = literalObj;
+            }
+            return literalObj;
+        }
+        newPropositional(propositionalText) {
+            const propositionalObj = new PropositionalLiteral(Literal.getPolarity(propositionalText), PropositionalLiteral.getProposition(propositionalText));
+            this.set(propositionalText, propositionalObj);
+            return propositionalObj;
+        }
+        newDeontic(deonticText) {
+            const propositionalText = DeonticLiteral.getPropositionalText(deonticText);
+            const propositionalObj = this.hasNot(propositionalText) ? this.newPropositional(propositionalText) : this.get(propositionalText);
+            const deonticObj = new DeonticLiteral(Literal.getPolarity(deonticText), DeonticLiteral.getTypeOfDeontic(deonticText), propositionalObj);
+            propositionalObj.deonticsIsPropositionOf.push(deonticObj);
+            this.set(deonticText, deonticObj);
+            return deonticObj;
+        }
+    }
+
+    class RulesMap extends MyMap {
+        addRule(label, delabeledRuleText, textPosition, textLine) {
+            const rule = new Rule(label, Rule.getTypeOfRule(delabeledRuleText), textPosition, textLine);
+            this.set(delabeledRuleText, rule);
+            return rule;
+        }
+    }
+    class SupRelsMap extends MyMap {
+        addSupRel(textLine, textPosition, numLine) {
+            const supRelText = textLine.replaceAll(" ", "");
+            const labels = supRelText.split(">");
+            const winner = {start: textPosition + textLine.search(/\S/), label: labels[0]};
+            const loser = {start: textPosition + textLine.indexOf(labels[1], textLine.indexOf(">")), label: labels[1]};
+            const supRelObj = new SuperiorityRelation(winner, loser, numLine, winner.start);
+            this.set(supRelText, supRelObj);
+            return supRelObj;
+        }
+    }
+    // --- CONSTANTS
+    //    --- regex
+    const propositionRegExp = "( )*~?[a-zA-Z0-9_]+( )*";
+    const deonticRegExp = "( )*~?[OP]\\(" + propositionRegExp + "\\)( )*";
+    const ruleLabelRegExp = "( )*[a-zA-Z][a-zA-Z0-9_]*( )*";
+    const ruleRegExp = 
+    "(" + ruleLabelRegExp + ":)?" + // rule label
+    "(" + // START TAIL
+        "(" +
+            "(" + propositionRegExp + "|" + deonticRegExp + ")" + "," +
+        ")*" + // zero or n elements, either proposition or deontic, each and every one followed by ','
+        "(" + propositionRegExp + "|" + deonticRegExp + ")" + // followed by one last element without final ','
+    ")?" + // zero OR one occurrences of a tail (zero means empty tail) - END TAIL
+    "( )*(→|⇒|↝)" + // RULE ARROW SYMBOL
+    "(" + propositionRegExp + "|" + deonticRegExp + ")" // head is either a literal or a deontic
+    ;
+    const superiorityRelationRegExp = ruleLabelRegExp + ">" + ruleLabelRegExp;
+    //   --- data structures
+    const literals = new LiteralsMap();
+    const rules = new RulesMap(); // ALL the rules objects [key : "a,b,c⇒d", value : object]
+    const rulesByLabel = new MyMap(); // ONLY the rules with a label [key : "rule1", value : object]
+    const superiorityRelations = new SupRelsMap();
+
+    const stats = {
+        literals : 0,
+        propositionals : 0,
+        deontics : 0,
+        facts : 0,
+        strictRules : 0,
+        defeasibleRules : 0,
+        defeaters : 0,
+        superiorityRelations : 0,
+        reset : function() {for (let x in this) if (typeof this[x] === "number") this[x] = 0;}
+    }
+
+    const currentState = {
+        errorCodeAtLine : [],
+        warningCodeAtLine : [],
+        isValidTheory: function() {return this.errorCodeAtLine.length == 0;},
+        isNotValidTheory : function() {return this.errorCodeAtLine.length > 0;},
+        reset : function() {this.errorCodeAtLine.length = 0; this.warningCodeAtLine.length = 0;}
+    }
+
+    const textarea = document.getElementById("theoryarea");
+    
+    // ----- INIT EXECUTION
+    document.getElementById('tab_info').addEventListener('click', function() {
+        document.getElementById('tab_warn_err').style.borderBottom = "2px solid black";
+        document.getElementById('tab_info').style.borderBottom = "none";
+        document.getElementById('content_info').style.display = 'flex';
+        document.getElementById('content_warn_err').style.display = 'none';
+    });
+
+    document.getElementById('tab_warn_err').addEventListener('click', function() {
+        document.getElementById('tab_info').style.borderBottom = "2px solid black";
+        document.getElementById('tab_warn_err').style.borderBottom = "none";
+        document.getElementById('content_info').style.display = 'none';
+        document.getElementById('content_warn_err').style.display = 'flex';
+    });
+    textarea.addEventListener('input', function() {
+        var cursorPos = textarea.selectionStart;
+        // TODO provare a estrarre i caratteri partendo dal cursore SENZA creare due nuove maxi stringhe
+        var textleft = textarea.value.substring(0, cursorPos);
+        var textright = textarea.value.substring(cursorPos);
+        if (textleft.substr(-2) === "=>") {
+            textarea.value = textleft.substring(0, textleft.length - 2) + "⇒" + textright;
+            textarea.setSelectionRange(cursorPos-1, cursorPos-1);
+            onInput();
+        } else if (textleft.substr(-2) === "->") {
+            textarea.value = textleft.substring(0, textleft.length - 2) + "→" + textright;
+            textarea.setSelectionRange(cursorPos-1, cursorPos-1);
+            onInput();
+        } else if (textleft.substr(-2) === "~>") {
+            textarea.value = textleft.substring(0, textleft.length - 2) + "↝" + textright;
+            textarea.setSelectionRange(cursorPos-1, cursorPos-1);
+            onInput();
+        } else if (textleft.substr(-2, 1) === "-") {
+            textarea.value = textleft.substring(0, textleft.length - 2) + "~" + textleft.substr(-1) + textright;
+            textarea.setSelectionRange(cursorPos, cursorPos);
+            onInput();
+        }
+    });
+    textarea.addEventListener('change', realTimeFeedback); // whatever, paste etc...
+    textarea.addEventListener('mouseup', realTimeFeedback); // Click up
+    textarea.addEventListener('keyup', realTimeFeedback); // keyboard arrows etc
+    textarea.onkeydown = TextareaShortcuts;
+    
+    // ----- functions
+    function TextareaShortcuts(e) {
+        var evtobj = window.event? event : e
+        if (evtobj.keyCode == 38 && evtobj.altKey) { // alt+arrowUp
+            // TODO
+        } else if (evtobj.keyCode == 40 && evtobj.altKey) { // alt+arrowDown
+            // TODO
+        } else if (evtobj.keyCode == 115) { // F4
+            // TODO
+        }
+    }
+      
+    function insertChar(char) {
+        var cursorPos = textarea.selectionStart;
+        var textBefore = textarea.value.substring(0, cursorPos);
+        var textAfter  = textarea.value.substring(cursorPos, textarea.value.length);
+        textarea.value = textBefore + char + textAfter;
+        textarea.focus();
+        textarea.setSelectionRange(cursorPos+1, cursorPos+1);
+        onInput();
+    }
+
+    function realTimeFeedback() {
+        var cursorPosition = getCursorPosition();
+        printRowColCursorPosition(cursorPosition);
+        const elementAndLine = getElementAndLine(cursorPosition);
+        if (elementAndLine.element) {
+            document.getElementById("content_title1").innerHTML = elementAndLine.element;
+            document.getElementById("content_title2").innerHTML = elementAndLine.line;
+        }
+    }
+
+    function getCursorPosition() {
+        return (textarea.selectionDirection == "forward") ? textarea.selectionEnd : textarea.selectionStart;
+    }
+
+    function printRowColCursorPosition(cursorPosition) {
+        var line = textarea.value.substr(0, cursorPosition).split("\n");
+        document.getElementById("row").innerHTML = line.length;
+        document.getElementById("col").innerHTML = line[line.length-1].length + 1;
+    }
+
+    function getElementAndLine(cursorPosition) {
+        // STEP 1: WE EXTRACT THE WHOLE LINE
+        let lineStartIndex = textarea.value.lastIndexOf("\n", cursorPosition) + 1; // works well with -1 too
+        let lineEndIndex = textarea.value.indexOf("\n", cursorPosition);
+        if (lineEndIndex == -1) {lineEndIndex = textarea.value.length;}
+        const line = textarea.value.substring(lineStartIndex, lineEndIndex);
+        var element;
+        // STEP 2: WE EXTRACT THE SUB-ELEMENT THE CURSOR IS OVER, EITHER LITERAL OR RULE LABEL
+        if(isValidFact(line)) {
+            element = line;
+        } else if (isValidRule(line)) {
+            start = cursorPosition, end = cursorPosition;
+            var separators = ["\n", "→", "⇒", "↝", ",", ":"];
+            while (start > 0 && !separators.includes(textarea.value[start - 1])) {start--;}
+            while (end < textarea.value.length && isFalseThat(separators.includes(textarea.value[end]))) {end++;}
+            element = textarea.value.substring(start, end).replaceAll(" ", "");
+        } else if (isValidSuperiorityRelation(line)) {
+            start = cursorPosition, end = cursorPosition;
+            var separators = ["\n", ">"];
+            while (start > 0 && !separators.includes(textarea.value[start - 1])) {start--;}
+            while (end < textarea.value.length && isFalseThat(separators.includes(textarea.value[end]))) {end++;}
+            element = textarea.value.substring(start, end).replaceAll(" ", "");
+        }
+        return {element : element, line : line}
+    }
+    
+    function onInput() {
+        buildTheoryAndCurrentState();
+        let warningsText = "";
+        for (const warning of currentState.warningCodeAtLine) {
+            warningsText += warning.code + " at line " + warning.line + "<br>";
+        }
+        document.getElementById("content_warnings").innerHTML = warningsText;
+        document.getElementById("warnings_count").innerHTML = currentState.warningCodeAtLine.length;
+        document.getElementById("errors_count").innerHTML = currentState.errorCodeAtLine.length;
+        if (currentState.isNotValidTheory()) {
+            let errorsText = "";
+            for (const error of currentState.errorCodeAtLine) {
+                errorsText += error.code + " at line " + error.line + "<br>";
+            }
+            document.getElementById("content_errors").innerHTML = errorsText;
+            document.getElementById("btn_normalize").disabled = true;
+            document.getElementById("btn_computeExtension").disabled = true;
+            document.getElementById("theoryarea").style.borderColor = "red";
+            // TODO
+        } else {
+            // the theory is valid
+            document.getElementById("content_errors").innerHTML = "";
+            document.getElementById("btn_normalize").disabled = false;
+            document.getElementById("btn_computeExtension").disabled = false;
+            document.getElementById("theoryarea").style.borderColor = "black";
+            document.getElementById("literals").innerHTML = stats.literals;
+            document.getElementById("propositions").innerHTML = stats.propositionals;
+            document.getElementById("deontics").innerHTML = stats.deontics;
+            document.getElementById("facts").innerHTML = stats.facts;
+            document.getElementById("stricts").innerHTML = stats.strictRules;
+            document.getElementById("defeasibles").innerHTML = stats.defeasibleRules;
+            document.getElementById("defeaters").innerHTML = stats.defeaters;
+        }
+    }
+
+    function buildTheoryAndCurrentState() {
+        
+        literals.clear(); rules.clear(); rulesByLabel.clear(); superiorityRelations.clear(); stats.reset(); currentState.reset(); // Initial restart
+        // TODO provare a fare qualcosa di incrementale che non ricostruisca la teoria ad ogni carattere inserito...
+        let currentIndex = 0;
+        let numLine = 1;
+        do {
+            let endOfLinePosition = textarea.value.indexOf("\n", currentIndex); // next \n position is the end of the line...
+            if (endOfLinePosition==-1) {endOfLinePosition = textarea.value.length;} // ... except for the last line (this is also the exit condition)
+            const line = textarea.value.substring(currentIndex, endOfLinePosition); // this line substring
+            // 4 possible valid lines: FACT, RULE, SUPERIORITY RELATION or EMPTY
+            if (isValidFact(line)) { // 1) FACT
+
+                stats.literals++; // it's a total amount of literal and every repetition counts as well
+                const literal = literals.setLiteral(line, currentIndex); // sets this literal in the map with this textarea position and creates it if new
+                // following stats count only unique propositionals (when appearing at least once as plain defeasible literals, not just defeasible arguments) and deontic literals
+                if (literal instanceof PropositionalLiteral && literal.textPositionsWhereIsLiteral.length == 1) {stats.propositionals++;}
+                else if (literal instanceof DeonticLiteral && literal.textPositions.length == 1) {stats.deontics++;}
+                literal.factInLines.push(numLine); // we add line literal is written as a fact (could be more than once... if it is the case, we'll throw a warning)
+                if (literal.factInLines.length == 1) {stats.facts++;} // if a literal is written as a fact more than once, we do not increment...
+                else {currentState.warningCodeAtLine.push(new Warning(Warnings.DUPLICATE_FACT, numLine));} // ...instead we register a warning
+
+            } else if (isValidRule(line)) {
+                
+                const rule = Rule.getRuleParts(line); // returns {label : "empty_or_label", labelSeparatorIndex : an index {-1, 1, 2...}, delabeledRuleText : "some,a,b⇒c"}
+                if (rules.has(rule.delabeledRuleText)) {
+                    currentState.errorCodeAtLine.push(new Error_(Errors.DUPLICATE_RULE + " (of line " + rules.get(rule.delabeledRuleText).textLine + ")", numLine));
+                }
+
+                const ruleObj = rules.addRule(rule.label, rule.delabeledRuleText, currentIndex + line.search(/\S/), numLine);
+                
+                if (rule.labelSeparatorIndex != -1) { // if separatorIndex != -1 then label !=""
+                    if (rulesByLabel.has(rule.label)) {currentState.errorCodeAtLine.push(new Error_(Errors.DUPLICATE_RULE_LABEL, numLine));}
+                    else {rulesByLabel.set(rule.label, ruleObj);}
+                }
+
+                if (ruleObj.typeOfRule == TypeOfRule.STRICT) {stats.strictRules++;}
+                else if (ruleObj.typeOfRule == TypeOfRule.DEFEASIBLE) {stats.defeasibleRules++;}
+                else {stats.defeaters++}
+
+                let otherRules = Array.from(rules.values()).filter(previousRule => {return previousRule!=ruleObj && previousRule.typeOfRule == ruleObj.typeOfRule;}); // we have an array of rules of same type
+
+                // ANTECEDENT (A.K.A. TAIL LITERALS)
+                let literalStartingIndex = rule.labelSeparatorIndex + 1;
+                const arrowIndex = line.search(/→|⇒|↝/); // cannot be -1 because it's valid rule
+                while (true) {
+                    const commaIndex = line.indexOf(",", literalStartingIndex);
+                    const literalText = line.substring(literalStartingIndex, (commaIndex != -1) ? commaIndex : arrowIndex);
+                    if (commaIndex != -1 || literalText.replaceAll(" ", "") != "") {
+                        stats.literals++; // total amount repeated included
+                        const literalObj = literals.setLiteral(literalText, currentIndex + literalStartingIndex);
+                        if (literalObj.isAntecedentOf.has(ruleObj)) { // same literal appears multiple times in same antecedent's rule (e.g. "a, a, b => c")
+                            currentState.warningCodeAtLine.push(new Warning(Warnings.DUPLICATE_LITERAL_IN_ANTECEDENT, numLine));
+                        } else {
+                            literalObj.isAntecedentOf.add(ruleObj);
+                            ruleObj.antecedent.add(literalObj);
+                        }
+                        otherRules = otherRules.filter(otherRule => otherRule.antecedent.has(literalObj));
+                        
+                        if (literalObj instanceof PropositionalLiteral && literalObj.textPositionsWhereIsLiteral.length == 1) {stats.propositionals++;} // TODO uguale a sopra
+                        else if (literalObj instanceof DeonticLiteral && literalObj.textPositions.length == 1) {stats.deontics++;}
+                        literalStartingIndex = commaIndex + 1;
+                    }
+                    if (commaIndex == -1) {break;} // if no comma aheadexit condition
+                } // end while
+
+                // now otherRules contains all the rules which have the literals our ruleObj has
+                // but we now must filter only those rules which has exactly and only these literals
+                otherRules = otherRules.filter(otherRule => otherRule.antecedent.size == ruleObj.antecedent.size);
+
+                // HEAD LITERAL
+                const headLiteralText = line.substring(arrowIndex+1);
+                stats.literals++; // total amount repeated included
+                const headLiteralObj = literals.setLiteral(headLiteralText, currentIndex + arrowIndex + 1);
+                ruleObj.head = headLiteralObj;
+                headLiteralObj.isHeadOf.push(ruleObj);
+                if (headLiteralObj instanceof PropositionalLiteral && headLiteralObj.textPositionsWhereIsLiteral.length == 1) {stats.propositionals++;} // TODO uguale a sopra
+                else if (headLiteralObj instanceof DeonticLiteral && headLiteralObj.textPositions.length == 1) {stats.deontics++;}
+                otherRules.every(otherRule => {
+                    if(otherRule.head == headLiteralObj) {
+                        currentState.errorCodeAtLine.push(new Error_(Errors.DUPLICATE_RULE + " (of line " + otherRule.textLine + ")", numLine));
+                        return false;
+                    }
+                    return true;
+                });
+                
+            } else if (isValidSuperiorityRelation(line)) {
+                if (superiorityRelations.has(line.replaceAll(" ", ""))) {
+                    currentState.warningCodeAtLine.push(new Warning(Warnings.DUPLICATE_SUPREL, numLine));
+                } else {
+                    superiorityRelations.addSupRel(line, currentIndex, numLine);
+                }
+                // since it is possible to find sup rels BEFORE the actual definition of the rules, we will reiterate
+                // all suprels again after this loop, in order to check rules update the rules attributes
+            } else if (line.replaceAll(" ", "") != "") {
+                // if not fact, nor rule, nor supRel, and now we have checked it's not even an empty line, then it's an INVALID LINE
+                currentState.errorCodeAtLine.push(new Error_(Errors.SYNTAX_ERROR, numLine));
+            }
+            currentIndex = endOfLinePosition+1;
+            numLine++;
+            if (endOfLinePosition == textarea.value.length) { break;} // we reached last line of textarea: exit condition
+        } while (true)
+
+        // after the textarea examination, we loop again supRels in order to update rules objects
+        for (const [key, supRel] of superiorityRelations) {
+            const winnerObj = rulesByLabel.get(supRel.winner.label);
+            const loserObj = rulesByLabel.get(supRel.loser.label);
+            if (winnerObj !== undefined) {
+                winnerObj.textPositions.push(supRel.winner.start);
+            } else {
+                currentState.warningCodeAtLine.push(new Warning(Warnings.NON_EXISTENT_LABEL_IN_SUPREL + supRel.winner.label, supRel.textareaLine));
+            }
+            if (loserObj !== undefined) {
+                loserObj.textPositions.push(supRel.loser.start);
+            } else {
+                currentState.warningCodeAtLine.push(new Warning(Warnings.NON_EXISTENT_LABEL_IN_SUPREL + supRel.loser.label, supRel.textareaLine));
+            }
+            if (winnerObj !== undefined && loserObj !== undefined) {
+                if (winnerObj.head.opposite === loserObj.head) {
+                    winnerObj.winsOver.push(loserObj);
+                    loserObj.losesAfter.push(winnerObj);
+                } else {
+                    currentState.warningCodeAtLine.push(new Warning(Warnings.NON_COMPLEMENTARY_SUPREL + " " + winnerObj.head.toString() + " and " + loserObj.head.toString(), supRel.textareaLine));
+                }
+            }
+        }
+    }
+
+    function isValidFact(line) {
+        return isValidLiteral(line);
+    }
+
+    function isValidLiteral(element) {
+        return (isValidProposition(element) || isValidDeontic(element));
+    }
+
+    function isValidProposition(element) {
+        return new RegExp('^'+ propositionRegExp + '$').test(element);
+    }
+
+    function isValidDeontic(element) {
+        return new RegExp('^' + deonticRegExp + '$').test(element);
+    }
+
+    function isValidRule(line) {
+        return new RegExp('^' + ruleRegExp + '$').test(line);
+    }
+
+    function isValidSuperiorityRelation(line) {
+        return new RegExp('^' + superiorityRelationRegExp + '$').test(line);
+    }
+
+    function normalizeTheory() {
+        // TODO TUTTO DA RIFARE
+
+        /*var lines = textarea.value.replaceAll(' ', '').split("\n"); // split in lines
+        var txtfacts = "";
+        var txtrules = "";
+        var txtsupRels = "";
+        var rulesCounter = 1;
+        var normalizationOk = lines.every(line => { // returns true if EVERY ITERATION return true
+            if (line == "") {
+                return true; // empty line is ok, but we ignore it
+            } else if (isValidFact(line)) {
+                line = line.replaceAll("-", "~");
+                txtfacts = txtfacts + line + "\n";
+                return true;
+            } else if (isValidRule(line)) {
+                if(!line.includes(":")) {line = "r" + (rulesCounter++) + ":" + line;} // default rule name
+                ["->", "→", "=>", "⇒", "~>", "↝", "-", ",", ":"].forEach((arrow, index) => {
+                    line = line.replaceAll(arrow, ["→", " → ", "⇒", " ⇒ ", "↝", " ↝ ", "~", ", ", ": "][index]);
+                }); // spacing
+                txtrules = txtrules + line + "\n";
+                return true;
+            } else if (isValidSuperiorityRelation(line)) {
+                txtsupRels = txtsupRels + line.replaceAll(">", " > ") + "\n";
+                return true;
+            } else {
+                // we should not be here, because theory should be valid, but if it isn't i guess we should stop and invalidate
+                buildTheory(); // this should lead to an invalidation
+                return false;
+            }
+        });
+        if (normalizationOk) {textarea.value = txtfacts + txtrules + txtsupRels;}*/
+    }
+
+    function computeExtension() {
+        const extensionRequest = {
+            ambiguityPropagation : document.getElementById('ambiguityPropagation').checked,
+            facts : Array.from(literals.values()).filter(literal => {return literal.factInLines.length > 0;}),
+            rules : Array.from(rules.values()),
+            superiorityRelations : Array.from(superiorityRelations.values()) // TODO che gli attributi winner e loser delle suprel siano degli oggetti improvvisati non mi piace
+        };
+        var req = new XMLHttpRequest();
+        req.onreadystatechange = function() {
+            if (req.readyState == XMLHttpRequest.DONE) {
+                console.log(req.responseText);
+            }
+        }
+        req.open("POST", "/posting");
+        var json = JSON.stringify(extensionRequest);
+        console.log(json);
+        req.send(json);
+        /*var select = document.getElementById('main_form');
+        var data = new FormData(select);
+        data.forEach(function(value, key){
+            object[key] = value;
+        });
+        */
+    }
+</script>
+
+</body>
+</html>

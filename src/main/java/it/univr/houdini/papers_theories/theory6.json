@@ -1,0 +1,8 @@
+{
+	"version" : "0.1",
+	"logicModel" : { 
+		"facts" : [""],
+		"rules" : ["evidenceA => responsible","evidenceB => ~responsible","responsible => guilty"," => ~guilty"," => evidenceA"," => evidenceB"],
+		"supRules" : ["r3 > r4"]
+	}
+}

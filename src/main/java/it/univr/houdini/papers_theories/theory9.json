@@ -1,0 +1,8 @@
+{
+	"version" : "0.1",
+	"logicModel" : { 
+		"facts" : [""],
+		"rules" : ["nautiluses => cephalopods","cephalopods => molluscs","nautiluses => haveShells","cephalopods => ~haveShells","molluscs => haveShells"," => nautiluses"],
+		"supRules" : ["r3 > r4","r4 > r5"]
+	}
+}

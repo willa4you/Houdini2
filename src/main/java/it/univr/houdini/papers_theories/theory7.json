@@ -1,0 +1,8 @@
+{
+	"version" : "0.1",
+	"logicModel" : { 
+		"facts" : [""],
+		"rules" : [" => Guido_friend_Samir","owner_Pic10_Samir,wedding_Pic10,Guido_friend_Samir => display_Pic10"," => owner_Pic10_Samir","uni_picture_Pic10 => ~wedding_Pic10"," => uni_picture_Pic10"],
+		"supRules" : [""]
+	}
+}
