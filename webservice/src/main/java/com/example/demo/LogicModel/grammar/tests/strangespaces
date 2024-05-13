@@ -1,3 +1,0 @@
-{
-     "facts" : [ "a", "___" ], "rules" : [ "a => b" ], "supRules" : [ "r1 > r2" ] 
-}

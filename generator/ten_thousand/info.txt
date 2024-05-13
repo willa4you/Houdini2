@@ -1,7 +1,0 @@
-Percentage of identical conclusions (estimation: for each conclusions, check 100 other random ones and count those which are identical): 0.245188
-Our average: 0.01022s
-Delores average: 0.11351s
-(11x better)
-Number of tests: 10'000
-
-
