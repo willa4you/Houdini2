@@ -5,11 +5,15 @@ import static it.univr.houdini.model.Literal.AmbiguityState.*;
 import static it.univr.houdini.model.Literal.ExtensionCase.*;
 import static it.univr.houdini.model.Literal.ExtensionState.*;
 
+import java.io.IOException;
 import java.util.*;
 
-import it.univr.houdini.LogicModel.Rule;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializable;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 
-public class Literal implements Comparable<Literal> {
+public class Literal implements Comparable<Literal>, JsonSerializable {
 
     public enum LiteralPolarity {POSITIVE, NEGATIVE};
     public enum ExtensionState {UNDECIDED, PLUS, MINUS, UNDECIDABLE}
@@ -25,7 +29,7 @@ public class Literal implements Comparable<Literal> {
     private AmbiguityState ambiguity;
     private ExtensionState deltaState = UNDECIDED;
     private ExtensionState partialState = UNDECIDED;
-    private ExtensionCase extensionCase;
+    private ExtensionCase extensionCase = CASE_X; // This should be always overwritten
 
     public Literal(String label, int polarity) {
         this.label = label;
@@ -174,5 +178,21 @@ public class Literal implements Comparable<Literal> {
         return ((polarity == LiteralPolarity.POSITIVE) ? "" : "~") + getLabel();
     }
 
+    @Override
+    public void serialize(JsonGenerator jsonGen, SerializerProvider provider) throws IOException {
+        jsonGen.writeStartObject();
+        jsonGen.writeStringField("proposition", this.label);
+        jsonGen.writeNumberField("polarity", (this.isPositive()) ? 1 : -1);
+        jsonGen.writeStringField("deltaState", this.deltaState.name());
+        jsonGen.writeStringField("partialState", this.partialState.name());
+        jsonGen.writeStringField("case", this.extensionCase.name());
+        jsonGen.writeStringField("ambiguity", this.ambiguity.name());
+        jsonGen.writeEndObject();
+    }
+
+    @Override
+    public void serializeWithType(JsonGenerator jsonGen, SerializerProvider provider, TypeSerializer typeSer) throws IOException {
+        serialize(jsonGen, provider);
+    }
 }
 

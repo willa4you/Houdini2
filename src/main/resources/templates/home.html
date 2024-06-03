@@ -5,316 +5,992 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <link src="../static/bootstrap-5.2.0-dist/css/bootstrap.min.css" rel="stylesheet" th:href="@{bootstrap-5.2.0-dist/css/bootstrap.min.css}" /> 
-    <link href="style.css" rel="stylesheet" />
-    <script type="text/javascript" th:src="@{js/jquery-3.6.0.min.js}"></script>
+    <link href='https://fonts.googleapis.com/css?family=Bree Serif' rel='stylesheet'>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #7FFFD4;
+        }
+        .header {
+            text-align: right;
+            padding: 20px;
+            font-size: 2em;
+        }
+        .menu {
+            overflow: hidden;
+            background-color: #333;
+        }
+        .menu li {
+            float: left;
+            list-style-type: none;
+            padding: 14px 16px;
+        }
+        .menu li a {
+            color: white;
+            text-decoration: none;
+        }
+        .main {
+            display: flex;
+            padding: 20px;
+        }
+        .textbox {
+            flex: 2;
+            margin-right: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }        
+        .toolbar {
+            background-color: #f0f0f0;
+            display: flex;
+            border-right: 2px solid black;
+            border-left: 2px solid black;
+        }
+        .up {
+            border-top: 2px solid black;
+        }
+        .down {
+            border-bottom: 2px solid black;
+            padding: 5px;
+        }
+        .toolbar button:hover:enabled {
+            background-color: lightgray;
+        }
+        .toolbar button:active:enabled {
+            background-color: gray;
+        }
+        .toolbar button:disabled img {
+            filter: grayscale(80%);
+        }
+        .toolbar-big-button {
+            border-width: 0px;
+            margin-right: 0px;
+            height: 90px;
+            width: 90px;
+        }
+        .toolbar-double-big-button {
+            border-width: 0px;
+            margin-right: 0px;
+            height: 90px;
+            width: 180px;
+        }
+        .toolbar-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        }
+        .toolbar-container-row {
+            height: 45px;
+            display: flex;
+            justify-content: space-between;
+            vertical-align: middle;
+        }
+        .toolbar-small-button {
+            border-width: 0px;
+            margin-right: 0px;
+            height: 45px;
+            width: 45px;
+            font-size: large;
+        }
+        .wide-button {
+            width: 135px;
+        }
+        .vertical-line {
+        border-left: 1px solid darkgrey;
+        height: 90%;
+        align-self:center;
+        }
+        .textbox textarea {
+            width: 100%;
+            box-sizing: border-box;
+            height: 50vh;
+            resize: none;
+            font-family: 'Bree Serif';
+            font-size: 32px;
+            outline: none;
+            border: 2px solid black;
+            -webkit-transition: 0.5s;
+            transition: 0.5s;
+        }
+        .info {
+            -webkit-transition: 0.5s;
+            transition: 0.5s;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .stats div {
+            display: flex;
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+        .stats span {
+            display: flex;
+            margin-left: 5px;
+        }
+        .tabs {
+            display: flex;
+        }
+        .tab {
+            width: 15%;
+            padding-top: 10px;
+            padding-bottom: 7px;
+            padding-right: 30px;
+            padding-left: 30px;
+            text-align: center;
+            cursor: pointer;
+            background-color: #D0E4F5; /* azzurro carta da zucchero */
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            border-left: 2px solid black;
+            border-right: 2px solid black;
+            border-top: 2px solid black;
+            display: flex;
+            justify-content: center;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 10px;
+            background-color: #D0E4F5; /* azzurro carta da zucchero */
+            border-left: 2px solid black;
+            border-right: 2px solid black;
+            border-bottom: 2px solid black;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .inside-content {
+            width: 92%;
+            height: 22vh;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 15px;
+            display: flex;
+            background-color: royalblue;
+        }
+        .inside-content-content {
+            flex-grow: 1;
+            overflow: auto;
+            margin-left: 10px;
+            height: 100%;
+        }
+        .extension-div {
+            cursor: pointer;
+            width: 8%;
+            color:gray;
+            text-align: center;
+            font-weight: bold;
+            font-size: 25pt;
+            padding: 8px;
+        }
+        .content-textarea {
+            flex-grow: 1;
+            width: calc(100% - 40px); /* sottraiamo i margini destro e sinistro */
+            height: calc(100% - 110px); /* sottraiamo i margini superiore e inferiore */
+            margin-left: 15px;
+            margin-bottom: 15px;
+            margin-right: 15px;
+            resize: none;
+            font-family: 'Bree Serif';
+            font-size: 32px;
+            outline: none;
+            border: 2px solid black;
+            -webkit-transition: 0.5s;
+            transition: 0.5s;
+        }
+    </style>
 </head>
-<body class="body-style">
-    <form autocomplete="off" id="logic-form" action="#" th:action="@{/}" th:object="${logic_model}" method="post" >
-        <nav class="navbar navbar-expand-lg navbar-dark bg-2" >
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <a class="navbar-brand" href="/home">
-                    <h1 class="set-title-navbar">
-                        Houdini
-                    </h1>
-                </a>
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item" style="align-items: center;">
-                        <a class="nav-link" href="help">
-                            <h5>
-                                Help
-                            </h5>
-                        </a>
-                    </li>
-                </ul>
-                <div class="alert alert-danger" style="margin-left: 520px; margin-bottom: 0px;" role="alert" th:if="${is_there_a_json_error_message} == true">
-                    There are some errors in the definition of the model. Check the HELP page.
-                </div>
-
-            </div>
-        </nav>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-2">
-            <h4 class="set-title-navbar">Ambiguity Propagation&nbsp;&nbsp;</h4>
-            <input type="checkbox" th:field="*{ambiguityPropagation}">
-        </nav>
-        <div class="row row-style" style="flex-wrap: wrap;">
-            <div class="col-3" style="padding: 0px !important; min-width: 300px;">
-                <div class="row bg-1 row-style"style="background-color: #5ba396;">
-                    <h1 class="set-title-home-facts">
-                        Facts
-                    </h1>
-                </div>
-                <div class="row bg-1 row-style" style="background-color: #84bab0; padding: 20px;">
-                    <div class="card card-home shadow-sm p-3 mb-5 bg-white rounded">
-                        <div class="container col-7 variable-list-home">
-                            <div th:each="fact, f_i : *{facts}" class="input-group md-3">
-                                <!--span class="input-group-text" id="basic-addon2">Fact&nbsp;<span th:text=" ${f_i.index+1}"></span></span-->
-                                <!--input th:field="*{facts[__${f_i.index}__]}" 
-                                style="border-radius: .375rem" type="text" class="form-control"
-                                th:classappend="${(f_i.index == facts_length ? 'facts-input ' : 'not-input ') + (are_facts_valid[__${f_i.index}__] ? 'valid ' : 'is-invalid ')}"-->
-                                <input th:field="*{facts[__${f_i.index}__]}" th:attr="label=${f_i.index}"
-                                type="text" class="form-control input-home-form" oninput="validate_facts(this, 100)" onfocusout="clear_timer()"
-                                th:classappend="${(f_i.index == facts_length)} ? 'facts-input-active ' : 'facts-input-not-active '"/>
-                                <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
-                                    <b>Use only alphanumeric symbols and '_'. You can start with '~'.</b>
-                                </div>
-                            </div>
-                        </div> 
+<body>
+    <div class="header">Nome del sito</div>
+    <ul class="menu">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#news">News</a></li>
+        <li><a href="#contact">Contatti</a></li>
+    </ul>
+    <form name="main_form" id="main_form" action="#" method="post" style="padding: 0px; margin: 0px;">
+    <div class="main">
+        <div class="textbox">
+            <div class="toolbar up">
+                <button type="button" class = "toolbar-big-button" onclick="insertChar('a')"><img src="/imgs/open.png" style="width: 50%;"/><br>Upload</button>
+                <button type="button" class = "toolbar-big-button" onclick="insertChar('b')"><img src="/imgs/json.png" style="width: 50%;"/><br>Download</button>
+                <div class="vertical-line"></div>
+                <button type="button" class = "toolbar-big-button" id="btn_normalize" onclick="normalizeTheory()"><img src="/imgs/normalize.png" style="width: 50%;"/><br>Normalize</button>
+                <div class="vertical-line"></div>
+                <div class="toolbar-container">
+                    <button type="button" class = "toolbar-small-button wide-button" onclick="insertChar('~')">~</button>
+                    <div class="toolbar-container-row">
+                        <button type="button" class = "toolbar-small-button" onclick="insertChar('→')">→</button>
+                        <button type="button" class = "toolbar-small-button" onclick="insertChar('⇒')">⇒</button>
+                        <button type="button" class = "toolbar-small-button" onclick="insertChar('↝')">↝</button>
                     </div>
                 </div>
-            </div>
-            <div class="col-6" style="padding: 0px !important;  min-width: 300px;">
-                <div class="row bg-1 row-style"style="background-color: #5ba396;">
-                    <h1 class="set-title-home-rules">
-                        Rules
-                    </h1>
-                </div>
-                <div class="row bg-1 row-style" style="background-color: #84bab0; padding: 20px;">
-                    <div class="card card-home-rules shadow-sm p-3 mb-5 bg-white rounded">
-                        <div class="container col-5 variable-list-home-rule">
-                            <div th:each="rule, r_i : *{rules}" class="input-group md-3">
-                                <span class="input-group-text" id="basic-addon2">Rule&nbsp;<span th:text=" ${r_i.index+1}"></span></span>
-                                <!--input th:field="*{rules[__${r_i.index}__]}"
-                                style="border-radius: .375rem" type="text" class="form-control"
-                                th:classappend="${(r_i.index == rules_length ? 'rules-input ' : 'not-input ') + (are_rules_valid[__${r_i.index}__] ? 'valid ' : 'is-invalid ')}"
-                                -->
-                                <input th:field="*{rules[__${r_i.index}__]}" th:attr="label=${r_i.index}"
-                                type="text" class="form-control input-home-form" oninput="validate_rules(this, 100)" onfocusout="clear_timer()"
-                                th:classappend="${(r_i.index == rules_length)} ? 'rules-input-active ' : 'rules-input-not-active '">
-                                <div id="regole-control-feedback" class="invalid-feedback error-home-card">
-                                    <b>It must have the form: a -> b, a => b or a ~> b.</b>
-                                </div>
-                            </div>
-                        </div>
+                <div class="vertical-line"></div>
+                <div class="toolbar-container">
+                    <div class="toolbar-container-row">
+                        <input type="checkbox" id="ambiguityPropagation" name="ambiguityPropagation">
+                        <label for="ambiguityPropagation" style="margin-left: 5px; margin-right: 5px; display: flex; align-items: center;">
+                            <div>Ambiguity Propagation</div>
+                        </label>
                     </div>
                 </div>
+                <button type="button" class = "toolbar-double-big-button" id="btn_computeExtension" onclick="computeExtension()">
+                    <img src="/imgs/extension.png" style="width: 50%;"/><br>Compute Extension</button>
+                <div class="vertical-line"></div>
+                <button class = "toolbar-big-button" onclick="insertChar('h')"><img src="/imgs/help.png" style="width: 50%;"/><br>Help</button>
+                <div class="vertical-line"></div>
             </div>
-            <div class="col-3 " style="padding: 0px !important;  min-width: 300px;">
-                <div class="row bg-1 row-style"style="background-color: #5ba396;">
-                    <h1 class="set-title-home-facts">
-                        Sup. relations
-                    </h1>
+            <textarea spellcheck="false" id="theoryarea" name="theoryarea" oninput="onInput()" placeholder="Insert theory here..."></textarea>
+            <div class="toolbar down" style="display: flex; justify-content: flex-end;">
+                <div class="stats" id="stats" style="display: flex;">
+                    <div><span>literals: </span><span id="literals">0</span></div>
+                    <div><span>propositions: </span><span id="propositions">0</span></div>
+                    <div><span>deontics: </span><span id="deontics">0</span></div>
+                    <div><span>facts: </span><span id="facts">0</span></div>
+                    <div><span>→: </span><span id="stricts">0</span></div>
+                    <div><span>⇒: </span><span id="defeasibles">0</span></div>
+                    <div><span>↝: </span><span id="defeaters">0</span></div>
                 </div>
-                <div class="row bg-1 row-style" style="background-color: #84bab0; padding: 20px;">
-                    <div class="card card-home shadow-sm p-3 mb-5 bg-white rounded">
-                        <div class="container col-7 variable-list-home">
-                            <div th:each="srule, sr_i : *{supRules}" class="input-group md-3">
-                                <!--span  class="input-group-text" id="basic-addon2">Sup. rule&nbsp;<span th:text=" ${sr_i.index+1}"></span></span-->
-                                <!--input th:field="*{supRules[__${sr_i.index}__]}" 
-                                style="border-radius: .375rem" type="text" class="form-control"
-                                th:classappend="${(sr_i.index == suprules_length ? 'sup-rules-input ' : 'not-input ') + (are_suprules_valid[__${sr_i.index}__] ? 'valid ' : 'is-invalid ')}"
-                                -->
-                                <input th:field="*{supRules[__${sr_i.index}__]}" th:attr="label=${sr_i.index}"
-                                type="text" class="form-control input-home-form" oninput="validate_suprels(this, 100)" onfocusout="clear_timer()"
-                                th:classappend="${(sr_i.index == suprules_length)} ? 'sup-rules-input-active ' : 'sup-rules-input-not-active '"
-                                >
-                                <div id="regole-control-feedback" class="invalid-feedback error-home-card">
-                                    <b>It must have the form: rx &lt; ry or rx > ry, where x,y are numbers.</b>
-                                </div>
-                            </div>
-                        </div>  
-                    </div>
-                </div>
-            </div>    
-        </div>
-        <div class="row bg-1 row-style" style="background-color: #84bab0; flex-wrap: wrap;">
-            <button id="logic-submit" type="submit" value="Submit" class="btn btn-primary calculate-button">CALCULATE</button>
-        </div>
-    </form>
-    <form id="upload-form" enctype="multipart/form-data" action="/upload" th:action="@{/upload}" method="post">
-        <div class="row bg-1 row-style" style="background-color: #9E9E9E; flex-wrap: wrap;">
-            <h1 class="set-title-home-facts">
-                Upload a JSON theory
-            </h1>
-        </div>
-        <div class="row bg-5 row-style" style="flex-wrap: wrap;">
-            <div class="col">
-                <div class="spinner-border spinner-home-style" role="status" th:classappend="${loading_file? ' d-all ' : ' d-none '}">
-                    <span class="sr-only"></span>
-                </div>
-                <input class="form-control form-home-upload" type="file" name="file"/>
-                <button type="submit" value="Submit" class="btn btn-primary upload-button">UPLOAD</button>
+                <div class="vertical-line" style="margin: 5px;"></div>
+                <div>Ln : <span id="row">1</span> - Col : <span id="col">1</span></div>
             </div>
-        </div>      
-    </form>
-    <div class="container" th:classappend="${loading_file? ' d-all ' : ' d-none '}">
-        <span th:text="${file_content}"></span>
+        </div>
+        <div class="info" id="info">
+            <div class="tabs">
+                <div class="tab" id="tab_info">Tab 1</div>
+                <div class="tab" id="tab_warn_err" style="border-bottom: 2px solid black;">
+                    <img src="/imgs/warning.png" style="width: 15px; height: 15px; margin-right: 5px;"/><div id="warnings_count">0</div>
+                    <img src="/imgs/error.png" style="width: 15px; height: 15px; margin-left: 10px; margin-right: 5px;"/><div id="errors_count">0</div>
+                </div>
+                <div class="tab" id="tab_extension" style="border-bottom: 2px solid black;padding-top: 6px; padding-bottom: 5px;font-size: larger;">
+                    <img src="/imgs/extension.png" style="height: 18px; padding: 2px; border: 1px solid #ddd;border-radius: 8px;background-color: white;"/>
+                </div>
+                <div style="width: 55%; border-bottom: 2px solid black;"></div>
+            </div>
+            <div class="content" id="content_info">
+                <div class="inside-content">
+                    <h1 style="margin: 0;"><div class="inside-content-title" id="content_title1"></div></h1>
+                    <div class="inside-content-content" id="content_info1"></div>
+                </div>
+                <div class="inside-content">
+                    <div class="inside-content-title" id="content_title2"></div>
+                    <div class="inside-content-content" id ="content_info2"></div>
+                </div>
+            </div>
+            <div class="content" id="content_warn_err" style="display: none;">
+                <div class="inside-content" style="background-color: khaki;">
+                    <div class="inside-content-title"><img src="/imgs/warning.png" style="width: 50px;"/></div>
+                    <div class="inside-content-content" id="content_warnings"></div>
+                </div>
+                <div class="inside-content" style="background-color: hsl(0, 84%, 45%);">
+                    <div class="inside-content-title"><img src="/imgs/error.png" style="width: 50px;"/></div>
+                    <div class="inside-content-content" id ="content_errors" style="color: white;"></div>
+                </div>
+            </div>
+            <div class="content" id="content_extension" style="display: none;">
+                <div style="height: 50px; background-color: black; border-radius: 5px; margin: 15px; display: flex;">
+                    <div class="extension-div" id="plusDelta">+Δ</div>
+                    <div class="extension-div" id="minusDelta">-Δ</div>
+                    <div class="extension-div" id="plusPartial" style="color: darkorange;">+δ</div>
+                    <div class="extension-div" id="minusPartial">-δ</div>
+                </div>
+                <textarea class="content-textarea" id="content-extension" spellcheck="false" style="background-color: white; border-radius: 10px;" disabled></textarea>
+            </div>
+        </div>
     </div>
+    </form>
 
-    <script th:inline="javascript">
-        var facts_counter = /*[[${facts_length+1}]]*/1;
-        var rules_counter = /*[[${rules_length+1}]]*/1;
-        var sup_rules_counter = /*[[${suprules_length+1}]]*/1;
-
-        var facts_validity = [];
-        var rules_validity = [];
-        var suprels_validity = [];
-
-        for (let i = 0; i < facts_counter; i++) {
-            facts_validity.push(true);
-        }
-        for (let i = 0; i < rules_counter; i++) {
-            rules_validity.push(true);
-        }
-        for (let i = 0; i < sup_rules_counter; i++) {
-            suprels_validity.push(true);
-        }
-    </script>
-
-    <script>
-        let f = function(e) {
-            facts_counter += 1;
-            facts_validity.push(true);
-            let tar = $(this);
-            tar.removeClass("facts-input-active");
-		//<span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
-            tar.unbind();
-            //<span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span>
-            tar.parent().after(`<div class="input-group md-3">
-                                        <!--span class="input-group-text" id="basic-addon2">Fact ${facts_counter}</span-->
-                                        <input id="facts${facts_counter-1}" name="facts[${facts_counter-1}]" label="${facts_counter-1}"
-                                        oninput="validate_facts(this, 100)" onfocusout="clear_timer()"
-                                        type="text" class="form-control facts-input-active input-home-form">
-                                        <div id="fatti-control-feedback" class="invalid-feedback error-home-card">
-                                            <b>Use only alphanumeric symbols and '_'. You can start with '~'.</b>
-                                         </div>
-                                    </div>
-                                `);
-            $(".facts-input-active").keypress(f);
-        };
-        
-        let r = function(e) {
-            rules_counter += 1;
-            rules_validity.push(true);
-            let tar = $(this);
-            tar.removeClass("rules-input-active ");
-            tar.unbind();
-            tar.parent().after(`<div class="input-group md-3">
-                    <span class="input-group-text" id="basic-addon2">Rule ${rules_counter}</span>
-                    <input id="rules${rules_counter-1}" name="rules[${rules_counter-1}]" label="${rules_counter-1}"
-                    oninput="validate_rules(this, 100)" onfocusout="clear_timer()"
-                    type="text" class="form-control rules-input-active input-home-form">
-                    <div id="regole-control-feedback" class="invalid-feedback error-home-card">
-                        <b>It must have the form: a -> b, a => b or a ~> b.</b>
-                    </div>
-                </div>
-            `);
-            $(".rules-input-active").keypress(r);
-        };
-
-        let sr = function(e) {
-            sup_rules_counter += 1;
-            suprels_validity.push(true);
-            let tar = $(this);
-            tar.removeClass("sup-rules-input-active ");
-            tar.unbind();
-            //<span class="input-group-text" id="basic-addon2">Sup. rule ${sup_rules_counter}</span>
-            tar.parent().after(`<div class="input-group md-3">
-                    <!--span class="input-group-text" id="basic-addon2">Sup. rule ${sup_rules_counter}</span-->
-                    <input id="supRules${sup_rules_counter-1}" name="supRules[${sup_rules_counter-1}]" label="${sup_rules_counter-1}"
-                    oninput="validate_suprels(this, 100)" onfocusout="clear_timer()"
-                    type="text" class="form-control sup-rules-input-active input-home-form">
-                    <div id="regole-control-feedback" class="invalid-feedback error-home-card">
-                        <b>It must have the form: rx &lt; ry or rx > ry, where x,y are numbers.</b>
-                    </div>
-                </div>
-            `);
-            $(".sup-rules-input-active").keypress(sr);
-        };
-        $(".facts-input-active").keypress(f);
-        $(".rules-input-active").keypress(r);
-        $(".sup-rules-input-active").keypress(sr);
-    </script>
-
-
-    <script>
-
-    function check_form_validity() {
-        //console.log(facts_validity.some(function(e) {e === false;}));
-        return !(facts_validity.some(e => e===false) || rules_validity.some(e => e===false) || suprels_validity.some(e => e===false));
+<script>
+    // --- ENUMS
+    const TypeOfDeontic = Object.freeze({ 
+        OBLIGATION: "O", 
+        PERMISSION: "P"
+    });
+    const Polarity = Object.freeze({
+        POSITIVE: 1,
+        NEGATIVE: -1
+    });
+    const TypeOfRule = Object.freeze({
+        STRICT: "strict",
+        DEFEASIBLE: "defeasible",
+        DEFEATER: "defeater"
+    });
+    const Errors = Object.freeze({
+        SYNTAX_ERROR : "Sintax Error",
+        DUPLICATE_RULE_LABEL : "Duplicate rule label",
+        DUPLICATE_RULE : "Duplicate rule",
+        DUPLICATE_LITERAL_IN_ANTECEDENT : "Duplicate literal in antecedent"
+    });
+    const Warnings = Object.freeze({
+        DUPLICATE_FACT : "Duplicate fact",
+        NON_COMPLEMENTARY_SUPREL : "Superiority relation: non complementary heads ",
+        NON_EXISTENT_LABEL_IN_SUPREL : "Superiority relation: no rule found with label ",
+        DUPLICATE_SUPREL : "Duplicate superiority relation"
+    });
+    // --- STRUCTURAL CLASSES AND FUNCTIONS
+    class MyMap extends Map { // a map with an additional method checking the non-presence of a key (because I don't like the exclamation mark in coding)
+        hasNot(key) {return !this.has(key);}
     }
-    function change_submit_button_state() {
-        if (check_form_validity()) {
-            $("#logic-submit").removeClass("disabled");
-        } else {
-            $("#logic-submit").addClass("disabled");
+    function isFalseThat(x) {return !x;} // because I REALLY don't like exclamation mark in coding (it's too small and sometimes can be mistaken for a letter like I or l)
+    // --- PROJECT CLASSES
+    class Error_ {
+        constructor(code, line) {
+            this.code = code;
+            this.line = line;
         }
     }
-
-    function set_validity(type, validity, index) {
-        if (type === "facts") {
-            facts_validity[index] = validity;
-        } else if (type === "rules") {
-            rules_validity[index] = validity;
-        } else if (type === "suprels") {
-            suprels_validity[index] = validity;
-        } else {
-           console.error("Wrong type in function 'set_validity'");
-        }
-
-    }
-
-    let _timer = null;
-
-    let validate_facts = function(elem, ms) {
-        if (_timer === null) {
-            const index = parseInt(elem.attributes["label"]["value"]);
-            _timer = setInterval(function() {
-                if (!elem.value.match(/^$|^[ ]*(\~)?[a-zA-Z_0-9àèéìòù]*[ ]*$/)) {
-                    $(elem).addClass("is-invalid");
-                    set_validity("facts", false, index);
-                } else {
-                    $(elem).removeClass("is-invalid");
-                    set_validity("facts", true, index);
-                };
-                change_submit_button_state();
-            }, ms);
+    class Warning extends Error_ {
+        constructor(code, line) {
+            super(code, line);
         }
     }
+    class Literal {
+        constructor(polarity) {
+            this.polarity = polarity;
+            this.textPositions = [];
+            this.opposite = null; // reference to opposite (if in theory)
+            this.isHeadOf = []; // objects of rules this literal is head of
+            this.isAntecedentOf = new Set(); // objects of rules this literal is antecedent of
+            this.factInLines = []; // lines of the textarea this literal is written as fact (potentially duplicated, so we track)
+        }
+        static toString(object) {
 
-
-    let validate_rules= function(elem, ms) {
-        if (_timer === null) {
-            const index = parseInt(elem.attributes["label"]["value"]);
-            _timer = setInterval(function() {
-                if (!elem.value.match(/^$|^[ ]*(\~)?[a-zA-Z0-9_àèéìòù, ~]*[ ]*[-=~]\>[ ]*(\~)?[a-zA-Z_0-9àèéìòù]+[ ]*$/)) {
-                    $(elem).addClass("is-invalid");
-                    set_validity("rules", false, index);
-                } else {
-                    $(elem).removeClass("is-invalid");
-                    set_validity("rules", true, index);
-                };
-                change_submit_button_state();
-            }, ms);
+        }
+        static isPositive(text) {
+            return isFalseThat(text.startsWith("~"));
+        }
+        static getPolarity(text) {
+            return this.isPositive(text) ? Polarity.POSITIVE : Polarity.NEGATIVE;
+        }
+        static getOppositeText(text) {
+            return text.startsWith("~") ? text.substring(1) : ("~" + text);
+        }
+        info() {
+            return `DELTA: ${this.deltaState}<br>PARTIAL: ${this.partialState}<br>AMBIGUITY: ${this.ambiguity}<br>CASE: ${this.case}`;
+        }
+    }
+    class PropositionalLiteral extends Literal {
+        constructor(polarity, proposition) {
+            super(polarity);
+            this.proposition = proposition;
+            this.textPositionsWhereIsLiteral = [];
+            this.deonticsIsPropositionOf = []; // objects of deontics that are about this literal
+        }
+        static toString(propobject) {
+            return ((propobject.polarity == Polarity.NEGATIVE) ? "~" : "") + propobject.proposition;
+        }
+        toString() {
+            return PropositionalLiteral.toString(this);
+        }
+        toJSON() {
+            return ({polarity: this.polarity, proposition: this.proposition});
+        }
+        static getProposition(propositionalTxt) {
+            return Literal.isPositive(propositionalTxt) ? propositionalTxt : propositionalTxt.substring(1);
+        }
+    }
+    class DeonticLiteral extends Literal {
+        constructor(polarity, typeOfDeontic, propositional) {
+            super(polarity);
+            this.typeOfDeontic = typeOfDeontic;
+            this.propositional = propositional; // reference to propositional literal
+        }
+        static toString(deontobject) {
+            return 
+                ((deontobject.polarity == Polarity.NEGATIVE) ? "~" : "")
+                + ((deontobject.typeOfDeontic == TypeOfDeontic.OBLIGATION) ? "O" : "P")
+                + "(" + PropositionalLiteral.toString(deontobject.propositional) + ")";
+        }
+        toString() {
+            return DeonticLiteral.toString(this);
+        }
+        toJSON() {
+            return ({polarity: this.polarity, typeOfDeontic: this.typeOfDeontic, propositional: this.propositional});
+        }
+        static getTypeOfDeontic(text) {
+            return text.includes("O(") ? TypeOfDeontic.OBLIGATION : TypeOfDeontic.PERMISSION;
+        }
+        static getPropositionalText(deonticText) {
+            return deonticText.substring(deonticText.indexOf("(") + 1, deonticText.indexOf(")"));
+        }
+    }
+    class Rule {
+        constructor(label, typeOfRule, textPosition, textLine) {
+            this.label = label;
+            this.typeOfRule = typeOfRule;
+            this.antecedent = new Set(); // set of literal objects
+            this.head; // object of literal
+            this.textPositions = [textPosition]; // position in textarea
+            this.textLine = textLine; // line position in textarea
+            this.winsOver = []; // contains a list of objects
+            this.losesAfter = []; // contains a list of objects
+        }
+        toJSON() {
+            return ({label: this.label, typeOfRule: this.typeOfRule, antecedent: Array.from(this.antecedent), head: this.head});
+        }
+        static getTypeOfRule(textOfRule) {
+            if (textOfRule.includes("→")) {return TypeOfRule.STRICT;}
+            if (textOfRule.includes("⇒")) {return TypeOfRule.DEFEASIBLE;}
+            return TypeOfRule.DEFEATER; // ↝ is last option: we expect not to check anything that is not a rule
+        }
+        static getRuleParts(ruleText) {
+            const labelSeparatorIndex = ruleText.indexOf(":");
+            let label; let delabeledRuleText;
+            if (labelSeparatorIndex != -1) {
+                label = ruleText.substring(0, labelSeparatorIndex).replaceAll(" ", "");
+                delabeledRuleText = ruleText.substring(labelSeparatorIndex+1).replaceAll(" ", "");
+            } else {
+                label = "";
+                delabeledRuleText = ruleText.replaceAll(" ", "");
+            }
+            return {label, labelSeparatorIndex, delabeledRuleText};
+        }
+    }
+    class SuperiorityRelation {
+        constructor (superior, inferior, textareaLine, textareaPosition) {
+            this.superior = superior;
+            this.inferior = inferior;
+            this.textareaLine = textareaLine;
+            this.textareaPosition = textareaPosition;
+        }
+        toJSON() {
+            return ({superior: this.superior.label, inferior: this.inferior.label});
+        }
+    }
+    class LiteralsMap extends MyMap {
+        setLiteral(text, startingPosition) {
+            const literalTxt = text.replaceAll(" ", ""); // all actual stored literal values and map keys are spaceless values
+            const literalObj = (this.has(literalTxt)) ? this.get(literalTxt) : this.newLiteral(literalTxt);
+            // potentially lots of spaces before and after literal itself in textarea, and before and after the proposition of a deontic
+            // e.g: "   P(   a     )    "
+            // so in order to find correct textarea position we must step forward a number of positions until first non-space characters
+            literalObj.textPositions.push(startingPosition + text.search(/\S/)); // adding textarea position to literal object
+            if (literalObj instanceof PropositionalLiteral) { // if literal is propositional, we add position also to a special list recording occurences of proposition as classic defeasible
+                literalObj.textPositionsWhereIsLiteral.push(startingPosition + text.search(/\S/));
+            } else { // if it's a deontic, there's no second list, but we must add textarea position to the general list of the propositional argument also
+                literalObj.propositional.textPositions.push(startingPosition + text.indexOf("(") + text.substring(text.indexOf("(") + 1).search(/\S/));
+            }
+            return literalObj;
+        }
+        newLiteral(literalTxt) {
+            const literalObj = (literalTxt.includes("(")) ? this.newDeontic(literalTxt) : this.newPropositional(literalTxt);
+            if (this.has(Literal.getOppositeText(literalTxt))) { // a new literal always must check for its opposite
+                const oppositeObj = this.get(Literal.getOppositeText(literalTxt));
+                literalObj.opposite = oppositeObj;
+                oppositeObj.opposite = literalObj;
+            }
+            return literalObj;
+        }
+        newPropositional(propositionalText) {
+            const propositionalObj = new PropositionalLiteral(Literal.getPolarity(propositionalText), PropositionalLiteral.getProposition(propositionalText));
+            this.set(propositionalText, propositionalObj);
+            return propositionalObj;
+        }
+        newDeontic(deonticText) {
+            const propositionalText = DeonticLiteral.getPropositionalText(deonticText);
+            const propositionalObj = this.hasNot(propositionalText) ? this.newPropositional(propositionalText) : this.get(propositionalText);
+            const deonticObj = new DeonticLiteral(Literal.getPolarity(deonticText), DeonticLiteral.getTypeOfDeontic(deonticText), propositionalObj);
+            propositionalObj.deonticsIsPropositionOf.push(deonticObj);
+            this.set(deonticText, deonticObj);
+            return deonticObj;
         }
     }
 
-    let validate_suprels = function(elem, ms) {
-        if (_timer === null) {
-            const index = parseInt(elem.attributes["label"]["value"]);
-            _timer = setInterval(function() {
-                if (!elem.value.match(/^$|^[ ]*r[1-9][0-9]*[ ]*[><][ ]*r[1-9][0-9]*[ ]*$/)) {
-                    $(elem).addClass("is-invalid");
-                    set_validity("suprels", false, index);
-                } else {
-                    $(elem).removeClass("is-invalid");
-                    set_validity("suprels", true, index);
-                };
-                change_submit_button_state();
-            }, ms);
+    class RulesMap extends MyMap {
+        addRule(label, delabeledRuleText, textPosition, textLine) {
+            const rule = new Rule(label, Rule.getTypeOfRule(delabeledRuleText), textPosition, textLine);
+            this.set(delabeledRuleText, rule);
+            return rule;
         }
     }
+    class SupRelsMap extends MyMap {
+        addSupRel(textLine, textPosition, numLine) {
+            const supRelText = textLine.replaceAll(" ", "");
+            const labels = supRelText.split(">");
+            const superior = {start: textPosition + textLine.search(/\S/), label: labels[0]};
+            const inferior = {start: textPosition + textLine.indexOf(labels[1], textLine.indexOf(">")), label: labels[1]};
+            const supRelObj = new SuperiorityRelation(superior, inferior, numLine, superior.start);
+            this.set(supRelText, supRelObj);
+            return supRelObj;
+        }
+    }
+    // --- CONSTANTS
+    //    --- regex
+    const propositionRegExp = "( )*~?[a-zA-Z0-9_]+( )*";
+    const deonticRegExp = "( )*~?[OP]\\(" + propositionRegExp + "\\)( )*";
+    const ruleLabelRegExp = "( )*[a-zA-Z][a-zA-Z0-9_]*( )*";
+    const ruleRegExp = 
+    "(" + ruleLabelRegExp + ":)?" + // rule label
+    "(" + // START TAIL
+        "(" +
+            "(" + propositionRegExp + "|" + deonticRegExp + ")" + "," +
+        ")*" + // zero or n elements, either proposition or deontic, each and every one followed by ','
+        "(" + propositionRegExp + "|" + deonticRegExp + ")" + // followed by one last element without final ','
+    ")?" + // zero OR one occurrences of a tail (zero means empty tail) - END TAIL
+    "( )*(→|⇒|↝)" + // RULE ARROW SYMBOL
+    "(" + propositionRegExp + "|" + deonticRegExp + ")" // head is either a literal or a deontic
+    ;
+    const superiorityRelationRegExp = ruleLabelRegExp + ">" + ruleLabelRegExp;
+    //   --- data structures
+    const literals = new LiteralsMap();
+    const rules = new RulesMap(); // ALL the rules objects [key : "a,b,c⇒d", value : object]
+    const rulesByLabel = new MyMap(); // ONLY the rules with a label [key : "rule1", value : object]
+    const superiorityRelations = new SupRelsMap();
+    const extension = {
+        plusDelta : new Set(),
+        minusDelta : new Set(),
+        plusPartial : new Set(),
+        minusPartial : new Set(),
+        undecidablesDeltaInStrictRulesLoop : new Set(),
+        undecidablesPartialInRulesLoop : new Set(),
+        ambiguousLiterals : new Set(),
+        iteratorToString : function(property) {
+            return Array.from(this[property].values()).join(", ");
+        },
+        clear : function() {for (let x in this) if (this[x] instanceof Set) this[x].clear();}
+    };
 
-    let clear_timer = function() {
-        clearInterval(_timer);
-        _timer = null;
+    const stats = {
+        literals : 0,
+        propositionals : 0,
+        deontics : 0,
+        facts : 0,
+        strictRules : 0,
+        defeasibleRules : 0,
+        defeaters : 0,
+        superiorityRelations : 0,
+        reset : function() {for (let x in this) if (typeof this[x] === "number") this[x] = 0;}
     }
 
-    $("#logic-form").on("submit", function(e) {
-        if (!check_form_validity()) e.preventDefault();
-    })
-    </script>
+    const currentState = {
+        errorCodeAtLine : [],
+        warningCodeAtLine : [],
+        isValidTheory: function() {return this.errorCodeAtLine.length == 0;},
+        isNotValidTheory : function() {return this.errorCodeAtLine.length > 0;},
+        reset : function() {this.errorCodeAtLine.length = 0; this.warningCodeAtLine.length = 0;}
+    }
+
+    const textarea = document.getElementById("theoryarea");
     
-</body>
+    // ----- INIT EXECUTION
+    document.getElementById('tab_info').addEventListener('click', function() {
+        document.getElementById('tab_warn_err').style.borderBottom = "2px solid black";
+        document.getElementById('tab_extension').style.borderBottom = "2px solid black";
+        document.getElementById('tab_info').style.borderBottom = "none";
+        document.getElementById('content_info').style.display = 'flex';
+        document.getElementById('content_warn_err').style.display = 'none';
+        document.getElementById('content_extension').style.display = 'none';
+    });
 
+    document.getElementById('tab_warn_err').addEventListener('click', function() {
+        document.getElementById('tab_info').style.borderBottom = "2px solid black";
+        document.getElementById('tab_extension').style.borderBottom = "2px solid black";
+        document.getElementById('tab_warn_err').style.borderBottom = "none";
+        document.getElementById('content_warn_err').style.display = 'flex';
+        document.getElementById('content_info').style.display = 'none';
+        document.getElementById('content_extension').style.display = 'none';
+    });
+
+    document.getElementById('tab_extension').addEventListener('click', function() {
+        document.getElementById('tab_info').style.borderBottom = "2px solid black";
+        document.getElementById('tab_warn_err').style.borderBottom = "2px solid black";
+        document.getElementById('tab_extension').style.borderBottom = "none";
+        document.getElementById('content_extension').style.display = 'block';
+        document.getElementById('content_warn_err').style.display = 'none';
+        document.getElementById('content_info').style.display = 'none';
+    });
+
+    document.getElementById('plusDelta').addEventListener('click', function() {
+        document.getElementById('plusDelta').style.color = "blue";
+        document.getElementById('minusDelta').style.color = "grey";
+        document.getElementById('plusPartial').style.color = "grey";
+        document.getElementById('minusPartial').style.color = "grey";
+        document.getElementById('content-extension').value = extension.iteratorToString("plusDelta");
+    });
+
+    document.getElementById('minusDelta').addEventListener('click', function() {
+        document.getElementById('plusDelta').style.color = "grey";
+        document.getElementById('minusDelta').style.color = "green";
+        document.getElementById('plusPartial').style.color = "grey";
+        document.getElementById('minusPartial').style.color = "grey";
+        document.getElementById('content-extension').value = extension.iteratorToString("minusDelta");
+    });
+
+    document.getElementById('plusPartial').addEventListener('click', function() {
+        document.getElementById('plusDelta').style.color = "grey";
+        document.getElementById('minusDelta').style.color = "grey";
+        document.getElementById('plusPartial').style.color = "darkorange";
+        document.getElementById('minusPartial').style.color = "grey";
+        document.getElementById('content-extension').value = extension.iteratorToString("plusPartial");
+    });
+
+    document.getElementById('minusPartial').addEventListener('click', function() {
+        document.getElementById('plusDelta').style.color = "grey";
+        document.getElementById('minusDelta').style.color = "grey";
+        document.getElementById('plusPartial').style.color = "grey";
+        document.getElementById('minusPartial').style.color = "yellow";
+        document.getElementById('content-extension').value = extension.iteratorToString("minusPartial");
+    });
+
+    textarea.addEventListener('input', function() {
+        var cursorPos = textarea.selectionStart;
+        // TODO provare a estrarre i caratteri partendo dal cursore SENZA creare due nuove maxi stringhe
+        var textleft = textarea.value.substring(0, cursorPos);
+        var textright = textarea.value.substring(cursorPos);
+        if (textleft.substr(-2) === "=>") {
+            textarea.value = textleft.substring(0, textleft.length - 2) + "⇒" + textright;
+            textarea.setSelectionRange(cursorPos-1, cursorPos-1);
+            onInput();
+        } else if (textleft.substr(-2) === "->") {
+            textarea.value = textleft.substring(0, textleft.length - 2) + "→" + textright;
+            textarea.setSelectionRange(cursorPos-1, cursorPos-1);
+            onInput();
+        } else if (textleft.substr(-2) === "~>") {
+            textarea.value = textleft.substring(0, textleft.length - 2) + "↝" + textright;
+            textarea.setSelectionRange(cursorPos-1, cursorPos-1);
+            onInput();
+        } else if (textleft.substr(-2, 1) === "-") {
+            textarea.value = textleft.substring(0, textleft.length - 2) + "~" + textleft.substr(-1) + textright;
+            textarea.setSelectionRange(cursorPos, cursorPos);
+            onInput();
+        }
+    });
+    textarea.addEventListener('change', realTimeFeedback); // whatever, paste etc...
+    textarea.addEventListener('mouseup', realTimeFeedback); // Click up
+    textarea.addEventListener('keyup', realTimeFeedback); // keyboard arrows etc
+    textarea.onkeydown = TextareaShortcuts;
+    
+    // ----- functions
+    function TextareaShortcuts(e) {
+        var evtobj = window.event? event : e
+        if (evtobj.keyCode == 38 && evtobj.altKey) { // alt+arrowUp
+            // TODO
+        } else if (evtobj.keyCode == 40 && evtobj.altKey) { // alt+arrowDown
+            // TODO
+        } else if (evtobj.keyCode == 115) { // F4
+            // TODO
+        }
+    }
+      
+    function insertChar(char) {
+        var cursorPos = textarea.selectionStart;
+        var textBefore = textarea.value.substring(0, cursorPos);
+        var textAfter  = textarea.value.substring(cursorPos, textarea.value.length);
+        textarea.value = textBefore + char + textAfter;
+        textarea.focus();
+        textarea.setSelectionRange(cursorPos+1, cursorPos+1);
+        onInput();
+    }
+
+    function realTimeFeedback() {
+        var cursorPosition = getCursorPosition();
+        printRowColCursorPosition(cursorPosition);
+        const elementAndLine = getElementAndLine(cursorPosition);
+        if (elementAndLine.element) {
+            document.getElementById("content_title1").innerHTML = elementAndLine.element;
+            document.getElementById("content_info1").innerHTML = literals.get(elementAndLine.element).info();
+            document.getElementById("content_title2").innerHTML = elementAndLine.line;
+        }
+    }
+
+    function getCursorPosition() {
+        return (textarea.selectionDirection == "forward") ? textarea.selectionEnd : textarea.selectionStart;
+    }
+
+    function printRowColCursorPosition(cursorPosition) {
+        var line = textarea.value.substr(0, cursorPosition).split("\n");
+        document.getElementById("row").innerHTML = line.length;
+        document.getElementById("col").innerHTML = line[line.length-1].length + 1;
+    }
+
+    function getElementAndLine(cursorPosition) {
+        // STEP 1: WE EXTRACT THE WHOLE LINE
+        let lineStartIndex = textarea.value.lastIndexOf("\n", cursorPosition) + 1; // works well with -1 too
+        let lineEndIndex = textarea.value.indexOf("\n", cursorPosition);
+        if (lineEndIndex == -1) {lineEndIndex = textarea.value.length;}
+        const line = textarea.value.substring(lineStartIndex, lineEndIndex);
+        var element;
+        // STEP 2: WE EXTRACT THE SUB-ELEMENT THE CURSOR IS OVER, EITHER LITERAL OR RULE LABEL
+        if(isValidFact(line)) {
+            element = line;
+        } else if (isValidRule(line)) {
+            start = cursorPosition, end = cursorPosition;
+            var separators = ["\n", "→", "⇒", "↝", ",", ":"];
+            while (start > 0 && !separators.includes(textarea.value[start - 1])) {start--;}
+            while (end < textarea.value.length && isFalseThat(separators.includes(textarea.value[end]))) {end++;}
+            element = textarea.value.substring(start, end).replaceAll(" ", "");
+        } else if (isValidSuperiorityRelation(line)) {
+            start = cursorPosition, end = cursorPosition;
+            var separators = ["\n", ">"];
+            while (start > 0 && !separators.includes(textarea.value[start - 1])) {start--;}
+            while (end < textarea.value.length && isFalseThat(separators.includes(textarea.value[end]))) {end++;}
+            element = textarea.value.substring(start, end).replaceAll(" ", "");
+        }
+        return {element : element, line : line}
+    }
+    
+    function onInput() {
+        buildTheoryAndCurrentState();
+        let warningsText = "";
+        for (const warning of currentState.warningCodeAtLine) {
+            warningsText += warning.code + " at line " + warning.line + "<br>";
+        }
+        document.getElementById("content_warnings").innerHTML = warningsText;
+        document.getElementById("warnings_count").innerHTML = currentState.warningCodeAtLine.length;
+        document.getElementById("errors_count").innerHTML = currentState.errorCodeAtLine.length;
+        if (currentState.isNotValidTheory()) {
+            let errorsText = "";
+            for (const error of currentState.errorCodeAtLine) {
+                errorsText += error.code + " at line " + error.line + "<br>";
+            }
+            document.getElementById("content_errors").innerHTML = errorsText;
+            document.getElementById("btn_normalize").disabled = true;
+            document.getElementById("btn_computeExtension").disabled = true;
+            document.getElementById("theoryarea").style.borderColor = "red";
+            // TODO
+        } else {
+            // the theory is valid
+            document.getElementById("content_errors").innerHTML = "";
+            document.getElementById("btn_normalize").disabled = false;
+            document.getElementById("btn_computeExtension").disabled = false;
+            document.getElementById("theoryarea").style.borderColor = "black";
+            document.getElementById("literals").innerHTML = stats.literals;
+            document.getElementById("propositions").innerHTML = stats.propositionals;
+            document.getElementById("deontics").innerHTML = stats.deontics;
+            document.getElementById("facts").innerHTML = stats.facts;
+            document.getElementById("stricts").innerHTML = stats.strictRules;
+            document.getElementById("defeasibles").innerHTML = stats.defeasibleRules;
+            document.getElementById("defeaters").innerHTML = stats.defeaters;
+        }
+    }
+
+    function buildTheoryAndCurrentState() {
+        
+        literals.clear(); rules.clear(); rulesByLabel.clear(); superiorityRelations.clear(); stats.reset(); currentState.reset(); // Initial restart
+        // TODO provare a fare qualcosa di incrementale che non ricostruisca la teoria ad ogni carattere inserito...
+        let currentIndex = 0;
+        let numLine = 1;
+        do {
+            let endOfLinePosition = textarea.value.indexOf("\n", currentIndex); // next \n position is the end of the line...
+            if (endOfLinePosition==-1) {endOfLinePosition = textarea.value.length;} // ... except for the last line (this is also the exit condition)
+            const line = textarea.value.substring(currentIndex, endOfLinePosition); // this line substring
+            // 4 possible valid lines: FACT, RULE, SUPERIORITY RELATION or EMPTY
+            if (isValidFact(line)) { // 1) FACT
+
+                stats.literals++; // it's a total amount of literal and every repetition counts as well
+                const literal = literals.setLiteral(line, currentIndex); // sets this literal in the map with this textarea position and creates it if new
+                // following stats count only unique propositionals (when appearing at least once as plain defeasible literals, not just defeasible arguments) and deontic literals
+                if (literal instanceof PropositionalLiteral && literal.textPositionsWhereIsLiteral.length == 1) {stats.propositionals++;}
+                else if (literal instanceof DeonticLiteral && literal.textPositions.length == 1) {stats.deontics++;}
+                literal.factInLines.push(numLine); // we add line literal is written as a fact (could be more than once... if it is the case, we'll throw a warning)
+                if (literal.factInLines.length == 1) {stats.facts++;} // if a literal is written as a fact more than once, we do not increment...
+                else {currentState.warningCodeAtLine.push(new Warning(Warnings.DUPLICATE_FACT, numLine));} // ...instead we register a warning
+
+            } else if (isValidRule(line)) {
+                
+                const rule = Rule.getRuleParts(line); // returns {label : "empty_or_label", labelSeparatorIndex : an index {-1, 1, 2...}, delabeledRuleText : "some,a,b⇒c"}
+                if (rules.has(rule.delabeledRuleText)) {
+                    currentState.errorCodeAtLine.push(new Error_(Errors.DUPLICATE_RULE + " (of line " + rules.get(rule.delabeledRuleText).textLine + ")", numLine));
+                }
+
+                const ruleObj = rules.addRule(rule.label, rule.delabeledRuleText, currentIndex + line.search(/\S/), numLine);
+                
+                if (rule.labelSeparatorIndex != -1) { // if separatorIndex != -1 then label !=""
+                    if (rulesByLabel.has(rule.label)) {currentState.errorCodeAtLine.push(new Error_(Errors.DUPLICATE_RULE_LABEL, numLine));}
+                    else {rulesByLabel.set(rule.label, ruleObj);}
+                }
+
+                if (ruleObj.typeOfRule == TypeOfRule.STRICT) {stats.strictRules++;}
+                else if (ruleObj.typeOfRule == TypeOfRule.DEFEASIBLE) {stats.defeasibleRules++;}
+                else {stats.defeaters++}
+
+                let otherRules = Array.from(rules.values()).filter(previousRule => {return previousRule!=ruleObj && previousRule.typeOfRule == ruleObj.typeOfRule;}); // we have an array of rules of same type
+
+                // ANTECEDENT (A.K.A. TAIL LITERALS)
+                let literalStartingIndex = rule.labelSeparatorIndex + 1;
+                const arrowIndex = line.search(/→|⇒|↝/); // cannot be -1 because it's valid rule
+                while (true) {
+                    const commaIndex = line.indexOf(",", literalStartingIndex);
+                    const literalText = line.substring(literalStartingIndex, (commaIndex != -1) ? commaIndex : arrowIndex);
+                    if (commaIndex != -1 || literalText.replaceAll(" ", "") != "") {
+                        stats.literals++; // total amount repeated included
+                        const literalObj = literals.setLiteral(literalText, currentIndex + literalStartingIndex);
+                        if (literalObj.isAntecedentOf.has(ruleObj)) { // same literal appears multiple times in same antecedent's rule (e.g. "a, a, b => c")
+                            currentState.errorCodeAtLine.push(new Error_(Errors.DUPLICATE_LITERAL_IN_ANTECEDENT, numLine));
+                        } else {
+                            literalObj.isAntecedentOf.add(ruleObj);
+                            ruleObj.antecedent.add(literalObj);
+                        }
+                        otherRules = otherRules.filter(otherRule => otherRule.antecedent.has(literalObj));
+                        
+                        if (literalObj instanceof PropositionalLiteral && literalObj.textPositionsWhereIsLiteral.length == 1) {stats.propositionals++;} // TODO uguale a sopra
+                        else if (literalObj instanceof DeonticLiteral && literalObj.textPositions.length == 1) {stats.deontics++;}
+                        literalStartingIndex = commaIndex + 1;
+                    }
+                    if (commaIndex == -1) {break;} // if no comma aheadexit condition
+                } // end while
+
+                // now otherRules contains all the rules which have the literals our ruleObj has
+                // but we now must filter only those rules which has exactly and only these literals
+                otherRules = otherRules.filter(otherRule => otherRule.antecedent.size == ruleObj.antecedent.size);
+
+                // HEAD LITERAL
+                const headLiteralText = line.substring(arrowIndex+1);
+                stats.literals++; // total amount repeated included
+                const headLiteralObj = literals.setLiteral(headLiteralText, currentIndex + arrowIndex + 1);
+                ruleObj.head = headLiteralObj;
+                headLiteralObj.isHeadOf.push(ruleObj);
+                if (headLiteralObj instanceof PropositionalLiteral && headLiteralObj.textPositionsWhereIsLiteral.length == 1) {stats.propositionals++;} // TODO uguale a sopra
+                else if (headLiteralObj instanceof DeonticLiteral && headLiteralObj.textPositions.length == 1) {stats.deontics++;}
+                otherRules.every(otherRule => {
+                    if(otherRule.head == headLiteralObj) {
+                        currentState.errorCodeAtLine.push(new Error_(Errors.DUPLICATE_RULE + " (of line " + otherRule.textLine + ")", numLine));
+                        return false;
+                    }
+                    return true;
+                });
+                
+            } else if (isValidSuperiorityRelation(line)) {
+                if (superiorityRelations.has(line.replaceAll(" ", ""))) {
+                    currentState.warningCodeAtLine.push(new Warning(Warnings.DUPLICATE_SUPREL, numLine));
+                } else {
+                    superiorityRelations.addSupRel(line, currentIndex, numLine);
+                }
+                // since it is possible to find sup rels BEFORE the actual definition of the rules, we will reiterate
+                // all suprels again after this loop, in order to check rules update the rules attributes
+            } else if (line.replaceAll(" ", "") != "") {
+                // if not fact, nor rule, nor supRel, and now we have checked it's not even an empty line, then it's an INVALID LINE
+                currentState.errorCodeAtLine.push(new Error_(Errors.SYNTAX_ERROR, numLine));
+            }
+            currentIndex = endOfLinePosition+1;
+            numLine++;
+            if (endOfLinePosition == textarea.value.length) { break;} // we reached last line of textarea: exit condition
+        } while (true)
+
+        // after the textarea examination, we loop again supRels in order to update rules objects
+        for (const [key, supRel] of superiorityRelations) {
+            const superiorObj = rulesByLabel.get(supRel.superior.label);
+            const inferiorObj = rulesByLabel.get(supRel.inferior.label);
+            if (superiorObj !== undefined) {
+                superiorObj.textPositions.push(supRel.superior.start);
+            } else {
+                currentState.warningCodeAtLine.push(new Warning(Warnings.NON_EXISTENT_LABEL_IN_SUPREL + supRel.superior.label, supRel.textareaLine));
+            }
+            if (inferiorObj !== undefined) {
+                inferiorObj.textPositions.push(supRel.inferior.start);
+            } else {
+                currentState.warningCodeAtLine.push(new Warning(Warnings.NON_EXISTENT_LABEL_IN_SUPREL + supRel.inferior.label, supRel.textareaLine));
+            }
+            if (superiorObj !== undefined && inferiorObj !== undefined) {
+                if (superiorObj.head.opposite === inferiorObj.head) {
+                    superiorObj.winsOver.push(inferiorObj);
+                    inferiorObj.losesAfter.push(superiorObj);
+                } else {
+                    currentState.warningCodeAtLine.push(new Warning(Warnings.NON_COMPLEMENTARY_SUPREL + " " + superiorObj.head.toString() + " and " + inferiorObj.head.toString(), supRel.textareaLine));
+                }
+            }
+        }
+    }
+
+    function isValidFact(line) {
+        return isValidLiteral(line);
+    }
+
+    function isValidLiteral(element) {
+        return (isValidProposition(element) || isValidDeontic(element));
+    }
+
+    function isValidProposition(element) {
+        return new RegExp('^'+ propositionRegExp + '$').test(element);
+    }
+
+    function isValidDeontic(element) {
+        return new RegExp('^' + deonticRegExp + '$').test(element);
+    }
+
+    function isValidRule(line) {
+        return new RegExp('^' + ruleRegExp + '$').test(line);
+    }
+
+    function isValidSuperiorityRelation(line) {
+        return new RegExp('^' + superiorityRelationRegExp + '$').test(line);
+    }
+
+    function normalizeTheory() {
+        // TODO TUTTO DA RIFARE
+
+        /*var lines = textarea.value.replaceAll(' ', '').split("\n"); // split in lines
+        var txtfacts = "";
+        var txtrules = "";
+        var txtsupRels = "";
+        var rulesCounter = 1;
+        var normalizationOk = lines.every(line => { // returns true if EVERY ITERATION return true
+            if (line == "") {
+                return true; // empty line is ok, but we ignore it
+            } else if (isValidFact(line)) {
+                line = line.replaceAll("-", "~");
+                txtfacts = txtfacts + line + "\n";
+                return true;
+            } else if (isValidRule(line)) {
+                if(!line.includes(":")) {line = "r" + (rulesCounter++) + ":" + line;} // default rule name
+                ["->", "→", "=>", "⇒", "~>", "↝", "-", ",", ":"].forEach((arrow, index) => {
+                    line = line.replaceAll(arrow, ["→", " → ", "⇒", " ⇒ ", "↝", " ↝ ", "~", ", ", ": "][index]);
+                }); // spacing
+                txtrules = txtrules + line + "\n";
+                return true;
+            } else if (isValidSuperiorityRelation(line)) {
+                txtsupRels = txtsupRels + line.replaceAll(">", " > ") + "\n";
+                return true;
+            } else {
+                // we should not be here, because theory should be valid, but if it isn't i guess we should stop and invalidate
+                buildTheory(); // this should lead to an invalidation
+                return false;
+            }
+        });
+        if (normalizationOk) {textarea.value = txtfacts + txtrules + txtsupRels;}*/
+    }
+
+    function computeExtension() {
+        var req = new XMLHttpRequest(); // preparing request
+
+        
+        // Preparing the function that'll be executed AFTER the response
+        req.onreadystatechange = function() {
+            if (req.readyState == XMLHttpRequest.DONE) {
+                extension.clear();
+                console.log(req.responseText);
+                const responseObj = JSON.parse(req.responseText);
+                for (lit of responseObj.literals) {
+                    const literalLabel = ('typeOfDeontic' in lit) ? DeonticLiteral.toString(lit) : PropositionalLiteral.toString(lit);
+                    const literalObj = literals.get(literalLabel);
+                    Object.assign(literalObj, lit); // TODO doesn't work for DEONTICS because propositional is overwritten
+                    if (lit["deltaState"] == "PLUS") {extension.plusDelta.add(literalLabel);}
+                    else if (lit["deltaState"] == "MINUS") {extension.minusDelta.add(literalLabel);}
+                    if (lit["partialState"] == "PLUS") {extension.plusPartial.add(literalLabel);}
+                    else if (lit["partialState"] == "MINUS") {extension.minusPartial.add(literalLabel);}
+                }
+
+                document.getElementById('plusPartial').click();
+            }
+        }
+
+        // preparing the sending data
+        const extensionRequest = {
+            ambiguityPropagation : document.getElementById('ambiguityPropagation').checked,
+            facts : Array.from(literals.values()).filter(literal => {return literal.factInLines.length > 0;}),
+            rules : Array.from(rules.values()),
+            superiorityRelations : Array.from(superiorityRelations.values()) // TODO che gli attributi superior e inferior delle suprel siano degli oggetti improvvisati non mi piace
+        };
+        var json = JSON.stringify(extensionRequest);
+
+        // sending request
+        req.open("POST", "/posting");
+        req.send(json);
+    }
+</script>
+
+</body>
 </html>

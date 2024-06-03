@@ -1,36 +1,44 @@
 package it.univr.houdini.model;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-import static it.univr.houdini.LogicModel.Rule.RuleType.*;
 import static it.univr.houdini.model.Literal.AmbiguityState.*;
+import static it.univr.houdini.model.Rule.RuleType.*;
 
 import java.io.IOException;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializable;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 
-import it.univr.houdini.LogicModel.Rule;
-import it.univr.houdini.LogicModel.Rule.RuleType;
+import it.univr.houdini.model.Rule.RuleType;
 
-public class ModelExtensionComputator {
+public class ModelExtensionComputator implements JsonSerializable {
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     private boolean ambiguityPropagation;
 
     private List<Literal> literals; // constructor builds a map checking there will be no duplicates of literals and in the end converts it in an ArrayList and assigns it here
-    private List<Rule> rules = new ArrayList<Rule>(); // there can not be duplicate rules by design: if duplicate name is found, program halts
+    private List<Rule> rules = new ArrayList<Rule>(); // constructor checks there will not be duplicate rules and/or duplicate rule labels
     
     private Set<Literal> plusDelta = new HashSet<Literal>(); // we don't want duplicates and later we'll need to do contains in O(1)
-    List<Literal> minusDelta = new ArrayList<Literal>(); // no contains, no removes, only adds and iterations
-    List<Literal> plusPartial = new ArrayList<Literal>(); // no contains, no removes, only adds and iterations
-    List<Literal> minusPartial = new ArrayList<Literal>(); // no contains, no removes, only adds and iterations
-    Set<Literal> undecidablesDeltaInStrictRulesLoop; // we need a Set for future "contains" in O(1)
-    Set<Literal> undecidablesPartialInRulesLoop; // it'll be assigned to the set of undecided literals at the end of the process
-    Set<Literal> ambiguousLiterals = new HashSet<Literal>(); // we don't want duplicates, we want "remove" in O(1)
+    private List<Literal> minusDelta = new ArrayList<Literal>(); // no contains, no removes, only adds and iterations
+    private List<Literal> plusPartial = new ArrayList<Literal>(); // no contains, no removes, only adds and iterations
+    private List<Literal> minusPartial = new ArrayList<Literal>(); // no contains, no removes, only adds and iterations
+    private Set<Literal> undecidablesDeltaInStrictRulesLoop; // we need a Set for future "contains" in O(1)
+    private Set<Literal> undecidablesPartialInRulesLoop; // it'll be assigned to the set of undecided literals at the end of the process
+    private Set<Literal> ambiguousLiterals = new HashSet<Literal>(); // we don't want duplicates, we want "remove" in O(1)
     private String nonPresentOpposites = "";
 
     public ModelExtensionComputator (String JSONTheory) throws IOException, NullPointerException {
         
-        JsonNode rootNode = new ObjectMapper().readTree(JSONTheory.getBytes()); //read JSON like DOM Parser
+        JsonNode rootNode = objectMapper.readTree(JSONTheory.getBytes()); //read JSON like DOM Parser
         JsonNode ambiguityPropagationNode = rootNode.path("ambiguityPropagation");
         this.ambiguityPropagation = ambiguityPropagationNode.asBoolean();
 
@@ -93,31 +101,46 @@ public class ModelExtensionComputator {
             String ruleLabel = ruleNode.get("label").asText();
             
             // checking if there are two rules with the same name because it's forbidden
-            if(mapOfRules.get(ruleLabel) != null) {
+            if(!ruleLabel.equals("") && mapOfRules.containsKey(ruleLabel)) {
                 System.out.println("Rules with the same name are not allowed in a well formed theory.");
-                System.exit(1);
-                // TODO: here we must throw an exception or something;
+                throw new NullPointerException("Duplicate rule labels."); // TODO: here we must throw an exception or something;
             }
             RuleType ruleType;
-            switch(ruleNode.get("type").asText()) {
-                case "strict" : ruleType = STRICT; break;
-                case "defeasible" : ruleType = DEFEASIBLE; break;
-                case "defeater" : ruleType = DEFEATER; break;
-                default : ruleType = STRICT; // TODO: this should be already checked
+            switch(ruleNode.get("typeOfRule").asText()) {
+                case "strict": ruleType = STRICT; break;
+                case "defeasible": ruleType = DEFEASIBLE; break;
+                case "defeater": ruleType = DEFEATER; break;
+                default: throw new NullPointerException("Invalide rule type."); // TODO: here we must throw an exception or something;
             }
-            Literal head = getLiteralAndUpdateTheory(ruleNode.get("head"), mapOfLiterals);
-            JsonNode tailNode = ruleNode.get("tail");
-            HashSet<Literal> tail = new HashSet<>(); // TODO: should duplicate literals in a tail be allowed?
-            
+            Literal head = mapOfLiterals.setLiteral(ruleNode.get("head"));
+            HashSet<Literal> tail = new HashSet<>();
             // creating new rule (tail is empty now, but we'are going to pouplate it)
             Rule rule = new Rule(ruleLabel, ruleType, head, tail);
-            
             head.addToRulesIsHeadOf(rule); // adding this rule to the rules this literal is head of
+            
+            List<Rule> potentiallyDuplicateRules = rules.stream()
+              .filter(r -> (r.getType() == ruleType && r.getHead().equals(head)))
+              .collect(Collectors.toList()); // all existing rules of the same type and with the same head are potentially duplicates of this
+
+            JsonNode tailNode = ruleNode.get("antecedent");
             Iterator<JsonNode> JSONtail = tailNode.elements(); // visiting tail in JSON
             while(JSONtail.hasNext()) {
-                Literal tailLiteral = getLiteralAndUpdateTheory(JSONtail.next(), mapOfLiterals);
-                tail.add(tailLiteral);
-                tailLiteral.addToRulesIsTailOf(rule);
+                Literal tailLiteral = mapOfLiterals.setLiteral(JSONtail.next());
+                if (tail.contains(tailLiteral)) { // this literal was already present in this tail, and that's forbidden
+                    throw new NullPointerException("Duplicate literal in rule tail.");
+                } else {
+                    tail.add(tailLiteral);
+                    tailLiteral.addToRulesIsTailOf(rule);
+                }
+                // now we filter all the rules which are potentially duplicates keeping only those containing this literal in their tail
+                potentiallyDuplicateRules = potentiallyDuplicateRules.stream().filter(r -> r.getTail().contains(tailLiteral)).collect(Collectors.toList());
+            }
+
+            // now we filter only the potentially duplicates having an equal number of tail literals as this rule
+            potentiallyDuplicateRules = potentiallyDuplicateRules.stream().filter(r -> r.getTail().size() == tail.size()).collect(Collectors.toList());
+            // at this point, if the list is not empty, we have at least one rule with same type, same head, same tail literals, and this is forbidden
+            if (!potentiallyDuplicateRules.isEmpty()) {
+                throw new NullPointerException("Invalide duplicate rule.");
             }
 
             // if this is an empty tail rule, we can early assign some conclusions
@@ -132,8 +155,8 @@ public class ModelExtensionComputator {
                 // defeaters with empty tail don't need any assignment
             }
 
+            if (!ruleLabel.equals("")) {mapOfRules.put(ruleLabel, rule);} // adding this rule to the local map for future checks
             rules.add(rule); // adding this rule to the theory global list rules
-            mapOfRules.put(ruleLabel, rule);// adding this rule to the local map for future checks
         } // end json rules while
         // end rules
             
@@ -142,33 +165,31 @@ public class ModelExtensionComputator {
         elements = supRelsNode.elements(); // reusing elements variable
         while(elements.hasNext()) {
             JsonNode supRelNode = elements.next();
+            if (!mapOfRules.containsKey(supRelNode.get("superior").asText()) || !mapOfRules.containsKey(supRelNode.get("inferior").asText())) {
+                continue;
+            }
             Rule superior = mapOfRules.get(supRelNode.get("superior").asText()); // retrieving rule by label
             Rule inferior = mapOfRules.get(supRelNode.get("inferior").asText()); // retrieving rule by label
-            // we want to avoid relations referring to non existing rules (non esistent names)
-            if (superior != null && inferior != null) { // if both names are presents and rules are taken from the map
-                // now we also want to avoid superiority relations about non complementary heads
-                if (superior.getHead() == inferior.getHead().getOpposite()) { // we use == because our references are coherent
-                    // superiority relations are stored into rules themselves: no needs for explicit objects
-                    superior.addToWinsOver(inferior);
-                    inferior.addToLosesAfter(superior);
-                    // if superior rule is active, inferior must know
-                    if ((superior.isDefeasible() || superior.isStrict()) && superior.isEmptyTail()) {
-                        inferior.setLosesAfterActiveRule();
-                    }
-                } else { // non complementary heads
-                    // TODO: WARNING superiority relations with non complementary heads exception
-                    System.out.println("Non complementary head rules found in a superiority relation:");
-                    System.out.println(supRelNode.asText());
+            // now we also want to avoid superiority relations about non complementary heads
+            if (superior.getHead() == inferior.getHead().getOpposite()) { // we use == because our references are coherent
+                // superiority relations are stored into rules themselves: no needs for explicit objects
+                superior.addToWinsOver(inferior);
+                inferior.addToLosesAfter(superior);
+                // if superior rule is active, inferior must know
+                if ((superior.isDefeasible() || superior.isStrict()) && superior.isEmptyTail()) {
+                    inferior.setLosesAfterActiveRule();
                 }
-            } else { // wrong rule names
-                // TODO: WARNING superiority relations with wrong name exception
-                System.out.println("Wrong rule name found in a superiority relation:");
+            } else { // non complementary heads
+                // TODO: WARNING superiority relations with non complementary heads exception
+                System.out.println("Non complementary head rules found in a superiority relation:");
                 System.out.println(supRelNode.asText());
             }
         } // end while superiority relations
         // end superiority relations
 
         literals = new ArrayList<Literal>(mapOfLiterals.values());
+
+        computeExtension(); // AND GOOOO!
 
     } // end constructor
 
@@ -185,11 +206,10 @@ public class ModelExtensionComputator {
      * The theory passed to this extension computator will be consumed by the process.
      * @return A reference to the object itself.
      */
-    public ModelExtensionComputator computeExtension() {
+    public void computeExtension() {
 
         computeStrictExtension();
         computeDefeasibleExtension();
-        return this;
 
     }
     
@@ -596,6 +616,7 @@ public class ModelExtensionComputator {
                                     isMinusPartial = false; // there is still the chance for undecided to be +Partial
                                 }
                             }
+                            if (isMinusPartial) {break;} // first active opposite Rsd we find, which is not beaten, or only beaten by defeater, we quit searching: this q is -Partial
                         }
                     }
                 } // end second check if !minusPartial
@@ -706,5 +727,22 @@ public class ModelExtensionComputator {
         String collectionString = collection.toString();
         return collectionString.substring(1, collectionString.length() - 1);
     }
+
+    @Override
+    public void serialize(JsonGenerator jsonGen, SerializerProvider provider) throws IOException {
+        jsonGen.writeStartObject();
+        jsonGen.writeBooleanField("ambiguityPropagation", this.ambiguityPropagation);
+        jsonGen.writeObjectField("literals", literals);
+        jsonGen.writeObjectField("undecidablesPartialInRulesLoop", undecidablesPartialInRulesLoop);
+        jsonGen.writeEndObject();
+    }
+
+    @Override
+    public void serializeWithType(JsonGenerator jsonGen, SerializerProvider provider, TypeSerializer typeSer) throws IOException {
+        serialize(jsonGen, provider);
+    }
     
+    public String toJSONString() throws JsonProcessingException {
+        return objectMapper.writeValueAsString(this);
+    }
 }

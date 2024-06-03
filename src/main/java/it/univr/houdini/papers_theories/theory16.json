@@ -1,8 +1,0 @@
-{
-	"version" : "0.1",
-	"logicModel" : { 
-		"facts" : [""],
-		"rules" : ["q2 => q3","q1 => q2"," => q1"," => a","q1 => ~a","a => ~q2"],
-		"supRules" : [""]
-	}
-}

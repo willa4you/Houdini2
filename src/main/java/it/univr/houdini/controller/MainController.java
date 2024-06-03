@@ -12,9 +12,9 @@ import it.univr.houdini.model.ModelExtensionComputator;
 @Controller
 public class MainController {
 
-    @GetMapping("/test")
+    @GetMapping("/")
     public String startHoudini() {
-        return "test";
+        return "home";
     }
 
     @PostMapping("/posting")
@@ -22,12 +22,14 @@ public class MainController {
     public String houdiniRESTbackend(@RequestBody String JSONTheory) {
         
         try {
-            new ModelExtensionComputator(JSONTheory);
-            System.out.println("a");
-            return "Somebody Once Told me the world is gonna roll me";
+            ModelExtensionComputator theoryExtension = new ModelExtensionComputator(JSONTheory);
+            //return "Somebody Once Told me the world is gonna roll me";
+            return theoryExtension.toJSONString();
         } catch (IOException e) {
+            System.out.println(e);
             return "Object Mapper is unable to recognize a JSON format. Please check your syntax. Error: " + e.toString();
         } catch (NullPointerException e) {
+            e.printStackTrace();
             return "Invalid JSON format, please check the specs. Error: " + e.toString();
         }
     }

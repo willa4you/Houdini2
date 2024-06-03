@@ -1,5 +1,0 @@
-{
-  "facts" : [ "a", "~z", "" ],
-  "rules" : [ " -> d", "~c -> f", "a, b,quokka ~> ~d", "passare_col_rosso => giallo", "" ],
-  "supRules" : [ "r4 < r3", "" ]
-}
